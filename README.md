@@ -23,7 +23,7 @@ The whole game is one HTML file (`index.html`). It works offline, so you can dow
 | ⭐ Venture upgrades | – | ✅ | ✅ |
 | 🧾 Income tax (Easy: optional "Give Back" donation) | – | ✅ | ✅ |
 | Bigger surprise costs | – | ✅ | ✅ |
-| When you can't pay | Safety net covers it (you skip a turn) | Ventures sold at half price, then bankruptcy | Loan up to your credit limit, then sales, then bankruptcy |
+| When you can't pay | Safety net covers it, but you go to Budget Bootcamp and skip a turn | Ventures sold at half price, then bankruptcy | Loan up to your credit limit, then sales, then bankruptcy |
 | 💳 Borrowing and loans | – | – | ✅ |
 | 📊 Credit score (sets your interest rate and limit) | – | – | ✅ |
 | 📅 Minimum payments and late fees | – | – | ✅ |

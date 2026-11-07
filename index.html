@@ -216,7 +216,7 @@ const GOALS = [
 ];
 const DIFFS = {
   easy:  { name:'Easy',   emoji:'🌱', lvl:0, start:400, upgrades:false, tax:false, sellOff:false, credit:false, inflation:false, quizOpts:3,
-           feats:['💵 Paychecks, Auto-save &amp; savings interest','🏪 Buy ventures and collect customer fees','🧠 Money Quiz with 3 choices','🛟 Safety net: you can\'t go into debt or go bankrupt','💝 “Give Back” tile instead of taxes'] },
+           feats:['💵 Paychecks, Auto-save &amp; savings interest','🏪 Buy ventures and collect customer fees','🧠 Money Quiz with 3 choices','🛟 Safety net: no debt or bankruptcy — if you can\'t pay, you go to Budget Bootcamp','💝 “Give Back” tile instead of taxes'] },
   medium:{ name:'Medium', emoji:'⚖️', lvl:1, start:300, upgrades:true, tax:true, sellOff:true, credit:false, inflation:false, quizOpts:4,
            feats:['✅ Everything in Easy','⭐ Upgrade ventures once you own a full set','🧾 Income tax &amp; bigger surprise costs','🏚️ Short on cash? Ventures get sold at half price','💥 Can\'t pay at all = bankrupt'] },
   hard:  { name:'Hard',   emoji:'🔥', lvl:2, start:250, upgrades:true, tax:true, sellOff:true, credit:true, inflation:true, quizOpts:4,
@@ -255,7 +255,7 @@ const TILES = [
   {t:'venture',g:'D', name:'App Startup',    emoji:'🚀', price:220}
 ];
 const DESC = {
-  payday:'Pass or land here to collect your $150 paycheck. Your Auto-save % goes straight to savings, savings earn 5% interest and your ventures pay side-hustle income. On Hard, loan interest and a minimum payment are due here too.',
+  payday:'Pass or land here to collect your paycheck (it starts at $150). Your Auto-save % goes straight to savings, savings earn 5% interest and your ventures pay side-hustle income. On Hard, loan interest and a minimum payment are due here too.',
   quiz:'Answer a money question. Get it right and earn $40.',
   life:'Draw a Life Happens card: surprise costs, windfalls and tricky choices.',
   mall:'Temptation! Decide whether to buy something you want. Planned treats are fine — impulse buys add up fast.',
@@ -739,7 +739,7 @@ function charge(p, amt, reason, to=null){
   if (p.cash < 0 && d.sellOff){ const mine = owned(pidx(p)).sort((a,b) => assetValue(a) - assetValue(b));
     for (const i of mine){ if (p.cash >= 0) break; const v = sellVenture(p, i, true); notes.push(`had to sell ${TILES[i].name} for ${money(v)}`); } }
   if (p.cash < 0){
-    if (!d.sellOff){ notes.push(`the family safety net covered ${money(-p.cash)} — but you sit out your next turn to rethink your budget`); p.safety += -p.cash; p.cash = 0; p.skip = Math.max(p.skip, 1); }
+    if (!d.sellOff){ notes.push(`the family safety net covered ${money(-p.cash)} — you're off to Budget Bootcamp and skip your next turn`); p.safety += -p.cash; p.cash = 0; p.skip = Math.max(p.skip, 1); p.toBootcamp = true; }
     else { notes.push(`still couldn't cover ${money(-p.cash)}`); p.cash = 0; bankrupt(p); }
   }
   log(`${p.name} paid ${money(amt)} — ${reason}${notes.length ? ' (' + notes.join(', ') + ')' : ''}`);
@@ -825,7 +825,7 @@ async function startTurn(){
   const p = cur();
   if (!p || p.out) return endTurn();
   S.phase = 'busy'; $('#diceOut').textContent = '';
-  updateUI(); focusCam(p); save();
+  updateUI(); focusCam(p); save(true);
   if (p.skip > 0){
     const feeAmt = infl(BOOTCAMP_FEE);
     let leave = false;
@@ -851,6 +851,7 @@ async function doRoll(){
   focusCam(p);
   await sleep(200);
   if (!p.out) await resolveTile(p);
+  if (p.toBootcamp && !p.out){ p.toBootcamp = false; if (p.pos !== 6){ await sleep(400); await jumpTo(pi, 6); } updateUI(); }
   if (S.over) return;
   if (p.out){ await sleep(800); return endTurn(); }
   if (p.cpu){ cpuManage(p); await sleep(900); return endTurn(); }
@@ -933,6 +934,8 @@ async function landVenture(p, i){
   const price = t.price;
   if (p.cpu){
     if (p.cash - price >= 60) buy(p, i);
+    else if (p.debt === 0 && p.cash + p.savings - price >= 100){ const w = Math.min(p.savings, price + 40 - p.cash); p.savings -= w; p.cash += w;
+      toast(`🤖 <b>${esc(p.name)}</b> withdrew ${money(w)} from savings to invest.`); buy(p, i); }
     else toast(`${t.emoji} <b>${esc(p.name)}</b> passed on ${t.name} (keeping a cash cushion).`);
     return;
   }
@@ -1012,7 +1015,7 @@ async function doMall(p){
     const short = p.cash < price;
     const r = await ask(p, {icon:it.e, title:'Impulse Mall', body:`<p>You spot <b>${it.name}</b> for <b>${money(price)}</b>. Want it?</p>
       <div class="kv"><span>Your cash</span><b>${money(p.cash)}</b><span>${p.goal.emoji} ${p.goal.name} savings</span><b>${money(p.savings)} / ${money(p.goal.amount)}</b><span>Treats bought so far</span><b>${p.fun}</b></div>
-      ${short ? `<p class="bad-t">You don't have enough cash — buying it would ${D().credit ? 'dip into savings or put you in debt' : 'dip into your savings'}.</p>` : ''}${lessonBox(LESSON.mall)}`,
+      ${short ? `<p class="bad-t">You don't have enough cash — buying it would ${D().credit ? 'dip into savings or put you in debt' : D().sellOff ? 'dip into savings, or force you to sell ventures' : 'dip into savings, or send you to Budget Bootcamp'}.</p>` : ''}${lessonBox(LESSON.mall)}`,
       buttons:[{label:`🛍️ Treat yourself (−${money(price)})`, value:'buy', kind:'danger'}, {label:'💪 Skip it', value:'skip', kind:'primary'}], dflt:'skip'});
     buyIt = r === 'buy';
   }
@@ -1033,7 +1036,8 @@ async function doBank(p){
 /* ---------------- CPU ---------------- */
 function cpuManage(p){ const pi = pidx(p);
   if (p.debt > 0){ const r = Math.min(p.debt, Math.max(0, p.cash - 80)); if (r > 0){ p.cash -= r; p.debt -= r; if (p.debt === 0) bumpCredit(p, 10); log(`${p.name} repaid ${money(r)} of debt.`); toast(`🤖 <b>${esc(p.name)}</b> repaid ${money(r)} of debt.`); } }
-  for (const i of owned(pi)){ if (canUpgrade(pi, i) && p.cash - upgradeCost(i) >= 120) upgrade(p, i); }
+  for (const i of owned(pi)){ const c = upgradeCost(i);
+    if (canUpgrade(pi, i) && p.debt === 0 && p.cash + p.savings - c >= 150){ if (p.cash < c + 40){ const w = Math.min(p.savings, c + 40 - p.cash); p.savings -= w; p.cash += w; } upgrade(p, i); } }
   if (p.cash > 260 && p.debt === 0){ const d = p.cash - 180; p.cash -= d; p.savings += d; log(`${p.name} deposited ${money(d)}.`); toast(`🤖 <b>${esc(p.name)}</b> moved ${money(d)} into savings.`); }
   updateUI(); }
 function upgrade(p, i){ const c = upgradeCost(i); if (p.cash < c || !canUpgrade(pidx(p), i)) return false;
@@ -1093,7 +1097,7 @@ function openMoneyUI(pi){
         <button class="btn" id="mBor" ${room<=0?'disabled':''}>💳 Borrow</button>` : ''}
       </div>
       <div style="min-height:20px;margin-top:8px;font-size:13px" class="muted">${note}</div>
-      ${lessonBox(d.credit ? (p.debt > 0 ? `Debt grows ${pct(tier.rate)} every Payday — paying it off is like earning a guaranteed ${pct(tier.rate)}. Borrowing to get “All” cash is tempting, but every dollar borrowed costs interest.` : 'Borrowing builds credit only if you repay on time. Better credit = lower interest and a higher limit.') : 'Savings are for goals and emergencies. Saving first, then spending what\'s left, is how budgets win.')}`;
+      ${lessonBox(d.credit ? (p.debt > 0 ? `Debt grows ${pct(tier.rate)} every Payday — paying it off is like earning a guaranteed ${pct(tier.rate)}. Only borrow when what you buy will earn more than the interest.` : 'Borrowing builds credit only if you repay on time. Better credit = lower interest and a higher limit.') : 'Savings are for goals and emergencies. Saving first, then spending what\'s left, is how budgets win.')}`;
     const sl = body.querySelector('#mSave');
     sl.oninput = e => { body.querySelector('#mSaveLbl').textContent = e.target.value + '%'; body.querySelector('#mSaveAmt').textContent = `(${money(Math.round(p.paycheck*e.target.value/100))} per Payday)`; };
     sl.onchange = e => { note = `Auto-save set to ${e.target.value}%.`; act(pi, {k:'save', v:+e.target.value}); };
@@ -1142,7 +1146,7 @@ function showTileInfo(i){
       <tr><td>Fee: basic / full set</td><td>${money(b)} / ${money(b*2)}</td></tr>
       ${D().upgrades ? `<tr><td>Fee: ⭐ / ⭐⭐ / ⭐⭐⭐</td><td>${money(b*MULT[1])} / ${money(b*MULT[2])} / ${money(b*MULT[3])}</td></tr>
       <tr><td>Upgrade cost</td><td>${money(upgradeCost(i))}</td></tr>` : ''}</table>${lessonBox(LESSON.venture)}`;
-  } else html += `<p style="margin:6px 0">${t.t === 'bill' ? `${DESC.bill} Right now: ${money(t.amount)}.` : DESC[t.t]}</p>${lessonBox(LESSON[t.t])}`;
+  } else html += `<p style="margin:6px 0">${t.t === 'bill' ? `${DESC.bill} Right now: ${money(t.amount)}.` : DESC[t.t].replace('$50', money(infl(BOOTCAMP_FEE)))}</p>${lessonBox(LESSON[t.t])}`;
   box.innerHTML = html; box.classList.remove('hidden');
   box.querySelector('.x').onclick = () => box.classList.add('hidden');
 }
@@ -1151,7 +1155,7 @@ function showTileInfo(i){
 let tipIdx = 0;
 function seatTag(p, k){
   if (NET.role === 'guest') return k === NET.mySeat ? 'You' : p.ctrl === 'cpu' ? 'CPU' : 'Player';
-  return p.ctrl === 'cpu' ? 'CPU' : p.ctrl === 'remote' ? '📡 Online' : 'You'; }
+  return p.ctrl === 'cpu' ? 'CPU' : p.ctrl === 'remote' ? '📡 Online' : S.players.filter(x => x.ctrl === 'local').length > 1 ? 'Here' : 'You'; }
 function updateUI(){
   if (S.phase === 'setup') return;
   const d = D();
@@ -1187,7 +1191,7 @@ function updateUI(){
 function rotateTip(){ const pool = TIPS.filter(t => (t.lvl || 0) <= LVL()); $('#tip').innerHTML = '💡 ' + pool[tipIdx++ % pool.length].t; }
 
 /* ---------------- save / load (host or single device only) ---------------- */
-function save(){ if (S.over || NET.role === 'guest' || S.phase === 'setup') return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e){} }
+function save(force){ if (S.over || NET.role === 'guest' || S.phase === 'setup' || (S.phase === 'busy' && !force)) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e){} }
 function loadSave(){ try { const d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); return d && d.players && d.players.length ? d : null; } catch(e){ return null; } }
 function clearSave(){ try { localStorage.removeItem(SAVE_KEY); } catch(e){} }
 
@@ -1260,6 +1264,7 @@ function syncSoon(){ if (NET.role !== 'host' || S.phase === 'setup' || stateTime
 function sendLobby(){ if (NET.role !== 'host' || S.phase !== 'setup') return;
   bcast({t:'lobby', diff:setupDiff, rounds:setupRounds, rows:setupRows.map((r,k) => ({k, rid:r.id, name:r.name, kind:r.kind, conn:!!(NET.peers[r.id] && NET.peers[r.id].open)}))}); }
 
+function sendSeats(){ for (const rid in NET.peers) sendPeer(NET.peers[rid], {t:'seat', seat:S.players.findIndex(p => p.rid === rid && p.ctrl === 'remote')}); }
 function hostNewPeer(rid){
   closePeer(rid); NET.role = 'host';
   const pc = new RTCPeerConnection({iceServers:ICE});
@@ -1293,6 +1298,7 @@ function hostPeerLost(rid, which){
 }
 function hostOnMsg(rid, m){
   const peer = NET.peers[rid]; if (!peer) return;
+  if (m.t === 'bye'){ hostPeerLost(rid, peer); try { peer.pc.close(); } catch(e){} return; }
   if (m.t === 'join'){ peer.name = String(m.name || 'Friend').slice(0, 14);
     const row = setupRows.find(r => r.id === rid); if (row) row.name = peer.name;
     if (S.phase === 'setup') renderSetup(); return; }
@@ -1331,25 +1337,40 @@ async function pumpGuest(){ if (gqBusy) return; gqBusy = true;
 async function guestHandle(m){
   switch (m.t){
     case 'hello': NET.myRid = m.rid; return;
-    case 'lobby': NET.lobby = m; if (NET.inGame){ NET.inGame = false; clearTokens(); S.phase = 'setup'; S.over = false; $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); if (modalOpen()){ $('#modal').classList.remove('open'); $('#modal').innerHTML=''; } }
+    case 'lobby': NET.lobby = m; NET.mySeat = -1; if (NET.inGame){ NET.inGame = false; clearTokens(); S.phase = 'setup'; S.over = false; $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); if (modalOpen()){ $('#modal').classList.remove('open'); $('#modal').innerHTML=''; } }
       showLobby(); return;
     case 'seat': NET.mySeat = m.seat; return;
     case 'state': applyState(m.s); return;
     case 'roll': await rollDice(m.vals); return;
     case 'hop': await hop(m.pi, m.a, m.b); return;
     case 'jump': await jumpTo(m.pi, m.to); return;
-    case 'toast': toast(m.html, m.kind, true); return;
+    case 'toast': toast(clean(m.html), String(m.kind || '').replace(/[^a-z]/g, ''), true); return;
     case 'sfx': if (Sound[m.n]) Sound[m.n](true); return;
     case 'prompt': answerPrompt(m); return;        // not awaited: the queue keeps flowing while the dialog is open
     case 'over': showReport(false); return;
   }
 }
-async function answerPrompt(m){ const o = m.opts; let v;
+async function answerPrompt(m){ const o = m.opts || {}; let v;
   if (o.panel === 'money') v = await openMoneyUI(NET.mySeat);
   else if (o.panel === 'ventures') v = await openVenturesUI(NET.mySeat);
-  else v = await modal(o);
+  else v = await modal({icon:clean(o.icon), title:clean(o.title), body:clean(o.body), stack:!!o.stack, wide:!!o.wide,
+    buttons:(Array.isArray(o.buttons) && o.buttons.length ? o.buttons : [{label:'OK', value:'ok'}]).slice(0, 8).map(b => ({label:clean(b.label), value:b.value, kind:String(b.kind || '').replace(/[^a-z ]/g, ''), disabled:!!b.disabled}))});
   netSend({t:'answer', id:m.id, v}); }
+function sanitizeState(s){
+  if (!s || !Array.isArray(s.players)) throw new Error('bad state');
+  if (!DIFFS[s.diff]) s.diff = 'medium';
+  s.players.forEach((p,k) => { p.name = String(p.name || 'Player').slice(0, 20); if (!/^#[0-9a-f]{6}$/i.test(p.color)) p.color = COLORS[k % 4];
+    if (!SHAPES.some(x => x.id === p.shape)) p.shape = 'orb';
+    const g = GOALS.find(x => x.id === (p.goal && p.goal.id)) || GOALS[0]; p.goal = {...g, amount: Math.max(10, +(p.goal && p.goal.amount) || g.amount)}; });
+  return s; }
+const SAFE_TAGS = new Set(['B','I','EM','STRONG','SMALL','SPAN','DIV','P','BR','UL','LI','TABLE','TBODY','TR','TD','LABEL']);
+/** Keep only harmless markup from the network: whitelisted tags, class/style attributes, no url() in styles. */
+function clean(html){ const t = document.createElement('template'); t.innerHTML = String(html == null ? '' : html);
+  const walk = n => [...n.children].forEach(el => { if (!SAFE_TAGS.has(el.tagName)){ el.replaceWith(document.createTextNode(el.textContent)); return; }
+    [...el.attributes].forEach(a => { if (!(a.name === 'class' || (a.name === 'style' && !/url\s*\(|expression|@import/i.test(a.value)))) el.removeAttribute(a.name); }); walk(el); });
+  walk(t.content); return t.innerHTML; }
 function applyState(s){
+  s = sanitizeState(s);
   const first = !NET.inGame || s.gameId !== S.gameId;
   const sig = JSON.stringify([S.owners, S.levels, S.priceLevel, S.diff, S.players.map(p => p.color)]);
   const prevTurn = S.turn;
@@ -1518,11 +1539,11 @@ async function startGame(){
   S.players = setupRows.map((r,k) => { let name = (r.name || '').trim() || `Player ${k+1}`; while (names.has(name)) name += '+'; names.add(name);
     return { name, ctrl:r.kind, rid:r.id, cpu:r.kind === 'cpu', color:COLORS[k], shape:SHAPES[r.shape].id, pos:0, cash:d.start, savings:0, debt:0, credit:650,
       autoSave: r.kind === 'cpu' ? 20 : 10, skip:0, goal:{...GOALS[r.goal], amount:goalAmt(GOALS[r.goal])}, fun:0, wants:0, skipped:0, quizRight:0, quizTotal:0,
-      paycheck:PAYCHECK, out:false, intEarned:0, intPaid:0, borrowed:0, autoSaved:0, missed:0, safety:0, given:0, iou:null }; });
+      paycheck:PAYCHECK, out:false, intEarned:0, intPaid:0, borrowed:0, autoSaved:0, missed:0, safety:0, given:0, iou:null, toBootcamp:false }; });
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), owners:Array(24).fill(-1), levels:Array(24).fill(0),
     lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy' });
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
-  S.players.forEach((p,pi) => { if (p.ctrl === 'remote') sendPeer(NET.peers[p.rid], {t:'seat', seat:pi}); });
+  sendSeats();
   enterGame(); flushState();
   toast(`👋 Welcome to ${d.emoji} <b>${d.name}</b>! Everyone starts with <b>${money(d.start)}</b>. Tap tiles to learn about them.`, 'gold');
   startTurn();
@@ -1530,8 +1551,8 @@ async function startGame(){
 function enterGame(){ $('#setup').classList.add('hidden'); $('#lobby').classList.add('hidden'); $('#ui').classList.remove('hidden');
   spawnTokens(); refreshAllTiles(); rotateTip(); updateUI(); }
 function resume(){ const d = loadSave(); if (!d) return; Object.assign(S, d); S.over = false;
-  S.players.forEach(p => { if (p.ctrl === 'remote'){ p.ctrl = 'cpu'; p.cpu = true; } });
-  enterGame(); flushState();
+  S.players.forEach(p => { if (p.ctrl === 'remote' && !(NET.peers[p.rid] && NET.peers[p.rid].open)){ p.ctrl = 'cpu'; p.cpu = true; } });
+  sendSeats(); enterGame(); flushState();
   toast(`↻ Welcome back! Round ${S.round}.`, 'gold');
   if (S.phase === 'manage' && canControl(cur())){ updateUI(); focusCam(cur()); } else { S.phase = 'busy'; startTurn(); } }
 
