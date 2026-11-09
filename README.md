@@ -12,7 +12,7 @@ The whole game is one HTML file (`index.html`). It works offline, so you can dow
 - **2–4 players**: people on one device, CPU players, or friends on their own devices.
 - **Money lessons built into the rules**: paychecks with automatic saving ("pay yourself first"), compound interest, side-hustle ventures that earn income, a quiz, surprise "Life Happens" cards, an impulse-buy mall, taxes and savings goals. Every game ends with a report card.
 - **Auto-save**: the host's device saves the game after every turn.
-- **Sound and music**: real recorded dice, chip, card and coin sounds, fanfares for big moments, and two background music tracks that alternate. Tap 🎵 to turn music or sound effects on or off and change their volume. Everything is embedded in the page, so it works offline too.
+- **Sound and music**: real recorded dice, chip, card and coin sounds, fanfares for big moments, and background music in three styles: 🎉 Upbeat, ☕ Calm lo-fi, or 🔀 Mix (the default). Tap 🎵 to pick a style, skip tracks, turn music or sound effects on or off, and change their volume. Everything is embedded in the page, so it works offline too.
 
 ## Difficulty levels
 
@@ -49,6 +49,7 @@ The host's device runs the game. Guests see the same board and make their own mo
 ## Credits: music and sound (bundled in `index.html`)
 
 - **Music:** “Sergio’s Magic Dustbin” and “Club Seamus” by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). The tracks were re-encoded to a smaller file size; the music itself is unchanged.
+- **Lo-fi music:** “Fire Place” (from *Winter Lofi*) and “Sense Of Purpose” (from *Spring at Last (LOFI TAPE)*) by [HoliznaCC0](https://freemusicarchive.org/music/holiznacc0), public domain ([CC0](https://creativecommons.org/publicdomain/zero/1.0/)). Loudness-matched and re-encoded to a smaller file size.
 - **Sound effects:** [Kenney](https://kenney.nl) Casino, UI, Digital and RPG audio packs, public domain ([CC0](https://creativecommons.org/publicdomain/zero/1.0/)).
 - **Fanfares:** Beatscribe, [Homebrew Free Jingle and Fanfare Music Assets](https://github.com/Beatscribe/homebrew_vgm), public domain (CC0).
 
