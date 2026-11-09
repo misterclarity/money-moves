@@ -156,7 +156,7 @@ textarea.code{width:100%;min-height:62px;font:11.5px/1.35 ui-monospace,Menlo,Con
 .logo span{color:var(--gold)}
 .tagline{color:var(--muted);margin:6px 0 12px;font-size:14.5px}
 .srow{display:grid;grid-template-columns:42px 1fr 132px 1fr 34px;gap:6px;align-items:center;margin-bottom:8px}
-.srow input,.srow select,.seg{font:inherit;font-size:14px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-width:0;width:100%}
+.srow input,.srow select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-width:0;width:100%}
 .srow select option{color:#111}
 .shape-btn{width:42px;height:42px;border-radius:12px;font-size:20px;color:#fff;border:0;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .conn{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;padding:0 0 4px 48px}
@@ -255,7 +255,7 @@ const TILES = [
   {t:'venture',g:'D', name:'App Startup',    emoji:'🚀', price:220}
 ];
 const DESC = {
-  payday:'Pass or land here to collect your paycheck (it starts at $150). Your Auto-save % goes straight to savings, savings earn 5% interest and your ventures pay side-hustle income. On Hard, loan interest and a minimum payment are due here too.',
+  payday:'Pass or land here to collect your paycheck (it starts at $150). Your Auto-save % goes straight to savings, savings earn 5% interest and your ventures pay side-hustle income.',
   quiz:'Answer a money question. Get it right and earn $40.',
   life:'Draw a Life Happens card: surprise costs, windfalls and tricky choices.',
   mall:'Temptation! Decide whether to buy something you want. Planned treats are fine — impulse buys add up fast.',
@@ -396,6 +396,10 @@ const TOK = [];          // token entities by player index
 const TILE_EL = [];      // tile entities
 let autoCam = true, PANEL = null;
 const SAVE_KEY = 'moneymoves-save-v2';
+/* Bumped whenever a game is abandoned, started or resumed. Async turn flows from an older generation
+   stop at their next await instead of playing ghost turns inside the new game. */
+let GEN = 0;
+const halt = () => new Promise(() => {});
 
 /* network state: role = null (single device) | 'host' | 'guest' */
 const NET = { role:null, peers:{}, pc:null, dc:null, mySeat:-1, myRid:null, pending:new Map(), seq:0, panelOpen:{},
@@ -404,7 +408,7 @@ const ICE = [{urls:'stun:stun.l.google.com:19302'}];   // only used when online;
 
 /* ---------------- helpers ---------------- */
 const $ = s => document.querySelector(s);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const sleep = ms => { const g = GEN; return new Promise(r => setTimeout(r, ms)).then(() => g === GEN ? undefined : halt()); };
 const rnd = n => Math.floor(Math.random()*n);
 const money = n => (n < 0 ? '−' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -416,10 +420,11 @@ const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a
 const pct = r => Math.round(r*100) + '%';
 const newId = () => Math.random().toString(36).slice(2, 9);
 /* animation helper that also finishes if the tab is hidden (requestAnimationFrame pauses) */
-function tween(ms, fn){ return new Promise(res => { const t0 = performance.now(); let done = false;
+function tween(ms, fn){ const g = GEN; return new Promise(res => { const t0 = performance.now(); let done = false;
   const fin = () => { if (done) return; done = true; fn(1); res(); };
   const safety = setTimeout(fin, ms + 250);
-  (function f(now){ if (done) return; const t = Math.min(1, (now - t0)/ms); if (t >= 1){ clearTimeout(safety); return fin(); } fn(t); requestAnimationFrame(f); })(t0); }); }
+  (function f(now){ if (done) return; const t = Math.min(1, (now - t0)/ms); if (t >= 1){ clearTimeout(safety); return fin(); } fn(t); requestAnimationFrame(f); })(t0); })
+  .then(() => g === GEN ? undefined : halt()); }
 const cur = () => S.players[S.turn];
 const pidx = p => S.players.indexOf(p);
 const alive = () => S.players.filter(p => !p.out);
@@ -787,7 +792,7 @@ async function payday(p){
 function modal({icon='', title='', body='', buttons=[{label:'OK', value:'ok', kind:'primary'}], stack=false, wide=false, onRender=null}){
   return new Promise(res => {
     const m = $('#modal');
-    m.innerHTML = `<div class="sheet ${wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${esc(title).replace(/<[^>]+>/g,'')}">
+    m.innerHTML = `<div class="sheet ${wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${String(title).replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}">
       <div class="sheet-head">${icon?`<div class="sheet-icon">${icon}</div>`:''}<h2>${title}</h2></div>
       <div class="sheet-body">${body}</div>
       <div class="sheet-btns ${stack?'stack':''}">${buttons.map((b,k) => `<button class="btn ${b.kind||''}" data-k="${k}" ${b.disabled?'disabled':''}>${b.label}</button>`).join('')}</div></div>`;
@@ -803,7 +808,8 @@ const modalOpen = () => $('#modal').classList.contains('open');
 const lessonBox = s => `<div class="lesson">${s}</div>`;
 
 /** Ask the player controlling p a question: a local dialog, or a prompt sent to their device. */
-function ask(p, opts){
+function ask(p, opts){ const g = GEN; return askRaw(p, opts).then(v => g === GEN ? v : halt()); }
+function askRaw(p, opts){
   if (p.ctrl === 'remote'){
     const peer = NET.peers[p.rid];
     if (!peer || !peer.open) return Promise.resolve(defaultAnswer(opts));
@@ -934,8 +940,8 @@ async function landVenture(p, i){
   const price = t.price;
   if (p.cpu){
     if (p.cash - price >= 60) buy(p, i);
-    else if (p.debt === 0 && p.cash + p.savings - price >= 100){ const w = Math.min(p.savings, price + 40 - p.cash); p.savings -= w; p.cash += w;
-      toast(`🤖 <b>${esc(p.name)}</b> withdrew ${money(w)} from savings to invest.`); buy(p, i); }
+    else if (p.debt === 0 && p.cash + p.savings - price >= 100){ const w = Math.max(0, Math.min(p.savings, price + 40 - p.cash));
+      if (w > 0){ p.savings -= w; p.cash += w; toast(`🤖 <b>${esc(p.name)}</b> withdrew ${money(w)} from savings to invest.`); } buy(p, i); }
     else toast(`${t.emoji} <b>${esc(p.name)}</b> passed on ${t.name} (keeping a cash cushion).`);
     return;
   }
@@ -1146,7 +1152,7 @@ function showTileInfo(i){
       <tr><td>Fee: basic / full set</td><td>${money(b)} / ${money(b*2)}</td></tr>
       ${D().upgrades ? `<tr><td>Fee: ⭐ / ⭐⭐ / ⭐⭐⭐</td><td>${money(b*MULT[1])} / ${money(b*MULT[2])} / ${money(b*MULT[3])}</td></tr>
       <tr><td>Upgrade cost</td><td>${money(upgradeCost(i))}</td></tr>` : ''}</table>${lessonBox(LESSON.venture)}`;
-  } else html += `<p style="margin:6px 0">${t.t === 'bill' ? `${DESC.bill} Right now: ${money(t.amount)}.` : DESC[t.t].replace('$50', money(infl(BOOTCAMP_FEE)))}</p>${lessonBox(LESSON[t.t])}`;
+  } else html += `<p style="margin:6px 0">${t.t === 'bill' ? `${DESC.bill} Right now: ${money(t.amount)}.` : DESC[t.t].replace('$50', money(infl(BOOTCAMP_FEE))) + (t.t === 'payday' && D().credit ? ' Loan interest and your minimum debt payment are due here too.' : '')}</p>${lessonBox(LESSON[t.t])}`;
   box.innerHTML = html; box.classList.remove('hidden');
   box.querySelector('.x').onclick = () => box.classList.add('hidden');
 }
@@ -1223,8 +1229,8 @@ async function showReport(isHost){
       <div class="row"><span>Treats</span><b>${p.fun} · ${treats}</b></div>
       <div class="row"><span>Impulse buys skipped</span><b>${money(p.skipped)}</b></div>
       <div class="row"><span>Ventures</span><b>${owned(pidx(p)).length}</b></div></div>`; }).join('');
-  const w = ranked[0].p;
-  const r = await modal({icon:'🏆', title:`${esc(w.name)} wins!`, wide:true,
+  const top = ranked[0].g.score, winners = ranked.filter(x => !x.p.out && x.g.score === top).map(x => esc(x.p.name));
+  const r = await modal({icon:'🏆', title: winners.length > 1 ? `It's a tie: ${winners.join(' & ')}!` : `${winners[0] || esc(ranked[0].p.name)} wins!`, wide:true,
     body:`<p>${d.emoji} ${d.name} · Score = net worth (cash + savings + ventures − debt) + ${money(GOAL_BONUS)} if you reached your savings goal.</p><div class="rep">${cards}</div>
       ${lessonBox('Real-life takeaways: save first, keep an emergency fund, avoid high-interest debt, invest in things that earn, and plan your treats.')}
       ${isHost ? '' : '<p class="muted">The host can start a new game — you\'ll stay connected.</p>'}`,
@@ -1308,7 +1314,7 @@ function hostOnMsg(rid, m){
 
 /* --- guest side --- */
 function netSend(msg){ if (NET.dc && NET.dc.readyState === 'open'){ try { NET.dc.send(JSON.stringify(msg)); } catch(e){} } }
-function guestReset(){ try { NET.dc && NET.dc.close(); } catch(e){} try { NET.pc && NET.pc.close(); } catch(e){} NET.pc = NET.dc = null; NET.role = null; NET.mySeat = -1; NET.inGame = false; GQ.length = 0; }
+function guestReset(){ try { NET.dc && NET.dc.close(); } catch(e){} try { NET.pc && NET.pc.close(); } catch(e){} NET.pc = NET.dc = null; NET.role = null; NET.mySeat = -1; NET.inGame = false; GQ.length = 0; gqBusy = false; }
 async function guestCreateAnswer(code, name, onOpen){
   const o = await decodeSig(code);
   if (o.t !== 'o') throw new Error('That\'s a reply code. Paste the HOST\'s invite code here.');
@@ -1325,7 +1331,7 @@ async function guestCreateAnswer(code, name, onOpen){
   return encodeSig({t:'a', v:1, sdp:pc.localDescription.sdp}); }
 function guestLost(){ if (NET.role !== 'guest' || NET.lost) return; NET.lost = true;
   leaveToMenu();
-  modal({icon:'📡', title:'Disconnected', body:'<p>The connection to the host was lost. The host\'s game keeps going with a CPU in your seat.</p><p>To rejoin, ask the host for a new invite.</p>'}); }
+  modal({icon:'📡', title:'Disconnected', body:'<p>The connection to the host was lost. If the host is still playing, a CPU has taken over your seat.</p><p>To rejoin, ask the host for a new invite.</p>'}); }
 function leaveToMenu(){ const wasGuest = NET.role === 'guest' || NET.pc; guestReset(); if (PANEL) PANEL = null;
   if (modalOpen()){ $('#modal').classList.remove('open'); $('#modal').innerHTML = ''; }
   clearTokens(); S.players = []; S.over = false; showSetup(); if (wasGuest) $('#lobby').classList.add('hidden'); }
@@ -1359,7 +1365,14 @@ async function answerPrompt(m){ const o = m.opts || {}; let v;
 function sanitizeState(s){
   if (!s || !Array.isArray(s.players)) throw new Error('bad state');
   if (!DIFFS[s.diff]) s.diff = 'medium';
-  s.players.forEach((p,k) => { p.name = String(p.name || 'Player').slice(0, 20); if (!/^#[0-9a-f]{6}$/i.test(p.color)) p.color = COLORS[k % 4];
+  const num = (v, d=0) => Number.isFinite(+v) ? +v : d, n = s.players.length;
+  s.round = num(s.round, 1); s.maxRounds = num(s.maxRounds, 20); s.priceLevel = Math.max(1, num(s.priceLevel, 1)); s.turn = clamp(Math.floor(num(s.turn)), 0, Math.max(0, n-1));
+  s.owners = Array.from({length:24}, (_,i) => { const o = Math.floor(num(s.owners && s.owners[i], -1)); return o >= 0 && o < n ? o : -1; });
+  s.levels = Array.from({length:24}, (_,i) => clamp(Math.floor(num(s.levels && s.levels[i])), 0, 3));
+  s.log = Array.isArray(s.log) ? s.log.slice(-120).map(String) : []; s.phase = String(s.phase || 'busy'); s.over = !!s.over;
+  s.players.forEach((p,k) => { ['cash','savings','debt','credit','pos','paycheck','autoSave','skip','fun','wants','skipped','quizRight','quizTotal','intEarned','intPaid','borrowed','autoSaved','missed','safety','given'].forEach(f => p[f] = num(p[f]));
+    p.pos = clamp(Math.floor(p.pos), 0, 23); p.credit = clamp(p.credit, 300, 850); p.out = !!p.out; p.cpu = !!p.cpu; p.ctrl = ['local','cpu','remote'].includes(p.ctrl) ? p.ctrl : 'cpu';
+    p.name = String(p.name || 'Player').slice(0, 20); if (!/^#[0-9a-f]{6}$/i.test(p.color)) p.color = COLORS[k % 4];
     if (!SHAPES.some(x => x.id === p.shape)) p.shape = 'orb';
     const g = GOALS.find(x => x.id === (p.goal && p.goal.id)) || GOALS[0]; p.goal = {...g, amount: Math.max(10, +(p.goal && p.goal.amount) || g.amount)}; });
   return s; }
@@ -1388,7 +1401,7 @@ function showLobby(){ $('#setup').classList.add('hidden'); $('#lobby').classList
   if (!L){ $('#lobbyList').innerHTML = '<p class="muted">Waiting for the host…</p>'; return; }
   const d = DIFFS[L.diff] || DIFFS.medium;
   $('#lobbyList').innerHTML = L.rows.map(r => `<div class="lrow"><span class="dot" style="background:${COLORS[r.k]};--pc:${COLORS[r.k]}"></span><b>${esc(r.name)}</b>${r.rid === NET.myRid ? ' <span class="tag">You</span>' : ''}<span class="spacer"></span><span class="tag">${r.kind === 'cpu' ? 'CPU' : r.kind === 'remote' ? (r.conn ? '📡 Connected' : '📡 Waiting') : 'Host device'}</span></div>`).join('')
-    + `<div class="lrow">${d.emoji} <b>${d.name}</b> · ${L.rounds} rounds</div><ul class="dfeat">${d.feats.map(f => `<li>${f}</li>`).join('')}</ul>`; }
+    + `<div class="lrow">${d.emoji} <b>${d.name}</b> · ${+L.rounds || 20} rounds</div><ul class="dfeat">${d.feats.map(f => `<li>${f}</li>`).join('')}</ul>`; }
 
 /* --- QR code drawing & scanning --- */
 function drawQR(canvas, text){
@@ -1524,7 +1537,8 @@ function renderSetup(){
   bc.classList.toggle('hidden', !sv); if (sv) bc.textContent = `↻ Continue (round ${sv.round}, ${(DIFFS[sv.diff]||DIFFS.medium).name})`;
   sendLobby();
 }
-function showSetup(){ S.phase = 'setup'; S.over = false; $('#setup').classList.remove('hidden'); $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); renderSetup(); }
+function showSetup(){ GEN++; for (const [, pd] of NET.pending) pd.res(defaultAnswer(pd.opts)); NET.pending.clear(); NET.panelOpen = {};
+  S.phase = 'setup'; S.over = false; $('#setup').classList.remove('hidden'); $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); renderSetup(); }
 
 async function startGame(){
   const missing = setupRows.filter(r => r.kind === 'remote' && !(NET.peers[r.id] && NET.peers[r.id].open));
@@ -1543,14 +1557,14 @@ async function startGame(){
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), owners:Array(24).fill(-1), levels:Array(24).fill(0),
     lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy' });
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
-  sendSeats();
+  GEN++; sendSeats();
   enterGame(); flushState();
   toast(`👋 Welcome to ${d.emoji} <b>${d.name}</b>! Everyone starts with <b>${money(d.start)}</b>. Tap tiles to learn about them.`, 'gold');
   startTurn();
 }
 function enterGame(){ $('#setup').classList.add('hidden'); $('#lobby').classList.add('hidden'); $('#ui').classList.remove('hidden');
   spawnTokens(); refreshAllTiles(); rotateTip(); updateUI(); }
-function resume(){ const d = loadSave(); if (!d) return; Object.assign(S, d); S.over = false;
+function resume(){ const d = loadSave(); if (!d) return; GEN++; Object.assign(S, d); S.over = false;
   S.players.forEach(p => { if (p.ctrl === 'remote' && !(NET.peers[p.rid] && NET.peers[p.rid].open)){ p.ctrl = 'cpu'; p.cpu = true; } });
   sendSeats(); enterGame(); flushState();
   toast(`↻ Welcome back! Round ${S.round}.`, 'gold');
@@ -1615,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
 </head>
 <body>
 
-<a-scene renderer="antialias: true; colorManagement: true" shadow="type: pcfsoft" vr-mode-ui="enabled: false"
+<a-scene renderer="antialias: true; colorManagement: true" shadow="type: pcf" vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
   background="color: #0d1626" fog="type: exponential; color: #0d1626; density: 0.018" loading-screen="dotsColor: #ffbf3c; backgroundColor: #0d1626">
   <a-entity id="cam" camera="fov: 50; near: 0.5; far: 200" orbit-cam></a-entity>
