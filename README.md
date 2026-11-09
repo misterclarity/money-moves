@@ -17,7 +17,11 @@ The web version loads the music separately so the first load is smaller, and cac
 - **2–4 players**: people on one device, CPU players, or friends on their own devices.
 - **Payday budget:** at every Payday you split your paycheck with sliders into needs & bills (cash), wants (fun money) and savings. Presets: ⚖️ 50/30/20, 🐷 Super saver and 🎉 Fun first. You can let the game reuse your split automatically and change it any time under 💰 Money.
 - **Fun money vs. impulse buys:** treats at the Impulse Mall paid from fun money count as planned. Anything beyond that comes out of your cash and counts as an impulse buy on the report card.
-- **Trading:** under 🏪 Ventures → **🤝 Trade with another player**, offer ventures and/or cash to any player and ask for theirs in return. CPU players accept fair deals and sometimes make offers themselves to complete a set. Ventures from a set with ⭐ upgrades can't be traded.
+- **Trading:** under 🏪 Ventures → **🤝 Trade with another player**, offer ventures and/or cash to any player and ask for theirs in return. CPU players accept fair deals and sometimes make offers themselves to complete a set. Ventures keep their ⭐ upgrades when they change hands.
+- **Insurance:** in 💰 Money, buy 🛡️ insurance for a small premium at sign-up and every Payday. When a Life Happens card breaks your phone, laptop or bike, or you have an accident, you pay only the deductible. The report card shows premiums paid vs. what insurance covered.
+- **Courses:** also in 💰 Money, take a 🎓 course to raise your paycheck for the rest of the game. The panel shows how many Paydays it takes to pay for itself and how many are left, so starting early pays off.
+- **Badges:** 18 🏅 badges for smart money moves (reach your goal, save 30%+ at 3 Paydays, skip impulse buys, pay off a loan, …). Tap **🏅 Badges** on the start screen to see the collection on this device.
+- **Net-worth chart:** the game-over report shows every player's net worth round by round. Hover or tap the chart to see the exact values.
 - **Money lessons built into the rules**: compound interest, side-hustle ventures that earn income, a quiz, surprise "Life Happens" cards, taxes and savings goals. Every game ends with a report card.
 - **English and German:** switch with **EN / DE** on the setup screen (German defaults to euros, and you can pick **$ / €** separately). In multiplayer, everyone plays in the host's language.
 - **Auto-save**: the host's device saves the game after every turn.
@@ -28,15 +32,17 @@ The web version loads the music separately so the first load is smaller, and cac
 | | 🌱 Easy | ⚖️ Medium | 🔥 Hard |
 |---|:-:|:-:|:-:|
 | Paychecks with a budget, savings interest | ✅ | ✅ | ✅ |
+| 🛡️ Insurance deductible | $10 | $25 | $25 |
+| 🎓 Courses | Online certificate | + Job training program | + Job training program |
 | Buy ventures, customer fees, full-set bonus, trading | ✅ | ✅ | ✅ |
 | Money Quiz | 3 choices | 4 choices | 4 choices + credit questions |
-| ⭐ Venture upgrades | – | ✅ | ✅ |
+| ⭐ Venture upgrades (⭐ on any venture; a full set unlocks ⭐⭐ and ⭐⭐⭐) | – | ✅ | ✅ |
 | 🧾 Income tax (Easy: optional "Give Back" donation) | – | ✅ | ✅ |
 | Bigger surprise costs | – | ✅ | ✅ |
 | When you can't pay | Safety net covers it, but you go to Budget Bootcamp and skip a turn | Ventures sold at half price, then bankruptcy | Loan up to your credit limit, then sales, then bankruptcy |
 | 💳 Borrowing and loans | – | – | ✅ |
 | 📊 Credit score (sets your interest rate and limit) | – | – | ✅ |
-| 📅 Minimum payments and late fees | – | – | ✅ |
+| 📅 Minimum payments (due before the paycheck) and late fees | – | – | ✅ |
 | 📈 Inflation every 5 rounds | – | – | ✅ |
 | Credit-card, buy-now-pay-later and payday-loan cards | – | – | ✅ |
 | Starting cash | $400 | $300 | $250 |

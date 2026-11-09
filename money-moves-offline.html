@@ -237,6 +237,43 @@ textarea.code{width:100%;min-height:62px;font:11.5px/1.35 ui-monospace,Menlo,Con
 .offer h5{margin:0 0 4px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 @media (max-width: 560px){ .tcols{grid-template-columns:1fr} .logo{font-size:28px}
   .srow{grid-template-columns:42px 1fr 136px} .srow select[data-act=kind]{font-size:13px;padding:9px 4px 9px 6px} }
+/* insurance, courses, badges */
+.msect{font-weight:800;margin-top:14px}
+.pico{float:right;letter-spacing:1px;font-size:11px}
+.bdg{font-size:18px;margin-right:2px;vertical-align:-2px}
+.bdgs span{margin-left:2px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tb{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;font-size:12.5px}
+.tb .te{font-size:26px;line-height:1.1}
+.tb .tn{font-weight:800;font-size:13.5px;margin:3px 0 2px}
+.tb .tw{color:var(--muted);font-size:11.5px;margin-top:3px}
+.tb:not(.lock){border-color:rgba(255,200,61,.6);background:rgba(255,200,61,.08)}
+.tb.lock .te{filter:grayscale(1);opacity:.45}
+.tb.lock .tn{color:var(--muted)}
+.tb .tl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+/* net-worth chart */
+.nwwrap{margin:10px 0 4px;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:10px 10px 2px}
+.nwhead{font-weight:800;font-size:14px}
+.nwleg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin:4px 0 2px}
+.nwleg i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.nwchart{position:relative;width:100%}
+.nwchart svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.nwchart .gl{stroke:rgba(255,255,255,.08);stroke-width:1}
+.nwchart .z{stroke:rgba(255,255,255,.3);stroke-width:1}
+.nwchart .yl{fill:var(--muted);font-size:11px;text-anchor:end;font-variant-numeric:tabular-nums}
+.nwchart .xl{fill:var(--muted);font-size:11px;text-anchor:middle}
+.nwchart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.nwchart .mk{stroke:#16233b;stroke-width:2}
+.nwchart .ld{stroke:rgba(255,255,255,.25);stroke-width:1}
+.nwchart .el{fill:var(--ink);font-size:12px;font-weight:700}
+.nwchart .ev{fill:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.nwchart .xh{stroke:rgba(255,255,255,.5);stroke-width:1}
+.nwchart .hit{fill:transparent;cursor:crosshair}
+.nwtip{position:absolute;top:6px;pointer-events:none;background:#0b1424;border:1px solid var(--line);border-radius:10px;padding:6px 9px;font-size:12px;min-width:130px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.nwtip .th{font-weight:800;margin-bottom:2px}
+.nwtip div{display:flex;align-items:center;gap:6px}
+.nwtip div b{margin-left:auto;padding-left:12px;font-variant-numeric:tabular-nums}
+.nwtip i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
 
 </style>
 <script>
@@ -249,8 +286,8 @@ textarea.code{width:100%;min-height:62px;font:11.5px/1.35 ui-monospace,Menlo,Con
    Text tokens: {$N} = amount N in the chosen currency; {cost}/{gain} = the card's own amount. */
 const TILE = 1.5;
 const PAYCHECK = 150, SAVE_RATE = 0.05, BANK_BONUS = 0.10, QUIZ_REWARD = 40, BOOTCAMP_FEE = 50, GOAL_BONUS = 150,
-      GIVE_AMT = 10, LATE_FEE = 15;
-const COLORS = ['#e63946','#9b5de5','#00b4d8','#ff3ea5'];
+      GIVE_AMT = 10, LATE_FEE = 15, INS_PREMIUM = 10;
+const COLORS = ['#e63946','#9b5de5','#00a3c8','#f43d9f'];   // checked for colour-blind separation on the dark UI
 const SHAPES = [{id:'orb',icon:'●'},{id:'rocket',icon:'▲'},{id:'gem',icon:'◆'},{id:'donut',icon:'◯'}];
 const GOALS = [
   {id:'trip',  name:'Summer Trip',    emoji:'✈️', amount:400,  de:{name:'Sommerreise'}},
@@ -260,17 +297,17 @@ const GOALS = [
 ];
 const DIFFS = {
   easy:  { name:'Easy', sub:'Budget basics', emoji:'🌱', lvl:0, start:400, upgrades:false, tax:false, sellOff:false, credit:false, inflation:false, quizOpts:3,
-           feats:['💵 Payday budget, savings &amp; interest','🏪 Buy and trade ventures, collect customer fees','🧠 Money Quiz with 3 choices','🛟 Safety net: no debt or bankruptcy — if you can’t pay, you go to Budget Bootcamp','💝 “Give Back” tile instead of taxes'],
+           feats:['💵 Payday budget, savings &amp; interest','🏪 Buy and trade ventures, collect customer fees','🛡️ Insurance &amp; 🎓 courses that raise your paycheck','🧠 Money Quiz with 3 choices','🛟 Safety net: no debt or bankruptcy — if you can’t pay, you go to Budget Bootcamp','💝 “Give Back” tile instead of taxes'],
            de:{ name:'Leicht', sub:'Budget-Grundlagen',
-           feats:['💵 Zahltag-Budget, Sparen &amp; Zinsen','🏪 Unternehmen kaufen und tauschen, Kundengebühren kassieren','🧠 Geld-Quiz mit 3 Antworten','🛟 Sicherheitsnetz: keine Schulden, keine Pleite – wer nicht zahlen kann, muss ins Budget-Bootcamp','💝 „Spenden“-Feld statt Steuern'] } },
+           feats:['💵 Zahltag-Budget, Sparen &amp; Zinsen','🏪 Unternehmen kaufen und tauschen, Kundengebühren kassieren','🛡️ Versicherung &amp; 🎓 Kurse für ein höheres Gehalt','🧠 Geld-Quiz mit 3 Antworten','🛟 Sicherheitsnetz: keine Schulden, keine Pleite – wer nicht zahlen kann, muss ins Budget-Bootcamp','💝 „Spenden“-Feld statt Steuern'] } },
   medium:{ name:'Medium', sub:'Real-world costs', emoji:'⚖️', lvl:1, start:300, upgrades:true, tax:true, sellOff:true, credit:false, inflation:false, quizOpts:4,
-           feats:['✅ Everything in Easy','⭐ Upgrade ventures once you own a full set','🧾 Income tax &amp; bigger surprise costs','🏚️ Short on cash? Ventures get sold at half price','💥 Can’t pay at all = bankrupt'],
+           feats:['✅ Everything in Easy','⭐ Upgrade ventures (a full set unlocks ⭐⭐ and ⭐⭐⭐)','🧾 Income tax &amp; bigger surprise costs','🏚️ Short on cash? Ventures get sold at half price','💥 Can’t pay at all = bankrupt'],
            de:{ name:'Mittel', sub:'Echte Kosten',
-           feats:['✅ Alles aus „Leicht“','⭐ Unternehmen ausbauen, sobald du eine ganze Gruppe besitzt','🧾 Einkommensteuer &amp; größere Überraschungskosten','🏚️ Zu wenig Geld? Unternehmen werden zum halben Preis verkauft','💥 Gar nicht zahlen können = pleite'] } },
+           feats:['✅ Alles aus „Leicht“','⭐ Unternehmen ausbauen (eine ganze Gruppe schaltet ⭐⭐ und ⭐⭐⭐ frei)','🧾 Einkommensteuer &amp; größere Überraschungskosten','🏚️ Zu wenig Geld? Unternehmen werden zum halben Preis verkauft','💥 Gar nicht zahlen können = pleite'] } },
   hard:  { name:'Hard', sub:'Credit & debt', emoji:'🔥', lvl:2, start:250, upgrades:true, tax:true, sellOff:true, credit:true, inflation:true, quizOpts:4,
-           feats:['✅ Everything in Medium','💳 Borrow money — loans cover shortfalls too','📊 Credit score sets your interest rate and borrowing limit','📅 Minimum debt payment every Payday — miss it and your score drops','📈 Inflation: prices rise 10% every 5 rounds','🛒 Credit-card, buy-now-pay-later &amp; payday-loan cards'],
+           feats:['✅ Everything in Medium','💳 Borrow money — loans cover shortfalls too','📊 Credit score sets your interest rate and borrowing limit','📅 Minimum debt payment due at every Payday, before your paycheck arrives — miss it and your score drops','📈 Inflation: prices rise 10% every 5 rounds','🛒 Credit-card, buy-now-pay-later &amp; payday-loan cards'],
            de:{ name:'Schwer', sub:'Kredit & Schulden',
-           feats:['✅ Alles aus „Mittel“','💳 Geld leihen – Kredite decken auch Engpässe','📊 Deine Bonität bestimmt Zinssatz und Kreditrahmen','📅 Mindestrate an jedem Zahltag – verpasst du sie, sinkt deine Bonität','📈 Inflation: Preise steigen alle 5 Runden um 10 %','🛒 Karten zu Kreditkarten, „Jetzt kaufen, später zahlen“ &amp; Sofortkrediten'] } }
+           feats:['✅ Alles aus „Mittel“','💳 Geld leihen – Kredite decken auch Engpässe','📊 Deine Bonität bestimmt Zinssatz und Kreditrahmen','📅 Mindestrate an jedem Zahltag, fällig bevor das Gehalt kommt – verpasst du sie, sinkt deine Bonität','📈 Inflation: Preise steigen alle 5 Runden um 10 %','🛒 Karten zu Kreditkarten, „Jetzt kaufen, später zahlen“ &amp; Sofortkrediten'] } }
 };
 const GROUPS = {
   A:{name:'Starter Hustles', color:'#f79d65', de:{name:'Einsteiger-Jobs'}},
@@ -307,9 +344,9 @@ const TILES = [
 const DESC = {
   payday:{en:'Pass or land here to collect your paycheck (it starts at {$150}) and split it with your budget: needs (cash), wants (fun money) and savings. Savings earn 5% interest and your ventures pay side-hustle income.',
           de:'Wer hier vorbeikommt oder landet, bekommt sein Gehalt (am Anfang {$150}) und teilt es mit dem Budget auf: Bedürfnisse (Bargeld), Wünsche (Spaß-Geld) und Sparen. Erspartes bringt 5 % Zinsen, deine Unternehmen bringen Nebenverdienst.'},
-  paydayHard:{en:' Loan interest and your minimum debt payment are due here too.', de:' Hier werden auch Kreditzinsen und deine Mindestrate fällig.'},
+  paydayHard:{en:' Loan interest and your minimum debt payment are due here too — before your paycheck arrives, so keep enough cash.', de:' Hier werden auch Kreditzinsen und deine Mindestrate fällig – noch bevor das Gehalt kommt. Behalte also genug Bargeld.'},
   quiz:{en:'Answer a money question. Get it right and earn {$40}.', de:'Beantworte eine Geldfrage. Richtig? Dann bekommst du {$40}.'},
-  life:{en:'Draw a Life Happens card: surprise costs, windfalls and tricky choices.', de:'Zieh eine Lebenskarte: Überraschungskosten, Geldsegen und knifflige Entscheidungen.'},
+  life:{en:'Draw a Life Happens card: surprise costs, windfalls and tricky choices. 🛡️ Insurance covers damage to phones, laptops and bikes, and accidents.', de:'Zieh eine Lebenskarte: Überraschungskosten, Geldsegen und knifflige Entscheidungen. 🛡️ Eine Versicherung zahlt bei Schäden an Handy, Laptop und Fahrrad und bei Unfällen.'},
   mall:{en:'Temptation! Decide whether to buy something you want. Treats paid from your fun money are planned — anything beyond that is an impulse buy.', de:'Versuchung! Entscheide, ob du dir etwas kaufst. Was aus deinem Spaß-Geld bezahlt wird, ist eingeplant – alles darüber hinaus ist ein Spontankauf.'},
   bank:{en:'Land here for a 10% bonus on your savings balance. The more you have saved, the bigger the bonus.', de:'Landest du hier, bekommst du 10 % Bonus auf dein Erspartes. Je mehr du gespart hast, desto größer der Bonus.'},
   bill:{en:'A fixed expense you pay every time you land here.', de:'Eine Fixkosten-Rechnung, die du jedes Mal zahlst, wenn du hier landest.'},
@@ -333,6 +370,8 @@ const LESSON = {
   gobootcamp:{en:'Overspending happens when you don’t track. A budget is a plan, not a punishment.', de:'Zu viel ausgeben passiert, wenn man nicht mitschreibt. Ein Budget ist ein Plan, keine Strafe.'},
   venture:{en:'Assets earn money for you. Buying something that earns income is investing, not just spending.', de:'Vermögenswerte verdienen Geld für dich. Etwas zu kaufen, das Einkommen bringt, ist Investieren – nicht nur Ausgeben.'},
   trade:{en:'A good trade helps both sides. Think about what a venture will EARN you, not just its price — completing a set doubles your fees.', de:'Ein guter Tausch hilft beiden Seiten. Denk daran, was ein Unternehmen dir EINBRINGT, nicht nur an den Preis – eine ganze Gruppe verdoppelt deine Gebühren.'},
+  insurance:{en:'Insurance: many people each pay a small premium, and the money pays for the few who have bad luck. On average you pay more than you get back, but a big loss can’t knock you out.', de:'Versicherung: Viele zahlen eine kleine Prämie, und davon wird der Schaden der wenigen bezahlt, die Pech haben. Im Schnitt zahlst du mehr ein, als du zurückbekommst – aber ein großer Schaden wirft dich nicht um.'},
+  education:{en:'Education is an investment: you pay now and earn more at every Payday after. The earlier you start, the more Paydays it pays off.', de:'Bildung ist eine Investition: Du zahlst jetzt und verdienst danach an jedem Zahltag mehr. Je früher du anfängst, desto öfter zahlt es sich aus.'},
   budget:{en:'50/30/20 rule: about half for needs and bills, 30% for wants, 20% for savings. Adjust it to your goals!', de:'50/30/20-Regel: etwa die Hälfte für Bedürfnisse und Rechnungen, 30 % für Wünsche, 20 % fürs Sparen. Pass sie an deine Ziele an!'}
 };
 
@@ -400,7 +439,13 @@ const QUIZ = [
 ];
 
 const LIFE = [
-  {e:'📱', title:'Cracked screen!', text:'You dropped your phone. Repair costs {cost}.', amount:-80, lesson:'This is exactly what an emergency fund is for.',
+  {e:'💻', title:'Laptop spill', text:'Juice all over your laptop keyboard. Repair: {cost}.', amount:-140, ins:true, lvl:1, lesson:'Big, rare costs are exactly what insurance is for.',
+   de:{title:'Laptop-Unfall', text:'Saft über die Laptop-Tastatur. Reparatur: {cost}.', lesson:'Große, seltene Kosten – genau dafür gibt es Versicherungen.'}},
+  {e:'🔓', title:'Bike stolen', text:'Your bike was stolen outside school. A used replacement costs {cost}.', amount:-100, ins:true, lesson:'Lock it up. Insurance turns a big loss into a small one.',
+   de:{title:'Fahrrad gestohlen', text:'Dein Fahrrad wurde vor der Schule gestohlen. Ein gebrauchtes kostet {cost}.', lesson:'Gut absperren! Eine Versicherung macht aus einem großen Verlust einen kleinen.'}},
+  {e:'🎓', title:'Course discount', text:'A training center offers you {$30} off your next course this week.', course:30, lesson:'Learning new skills is one of the best investments you can make.',
+   de:{title:'Kurs-Rabatt', text:'Ein Bildungszentrum bietet dir diese Woche {$30} Rabatt auf deinen nächsten Kurs.', lesson:'Neue Fähigkeiten zu lernen ist eine der besten Investitionen überhaupt.'}},
+  {e:'📱', title:'Cracked screen!', text:'You dropped your phone. Repair costs {cost}.', amount:-80, ins:true, lesson:'This is exactly what an emergency fund is for.',
    de:{title:'Display kaputt!', text:'Dein Handy ist runtergefallen. Die Reparatur kostet {cost}.', lesson:'Genau dafür ist ein Notgroschen da.'}},
   {e:'🎂', title:'Birthday money', text:'Your grandma sends you {$50}.', choices:[
       {label:'🏦 Put it in savings', amount:50, toSavings:true, smart:true, lesson:'Saving windfalls is a painless way to grow your goal.'},
@@ -410,7 +455,7 @@ const LIFE = [
       {label:'💵 Als Bargeld behalten', lesson:'Bargeld ist flexibel – pass nur auf, dass es nicht für Spontankäufe verschwindet.'}]}},
   {e:'👖', title:'Laundry luck', text:'You find {gain} in an old pair of jeans.', amount:20, lesson:'Small windfalls add up — consider saving them.',
    de:{title:'Glück beim Wäschewaschen', text:'Du findest {gain} in einer alten Jeans.', lesson:'Kleine Geldsegen summieren sich – überleg, sie zu sparen.'}},
-  {e:'🚲', title:'Flat tire', text:'Your bike tire pops. New tube: {cost}.', amount:-15, lesson:'Small surprise costs happen all the time. Keep a cash cushion.',
+  {e:'🚲', title:'Flat tire', text:'Your bike tire pops. New tube: {cost}.', amount:-15, ins:true, lesson:'Small surprise costs happen all the time. Keep a cash cushion.',
    de:{title:'Platter Reifen', text:'Dein Fahrradreifen ist platt. Neuer Schlauch: {cost}.', lesson:'Kleine Überraschungskosten passieren ständig. Behalte einen Bargeld-Puffer.'}},
   {e:'🏆', title:'Contest winner!', text:'Your app wins a school coding contest. Prize: {gain}.', amount:100, lesson:'Skills can earn money. Learning is an investment.',
    de:{title:'Wettbewerb gewonnen!', text:'Deine App gewinnt einen Programmier-Wettbewerb in der Schule. Preis: {gain}.', lesson:'Fähigkeiten können Geld bringen. Lernen ist eine Investition.'}},
@@ -444,7 +489,7 @@ const LIFE = [
    de:{title:'Gemeinsames Geschenk', text:'Deine Freunde legen für ein Geburtstagsgeschenk zusammen. Dein Anteil: {cost}.', lesson:'Geschenke gehören dazu – ein kleiner „Geschenke“-Posten im Budget hilft.'}},
   {e:'📈', title:'You got a raise!', text:'Your boss is impressed. Your paycheck goes up by {$20} — permanently.', raise:20, lesson:'Raises are a great moment to save a bigger share of each paycheck.',
    de:{title:'Gehaltserhöhung!', text:'Deine Chefin ist begeistert. Dein Gehalt steigt dauerhaft um {$20}.', lesson:'Eine Gehaltserhöhung ist der perfekte Moment, einen größeren Teil zu sparen.'}},
-  {e:'🔌', title:'Charger broke', text:'Your laptop charger dies. Replacement: {cost}.', amount:-40, lesson:'Things break. Emergency funds turn panic into a shrug.',
+  {e:'🔌', title:'Charger broke', text:'Your laptop charger dies. Replacement: {cost}.', amount:-40, ins:true, lesson:'Things break. Emergency funds turn panic into a shrug.',
    de:{title:'Ladekabel kaputt', text:'Das Ladegerät deines Laptops gibt auf. Ersatz: {cost}.', lesson:'Dinge gehen kaputt. Ein Notgroschen macht aus Panik ein Schulterzucken.'}},
   {e:'🧹', title:'Garage sale', text:'You sell old games at a garage sale for {gain}.', amount:45, lesson:'Decluttering can pay.',
    de:{title:'Flohmarkt', text:'Du verkaufst alte Spiele am Flohmarkt für {gain}.', lesson:'Ausmisten kann sich lohnen.'}},
@@ -460,7 +505,7 @@ const LIFE = [
    de:{title:'Tombola-Gewinn', text:'Dein Los gewinnt {gain}!', lesson:'Glück gehabt! Glück ist aber kein Plan – ein Budget schon.'}},
   {e:'🦷', title:'Dentist bill', text:'A filling costs {cost} after insurance.', amount:-90, lesson:'Health costs are a classic reason to keep an emergency fund.', lvl:1,
    de:{title:'Zahnarztrechnung', text:'Eine Füllung kostet nach der Versicherung {cost}.', lesson:'Gesundheitskosten sind ein klassischer Grund für einen Notgroschen.'}},
-  {e:'🚗', title:'Fender bender', text:'You bump a parked car while learning to drive. Your share: {cost}.', amount:-120, lesson:'Insurance deductibles and emergency funds exist for moments like this.', lvl:1,
+  {e:'🚗', title:'Fender bender', text:'You bump a parked car while learning to drive. Your share: {cost}.', amount:-120, ins:true, lesson:'Insurance deductibles and emergency funds exist for moments like this.', lvl:1,
    de:{title:'Blechschaden', text:'Du streifst beim Fahrenlernen ein geparktes Auto. Dein Anteil: {cost}.', lesson:'Selbstbehalte und Notgroschen gibt es genau für solche Momente.'}},
   {e:'💳', title:'Store card offer', text:'“Open a store credit card and get 15% off your {$60} purchase today!”', lvl:2, choices:[
       {label:'Open card & buy ({$51} on credit)', debt:51, fun:1, lesson:'You saved {$9}… but now owe {$51} that grows with interest. Credit isn’t free money.'},
@@ -505,13 +550,45 @@ const TIPS = [
   {t:'<b>Credit score:</b> paying the minimum on time raises it; missing a payment drops it fast. Better score = cheaper loans.', de:'<b>Bonität:</b> Pünktliche Mindestraten verbessern sie, verpasste Raten senken sie stark. Bessere Bonität = günstigere Kredite.', lvl:2},
   {t:'<b>Inflation</b> raises prices every 5 rounds. Interest on savings helps your money keep up.', de:'<b>Inflation</b> erhöht alle 5 Runden die Preise. Zinsen auf dein Erspartes helfen, mitzuhalten.', lvl:2},
   {t:'<b>Own a full color set</b> to double customer fees — and use 🤝 Trade in 🏪 Ventures to complete one.', de:'<b>Hol dir eine ganze Farbgruppe</b>, um die Kundengebühren zu verdoppeln – mit 🤝 Tauschen unter 🏪 Unternehmen.'},
-  {t:'<b>Upgrades:</b> with a full set you can add ⭐ to ventures for much bigger fees and income.', de:'<b>Ausbauen:</b> Mit einer ganzen Gruppe kannst du ⭐ kaufen – für viel höhere Gebühren und Einnahmen.', lvl:1},
+  {t:'<b>Upgrades:</b> add a ⭐ to any venture for bigger fees and income. A full set unlocks ⭐⭐ and ⭐⭐⭐.', de:'<b>Ausbauen:</b> Gib jedem Unternehmen einen ⭐ für höhere Gebühren und mehr Einkommen. Eine ganze Gruppe schaltet ⭐⭐ und ⭐⭐⭐ frei.', lvl:1},
+  {t:'<b>Insurance</b> (in 💰 Money) costs a little at every Payday and covers big repair bills from Life Happens cards — you only pay the deductible.', de:'<b>Versicherung</b> (unter 💰 Geld) kostet an jedem Zahltag ein bisschen und übernimmt große Reparaturkosten von Lebenskarten – du zahlst nur den Selbstbehalt.'},
+  {t:'<b>Invest in yourself:</b> a 🎓 course (in 💰 Money) raises your paycheck for the rest of the game. Early is better!', de:'<b>Investier in dich selbst:</b> Ein 🎓 Kurs (unter 💰 Geld) erhöht dein Gehalt für den Rest des Spiels. Je früher, desto besser!'},
+  {t:'<b>Badges:</b> smart money moves unlock 🏅 badges. See your collection on the start screen.', de:'<b>Abzeichen:</b> Kluge Geld-Entscheidungen schalten 🏅 Abzeichen frei. Deine Sammlung siehst du auf dem Startbildschirm.'},
   {t:'<b>Keep a cash cushion.</b> Life Happens cards can hit hard when your wallet is empty.', de:'<b>Behalte einen Bargeld-Puffer.</b> Lebenskarten können hart treffen, wenn die Geldbörse leer ist.'},
   {t:'<b>Ventures are assets:</b> they pay side-hustle income every Payday, even if no one visits.', de:'<b>Unternehmen sind Vermögenswerte:</b> Sie bringen an jedem Zahltag Nebenverdienst – auch ohne Kundschaft.'},
   {t:'<b>Your goal</b> is measured by your SAVINGS balance at the end of the game.', de:'<b>Dein Ziel</b> wird am Spielende an deinem ERSPARTEN gemessen.'},
   {t:'<b>Tax takes 10% of your cash.</b> Savings and fun money aren’t taxed in this game.', de:'<b>Steuer: 10 % deines Bargelds.</b> Erspartes und Spaß-Geld werden in diesem Spiel nicht besteuert.', lvl:1},
   {t:'<b>Tap any board tile</b> to see what it does and how much it earns.', de:'<b>Tipp auf ein Feld</b>, um zu sehen, was es macht und wie viel es einbringt.'},
   {t:'<b>Trades:</b> think about what a venture will earn you, not just its price.', de:'<b>Tauschen:</b> Denk daran, was ein Unternehmen dir einbringt, nicht nur an den Preis.'}
+];
+
+/* 🎓 courses: pay once, earn a higher paycheck for the rest of the game */
+const COURSES = [
+  {id:'cert',  e:'🎓', name:'Online certificate', cost:80,  raise:20, lvl:0, de:{name:'Online-Zertifikat'}},
+  {id:'train', e:'🛠️', name:'Job training program', cost:160, raise:35, lvl:1, needs:'cert', de:{name:'Fachausbildung'}}
+];
+
+/* 🏅 badges: earned during a game, collected in the trophy case on this device.
+   lvl = lowest difficulty level where it can be earned; only = the one level where it exists */
+const BADGES = [
+  {id:'goal',     e:'🎯', name:'Goal Getter',     how:'Reach your savings goal.',                                   de:{name:'Ziel erreicht',      how:'Erreiche dein Sparziel.'}},
+  {id:'budget',   e:'⚖️', name:'Budget Boss',     how:'Save 30% or more of your paycheck at 3 Paydays.',           de:{name:'Budget-Profi',       how:'Spar an 3 Zahltagen 30 % oder mehr deines Gehalts.'}},
+  {id:'rainy',    e:'☔', name:'Rainy-Day Fund',  how:'Have savings worth at least two paychecks.',                  de:{name:'Notgroschen',        how:'Hab Erspartes im Wert von mindestens zwei Gehältern.'}},
+  {id:'interest', e:'🌱', name:'Money Grows',     how:'Earn {$100} in interest in one game.',                        de:{name:'Geld wächst',        how:'Verdiene in einem Spiel {$100} an Zinsen.'}},
+  {id:'willpower',e:'💪', name:'Willpower',       how:'Skip 3 impulse buys.',                                        de:{name:'Willensstark',       how:'Verzichte auf 3 Spontankäufe.'}},
+  {id:'planned',  e:'🎉', name:'Planned Fun',     how:'Pay for a treat completely with fun money.',                 de:{name:'Geplanter Spaß',     how:'Bezahl etwas komplett mit Spaß-Geld.'}},
+  {id:'quiz',     e:'🧠', name:'Quiz Whiz',       how:'Answer 3 Money Quiz questions correctly.',                    de:{name:'Quiz-Ass',           how:'Beantworte 3 Geld-Quiz-Fragen richtig.'}},
+  {id:'smart',    e:'🕵️', name:'Smart Choice',    how:'Make the smart choice on 2 Life Happens cards.',              de:{name:'Kluge Wahl',         how:'Triff bei 2 Lebenskarten die kluge Entscheidung.'}},
+  {id:'owner',    e:'🏪', name:'Business Owner',  how:'Own 3 ventures at the same time.',                            de:{name:'Unternehmer:in',     how:'Besitze 3 Unternehmen gleichzeitig.'}},
+  {id:'set',      e:'🌈', name:'Set Collector',   how:'Own a full color set.',                                       de:{name:'Gruppen-Sammler',    how:'Besitze eine ganze Farbgruppe.'}},
+  {id:'investor', e:'⭐', name:'Investor',        how:'Upgrade a venture.', lvl:1,                                   de:{name:'Investor:in',        how:'Bau ein Unternehmen aus.'}},
+  {id:'deal',     e:'🤝', name:'Deal Maker',      how:'Complete a trade.',                                           de:{name:'Verhandlungsprofi',  how:'Schließ einen Tausch ab.'}},
+  {id:'covered',  e:'🛡️', name:'Covered',         how:'Have your insurance pay for a claim.',                        de:{name:'Gut versichert',     how:'Lass deine Versicherung einen Schaden bezahlen.'}},
+  {id:'learner',  e:'🎓', name:'Lifelong Learner',how:'Finish a course.',                                            de:{name:'Lernprofi',          how:'Schließ einen Kurs ab.'}},
+  {id:'giver',    e:'💝', name:'Giver',           how:'Donate to a good cause.', only:0,                             de:{name:'Großes Herz',        how:'Spende für einen guten Zweck.'}},
+  {id:'debtfree', e:'🏆', name:'Debt Destroyer',  how:'Pay off all your debt after borrowing.', only:2,              de:{name:'Schuldenfrei',       how:'Zahl nach einem Kredit alle Schulden zurück.'}},
+  {id:'credit',   e:'📈', name:'Credit Star',     how:'Reach a credit score of 750.', only:2,                        de:{name:'Bonitäts-Star',      how:'Erreiche eine Bonität von 750.'}},
+  {id:'winner',   e:'🥇', name:'Champion',        how:'Win a game.',                                                 de:{name:'Champion',           how:'Gewinne ein Spiel.'}}
 ];
 
 /* ---------------- language & currency ----------------
@@ -725,10 +802,8 @@ const DE = {
 '❌ Decline':'❌ Ablehnen',
 '🤝 {b} accepted {a}’s trade!':'🤝 {b} hat den Tausch von {a} angenommen!',
 '🤝 {b} declined the trade.':'🤝 {b} hat den Tausch abgelehnt.',
-'No tradeable ventures':'Keine tauschbaren Unternehmen',
 'Cash (you have {m})':'Bargeld (du hast {m})',
 'Cash ({n} has {m})':'Bargeld ({n} hat {m})',
-'Ventures in a set with ⭐ upgrades can’t be traded.':'Unternehmen aus einer Gruppe mit ⭐ Ausbau können nicht getauscht werden.',
 'Send offer':'Angebot senden',
 'List value — you give {a}, you get {b}.':'Listenwert – du gibst {a}, du bekommst {b}.',
 'Propose a trade':'Tausch vorschlagen',
@@ -779,13 +854,11 @@ const DE = {
 'Borrowed {m} at {r} per Payday.':'{m} zu {r} pro Zahltag geliehen.',
 '{p} Money':'Geld von {n}',
 'Trade with another player':'Mit jemandem tauschen',
-'Own all 3 ventures in a set to double fees and unlock ⭐ upgrades (up to 3).':'Besitze alle 3 Unternehmen einer Gruppe, um die Gebühren zu verdoppeln und ⭐ Ausbau (bis 3) freizuschalten.',
 'Own all 3 ventures in a set to double fees (⭐ upgrades unlock on Medium).':'Besitze alle 3 Unternehmen einer Gruppe, um die Gebühren zu verdoppeln (⭐ Ausbau gibt es ab „Mittel“).',
 'Every venture pays side-hustle income each Payday.':'Jedes Unternehmen bringt an jedem Zahltag Nebenverdienst.',
 'Cash: {m}':'Bargeld: {m}',
 'Medium+ only':'Erst ab „Mittel“',
 'Max level':'Höchste Stufe',
-'Need full set':'Ganze Gruppe nötig',
 'Fee {f} · Income {m}/Payday':'Gebühr {f} · Einkommen {m}/Zahltag',
 'Upgrade {m}':'Ausbauen {m}',
 'Sell {m}':'Verkaufen {m}',
@@ -799,7 +872,6 @@ const DE = {
 'Fee right now':'Aktuelle Gebühr',
 'Owner income / Payday':'Einkommen / Zahltag',
 'Fee: basic / full set':'Gebühr: normal / ganze Gruppe',
-'Fee: ⭐ / ⭐⭐ / ⭐⭐⭐':'Gebühr: ⭐ / ⭐⭐ / ⭐⭐⭐',
 'Upgrade cost':'Ausbaukosten',
 'Right now: {m}.':'Derzeit: {m}.',
 'You':'Du',
@@ -983,7 +1055,56 @@ const DE = {
 'How to play':'Spielanleitung',
 '🎉 Upbeat':'🎉 Fröhlich',
 '☕ Calm lo-fi':'☕ Ruhiger Lo-Fi',
-'🔀 Mix':'🔀 Mix'
+'🔀 Mix':'🔀 Mix',
+'{n} bought insurance ({m} per Payday).':'{n} hat eine Versicherung abgeschlossen ({m} pro Zahltag).',
+'🛡️ {n} is now insured.':'🛡️ {n} ist jetzt versichert.',
+'{n} cancelled the insurance.':'{n} hat die Versicherung gekündigt.',
+'🛡️ {n} cancelled the insurance.':'🛡️ {n} hat die Versicherung gekündigt.',
+'{n} finished the course “{c}” — paycheck +{r}.':'{n} hat den Kurs „{c}“ abgeschlossen – Gehalt +{r}.',
+'🎓 {n} finished “{c}”: paycheck +{r}, now {m}.':'🎓 {n} hat „{c}“ abgeschlossen: Gehalt +{r}, jetzt {m}.',
+'{n} earned the badge {b}.':'{n} hat das Abzeichen {b} bekommen.',
+'{n} earned a badge: {b}':'{n} bekommt ein Abzeichen: {b}',
+'−{m} insurance':'−{m} Versicherung',
+'insurance cancelled — no cash for the {m} premium':'Versicherung gekündigt – kein Bargeld für die Prämie von {m}',
+'⚠️ {n}: your cash is less than your next minimum payment ({m}). Move money into cash before Payday!':'⚠️ {n}: Dein Bargeld reicht nicht für die nächste Mindestrate ({m}). Verschieb vor dem Zahltag Geld ins Bargeld!',
+'💳 {n} borrowed {m} to buy {v}.':'💳 {n} hat {m} geliehen, um {v} zu kaufen.',
+'🛡️ insurance paid {m}':'🛡️ Versicherung zahlt {m}',
+'🛡️ below your {d} deductible':'🛡️ unter deinem Selbstbehalt von {d}',
+'With 🛡️ insurance you would have paid only {m}.':'Mit 🛡️ Versicherung hättest du nur {m} gezahlt.',
+'−{m} on your next 🎓 course':'−{m} auf deinen nächsten 🎓 Kurs',
+'You’ve already taken every course.':'Du hast schon alle Kurse gemacht.',
+'No ventures':'Keine Unternehmen',
+'Insurance':'Versicherung',
+'Insured ✓':'Versichert ✓',
+'Not insured':'Nicht versichert',
+'{m} per Payday · you pay the first {d} of each repair or accident (deductible)':'{m} pro Zahltag · bei jedem Schaden zahlst du die ersten {d} selbst (Selbstbehalt)',
+'Premiums paid {a} · insurance paid {b}':'Prämien gezahlt {a} · Versicherung hat {b} gezahlt',
+'Get it ({m} now)':'Abschließen ({m} jetzt)',
+'Invest in yourself':'Investier in dich selbst',
+'First: {c}':'Zuerst: {c}',
+'Take it · {m}':'Machen · {m}',
+'+{r} paycheck · pays for itself after {k} Paydays':'+{r} Gehalt · hat sich nach {k} Zahltagen bezahlt gemacht',
+'About {k} Paydays left in this game.':'Noch etwa {k} Zahltage in diesem Spiel.',
+'🎟️ {m} off your next course':'🎟️ {m} Rabatt auf deinen nächsten Kurs',
+'🛡️ Insured! Covered Life Happens costs now cost you at most {d}.':'🛡️ Versichert! Versicherte Kosten aus Lebenskarten kosten dich jetzt höchstens {d}.',
+'Insurance cancelled.':'Versicherung gekündigt.',
+'🎓 Course done! Your paycheck rises by {r}.':'🎓 Kurs geschafft! Dein Gehalt steigt um {r}.',
+'Upgrade any venture to ⭐. Own all 3 ventures in a set to double fees and unlock ⭐⭐ and ⭐⭐⭐ (without the full set, upgraded ventures earn half).':'Jedes Unternehmen kann einen ⭐ bekommen. Besitze alle 3 einer Gruppe, um die Gebühren zu verdoppeln und ⭐⭐ und ⭐⭐⭐ freizuschalten (ohne ganze Gruppe bringen ausgebaute Unternehmen nur die Hälfte).',
+'Full set needed for ⭐⭐':'Für ⭐⭐ ganze Gruppe nötig',
+'Fee with full set: ⭐ / ⭐⭐ / ⭐⭐⭐':'Gebühr mit ganzer Gruppe: ⭐ / ⭐⭐ / ⭐⭐⭐',
+'Fee with ⭐, no full set':'Gebühr mit ⭐, ohne ganze Gruppe',
+'Insurance: paid / covered':'Versicherung: gezahlt / übernommen',
+'Courses · paycheck':'Kurse · Gehalt',
+'Badges':'Abzeichen',
+'Net worth, round by round':'Vermögen, Runde für Runde',
+'Start':'Start',
+'After round {r}':'Nach Runde {r}',
+'<b>Protect &amp; grow:</b> in 💰 Money you can buy 🛡️ insurance (a small premium at every Payday, and big repair bills from Life Happens cost you only the deductible) and take 🎓 courses that raise your paycheck. Smart money moves earn 🏅 badges.':'<b>Absichern &amp; wachsen:</b> Unter 💰 Geld kannst du eine 🛡️ Versicherung abschließen (eine kleine Prämie an jedem Zahltag – große Reparaturkosten aus Lebenskarten kosten dich dann nur den Selbstbehalt) und 🎓 Kurse machen, die dein Gehalt erhöhen. Kluge Geld-Entscheidungen bringen 🏅 Abzeichen.',
+'Easy only':'Nur „Leicht“',
+'Hard only':'Nur „Schwer“',
+'Medium & Hard':'„Mittel“ & „Schwer“',
+'{k} of {t} badges collected on this device.':'{k} von {t} Abzeichen auf diesem Gerät gesammelt.',
+'🏅 Badges':'🏅 Abzeichen'
 };
 
 /* ---------------- state ---------------- */
@@ -1061,11 +1182,11 @@ const SFX = {
   lose:{s:['k_chipsHandle1','k_chipsHandle2','k_chipsHandle3'], g:.55},  buy:{s:['k_chipsStack1','k_chipsStack2'], g:.7},
   payday:{s:['k_chipsCollide1','k_handleCoins2'], g:.6},  card:{s:['k_cardSlide1','k_cardSlide2','k_cardSlide3'], g:.6},
   click:{s:['k_click3'], g:.16},  toggle:{s:['k_switch3'], g:.3},
-  good:{s:['k_powerUp2'], g:.35},  bad:{s:['k_lowDown'], g:.3},  upgrade:{s:['k_powerUp7'], g:.4},
+  good:{s:['k_powerUp2'], g:.35},  badge:{s:['k_powerUp7'], g:.38},  bad:{s:['k_lowDown'], g:.3},  upgrade:{s:['k_powerUp7'], g:.4},
   set:{s:['b_treasure'], g:.33, duck:true},  fail:{s:['b_failure'], g:.33, duck:true},  bankrupt:{s:['b_game_over'], g:.33, duck:true},
   inflation:{s:['b_time_running_out'], g:.3, duck:true},  start:{s:['b_level_start'], g:.28, duck:true},  win:{s:['b_victory'], g:.33, duck:true}
 };
-const NET_SFX = new Set(['coin','lose','good','bad','buy','payday','card','upgrade','set','fail','bankrupt','inflation','start','win']);
+const NET_SFX = new Set(['badge','coin','lose','good','bad','buy','payday','card','upgrade','set','fail','bankrupt','inflation','start','win']);
 const TRACKS = [
   {id:'m_sergio',    title:'Sergio’s Magic Dustbin', artist:'Kevin MacLeod', style:'upbeat'},
   {id:'m_fireplace', title:'Fire Place',             artist:'HoliznaCC0',    style:'lofi'},
@@ -1117,7 +1238,7 @@ const Sound = {
     ({ coin:() => { this.tone(988,.08,'square',.05); this.tone(1319,.28,'square',.05,.08); }, lose:() => { this.tone(330,.14,'sawtooth',.05); this.tone(220,.3,'sawtooth',.05,.12); },
        step:() => this.tone(560+rnd(220),.05,'triangle',.07), dice:() => { for (let k=0;k<7;k++) this.tone(180+rnd(320),.035,'square',.035,k*.07); },
        land:() => this.tone(140,.08,'square',.05), click:() => this.tone(1200,.02,'square',.02), toggle:() => this.tone(900,.03,'square',.03), card:() => this.tone(700,.06,'triangle',.04),
-       buy:() => this.tone(988,.12,'square',.05), payday:() => this.tone(1319,.25,'square',.05), good:up, set:up, start:up, win:up, upgrade:up,
+       buy:() => this.tone(988,.12,'square',.05), payday:() => this.tone(1319,.25,'square',.05), good:up, set:up, start:up, win:up, upgrade:up, badge:up,
        bad:down, fail:down, bankrupt:down, inflation:down }[ev] || (() => {}))(); },
   async startMusic(){
     if (!this.ctx || this.music.playing || this.music.starting) return; this.music.starting = true;
@@ -1396,12 +1517,13 @@ const baseFee = i => Math.round(TILES[i].price/10);
 const upgradeCost = i => Math.round(TILES[i].price/2);
 const setTiles = g => TILES.map((t,j) => j).filter(j => TILES[j].g === g);
 function ownsSet(pi, g){ return setTiles(g).every(j => S.owners[j] === pi); }
-function fee(i){ const o = S.owners[i]; if (o < 0) return baseFee(i); const lv = S.levels[i]; let f = baseFee(i)*MULT[lv]; if (lv === 0 && ownsSet(o, TILES[i].g)) f *= 2; return f; }
+function fee(i){ const o = S.owners[i]; if (o < 0) return baseFee(i); const lv = S.levels[i], set = ownsSet(o, TILES[i].g);
+  let f = baseFee(i)*MULT[lv]; if (lv === 0 && set) f *= 2; if (lv > 0 && !set) f = Math.round(f/2); return f; }
 const hustle = i => Math.max(1, Math.round(fee(i)/3));
 const owned = pi => S.owners.map((o,i) => o === pi ? i : -1).filter(i => i >= 0);
 const assetValue = i => TILES[i].price + S.levels[i]*upgradeCost(i);
 function netWorth(p){ const pi = pidx(p); return p.cash + p.savings + (p.funMoney || 0) - p.debt + owned(pi).reduce((s,i) => s + assetValue(i), 0); }
-function canUpgrade(pi, i){ return D().upgrades && S.owners[i] === pi && S.levels[i] < 3 && ownsSet(pi, TILES[i].g); }
+function canUpgrade(pi, i){ return D().upgrades && S.owners[i] === pi && S.levels[i] < 3 && (S.levels[i] === 0 || ownsSet(pi, TILES[i].g)); }
 /* credit (Hard) */
 function creditTier(score){ return score >= 740 ? {rate:.08, limit:800, label:L('Excellent')} : score >= 670 ? {rate:.12, limit:600, label:L('Good')}
                                  : score >= 580 ? {rate:.18, limit:400, label:L('Fair')} : {rate:.25, limit:200, label:L('Poor')}; }
@@ -1409,6 +1531,60 @@ const loanRate = p => creditTier(p.credit).rate;
 const creditLimit = p => creditTier(p.credit).limit;
 const minPayment = p => p.debt > 0 ? Math.min(p.debt, Math.max(10, Math.ceil(p.debt*.1))) : 0;
 function bumpCredit(p, d){ if (!D().credit) return; p.credit = clamp(Math.round(p.credit + d), 300, 850); }
+/* 🛡️ insurance: a premium at sign-up and at every Payday; covered Life cards cost only the deductible */
+const premium = () => infl(INS_PREMIUM);
+const deductible = () => infl(LVL() === 0 ? 10 : 25);
+function setInsurance(p, on){
+  if (!!on === !!p.ins) return false;
+  if (on){ const pr = premium(); if (p.cash < pr) return false; p.cash -= pr; p.insPaid += pr; p.ins = true; Sound.good();
+    log(L('{n} bought insurance ({m} per Payday).', {n:p.name, m:money(pr)})); toast(L('🛡️ {n} is now insured.', {n:B(p.name)}), 'good'); }
+  else { p.ins = false; log(L('{n} cancelled the insurance.', {n:p.name})); toast(L('🛡️ {n} cancelled the insurance.', {n:B(p.name)})); }
+  return true; }
+/* 🎓 courses: pay once, earn more at every Payday after */
+const courseCost = (p, c) => Math.max(0, infl(c.cost) - (p.eduDisc || 0));
+/** '' = can take it now; otherwise why not: done | level | needs */
+function courseState(p, c){ const done = p.courses || []; return done.includes(c.id) ? 'done' : LVL() < c.lvl ? 'level' : c.needs && !done.includes(c.needs) ? 'needs' : ''; }
+const paydaysLeft = () => Math.max(0, Math.round((S.maxRounds - S.round + 1)*7/24));
+function takeCourse(p, id){ const c = COURSES.find(x => x.id === id); if (!c || courseState(p, c)) return false;
+  const cost = courseCost(p, c); if (p.cash < cost) return false;
+  p.cash -= cost; p.eduSpent += cost; p.eduDisc = 0; p.courses.push(c.id); p.paycheck += c.raise; Sound.upgrade();
+  log(L('{n} finished the course “{c}” — paycheck +{r}.', {n:p.name, c:tx(c,'name'), r:money(c.raise)}));
+  toast(L('🎓 {n} finished “{c}”: paycheck +{r}, now {m}.', {n:B(p.name), c:tx(c,'name'), r:money(c.raise), m:money(p.paycheck)}), 'good'); return true; }
+/** fill in fields added in later versions (old saves) */
+function normPlayer(p){
+  const d0 = {funMoney:0, trades:0, ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false};
+  for (const k in d0) if (p[k] === undefined) p[k] = d0[k];
+  if (!Array.isArray(p.courses)) p.courses = []; if (!Array.isArray(p.badges)) p.badges = []; return p; }
+/* 📈 net worth after every round, for the end-of-game chart */
+function snapHist(r){ if (!Array.isArray(S.hist)) S.hist = []; const last = S.hist[S.hist.length - 1]; if (last && last.r === r) S.hist.pop();
+  S.hist.push({r, v:S.players.map(p => p.out ? null : netWorth(p))}); if (S.hist.length > 80) S.hist.shift(); }
+/* 🏅 badges */
+const TROPHY_KEY = 'moneymoves-badges-v1';
+function trophies(){ try { const t = JSON.parse(localStorage.getItem(TROPHY_KEY) || '{}'); return t && typeof t === 'object' ? t : {}; } catch(e){ return {}; } }
+/** remember a badge in this device's trophy case (once per game and name) */
+function recordTrophy(name, id, gid){ if (!BADGES.some(b => b.id === id)) return; const t = trophies();
+  const e = t[id] && typeof t[id] === 'object' ? t[id] : {n:0, who:[], seen:[]}; e.who = Array.isArray(e.who) ? e.who : []; e.seen = Array.isArray(e.seen) ? e.seen : [];
+  const key = gid + '|' + name; if (e.seen.includes(key)) return;
+  e.seen.push(key); if (e.seen.length > 40) e.seen.shift(); e.n = (+e.n || 0) + 1; e.who = [name, ...e.who.filter(x => x !== name)].slice(0, 4); t[id] = e;
+  try { localStorage.setItem(TROPHY_KEY, JSON.stringify(t)); } catch(e2){} }
+const badgeOk = b => b.only !== undefined ? b.only === LVL() : (b.lvl || 0) <= LVL();
+function award(p, id){
+  if (NET.role === 'guest' || !p || S.phase === 'setup') return; normPlayer(p);
+  const b = BADGES.find(x => x.id === id); if (!b || !badgeOk(b) || p.badges.includes(id)) return;
+  p.badges.push(id); Sound.badge();
+  log(L('{n} earned the badge {b}.', {n:p.name, b:`${b.e} ${tx(b,'name')}`}));
+  toast(`<span class="bdg">${b.e}</span> ${L('{n} earned a badge: {b}', {n:B(p.name), b:`<b>${tx(b,'name')}</b>`})}<br><small>${tx(b,'how')}</small>`, 'gold');
+  if (p.ctrl === 'local') recordTrophy(p.name, id, S.gameId); }
+/** award every badge whose condition is met (host or single device; runs with each UI update) */
+function checkBadges(){
+  if (NET.role === 'guest' || S.phase === 'setup' || !Array.isArray(S.players)) return;
+  S.players.forEach((p, pi) => { if (p.out) return; normPlayer(p); if (p.debt > 0) p.hadDebt = true;
+    const mine = owned(pi), chk = (id, ok) => { if (ok && !p.badges.includes(id)) award(p, id); };
+    chk('goal', p.savings >= p.goal.amount); chk('budget', p.goodBudgets >= 3); chk('rainy', p.savings >= 2*p.paycheck);
+    chk('interest', p.intEarned >= 100); chk('willpower', p.skips >= 3); chk('planned', p.planned > 0); chk('quiz', p.quizRight >= 3);
+    chk('smart', p.smart >= 2); chk('owner', mine.length >= 3); chk('set', Object.keys(GROUPS).some(g => ownsSet(pi, g)));
+    chk('investor', mine.some(i => S.levels[i] > 0)); chk('deal', p.trades > 0); chk('covered', p.claims > 0); chk('learner', p.courses.length > 0);
+    chk('giver', p.given > 0); chk('debtfree', p.hadDebt && p.debt === 0); chk('credit', p.credit >= 750); }); }
 /* payday budget: shares in percent; needs (cash) = the rest */
 const budgetOf = p => { const b = p.budget || {save:20, fun:30}; const save = clamp(Math.round(b.save), 0, 100); return {save, fun:clamp(Math.round(b.fun), 0, 100 - save)}; };
 function splitPay(gross, b){ gross = Math.max(0, Math.round(gross)); const s = Math.min(gross, Math.round(gross*b.save/100)), f = Math.min(gross - s, Math.round(gross*b.fun/100)); return {save:s, fun:f, needs:gross - s - f}; }
@@ -1462,27 +1638,36 @@ function checkDebt(p){
 }
 
 async function payday(p){
-  const d = D(), pi = pidx(p), gross = p.paycheck;
+  const d = D(), pi = pidx(p), gross = p.paycheck, after = [], bad = x => `<span class="bad-t">${x}</span>`;
   // 1. interest on what was already saved
   const interest = Math.round(p.savings*SAVE_RATE); p.savings += interest; p.intEarned += interest;
-  // 2. the player budgets the paycheck (people are asked unless they chose “use automatically”)
+  // 2. Hard: loan interest and the minimum payment are due BEFORE the paycheck arrives (cash first, then fun money)
+  if (d.credit && p.debt > 0){
+    p.hadDebt = true;
+    const li = Math.ceil(p.debt*loanRate(p)); p.debt += li; p.intPaid += li; after.push(bad(L('−{m} loan interest ({r})', {m:money(li), r:pct(loanRate(p))})));
+    const mp = minPayment(p);
+    if (p.cash + p.funMoney >= mp){ const c = Math.min(p.cash, mp); p.cash -= c; p.funMoney -= mp - c; p.debt -= mp; bumpCredit(p, 8);
+      after.push(L('paid {m} minimum ✓ credit +8', {m:money(mp)})); if (p.debt === 0) bumpCredit(p, 10); }
+    else { const lf = infl(LATE_FEE); p.debt += lf; p.missed++; bumpCredit(p, -45); Sound.bad();
+      after.push(bad(L('MISSED the {m} minimum! +{f} late fee, credit −45', {m:money(mp), f:money(lf)}))); }
+    if (p.debt > creditLimit(p)*.8){ bumpCredit(p, -10); after.push(bad(L('maxed-out credit −10'))); }
+  }
+  // 3. the player budgets the paycheck (people are asked unless they chose “use automatically”)
   if (!p.cpu && p.askBudget !== false){
     const r = await ask(p, {panel:'budget', gross});
     if (r && typeof r === 'object'){ const save = clamp(Math.floor(+r.save || 0), 0, 100); p.budget = {save, fun:clamp(Math.floor(+r.fun || 0), 0, 100 - save)}; p.askBudget = r.ask !== false; }
   }
-  const sp = splitPay(gross, budgetOf(p));
+  const b = budgetOf(p), sp = splitPay(gross, b);
   p.savings += sp.save; p.funMoney += sp.fun; p.cash += sp.needs; p.autoSaved += sp.save; p.paidFun += sp.fun;
-  // 3. ventures pay side-hustle income into cash
+  if (b.save >= 30) p.goodBudgets++;
+  // 4. ventures pay side-hustle income into cash
   let hust = 0; owned(pi).forEach(i => hust += hustle(i)); p.cash += hust;
+  // 5. insurance premium (from cash; no cash = the policy lapses)
+  if (p.ins){ const pr = premium();
+    if (p.cash >= pr){ p.cash -= pr; p.insPaid += pr; after.push(L('−{m} insurance', {m:money(pr)})); }
+    else { p.ins = false; after.push(bad(L('insurance cancelled — no cash for the {m} premium', {m:money(pr)}))); log(L('{n} cancelled the insurance.', {n:p.name})); } }
   const parts = [L('+{m} paycheck → {c} cash · {f} fun money · {s} savings', {m:money(gross), c:money(sp.needs), f:money(sp.fun), s:money(sp.save)}),
-                 interest ? L('+{m} interest', {m:money(interest)}) : '', hust ? L('+{m} side hustles', {m:money(hust)}) : ''].filter(Boolean);
-  if (d.credit && p.debt > 0){
-    const li = Math.ceil(p.debt*loanRate(p)); p.debt += li; p.intPaid += li; parts.push(`<span class="bad-t">${L('−{m} loan interest ({r})', {m:money(li), r:pct(loanRate(p))})}</span>`);
-    const mp = minPayment(p);
-    if (p.cash >= mp){ p.cash -= mp; p.debt -= mp; bumpCredit(p, 8); parts.push(L('paid {m} minimum ✓ credit +8', {m:money(mp)})); if (p.debt === 0) bumpCredit(p, 10); }
-    else { const lf = infl(LATE_FEE); p.debt += lf; p.missed++; bumpCredit(p, -45); parts.push(`<span class="bad-t">${L('MISSED the {m} minimum! +{f} late fee, credit −45', {m:money(mp), f:money(lf)})}</span>`); }
-    if (p.debt > creditLimit(p)*.8){ bumpCredit(p, -10); parts.push(`<span class="bad-t">${L('maxed-out credit −10')}</span>`); }
-  }
+                 interest ? L('+{m} interest', {m:money(interest)}) : '', hust ? L('+{m} side hustles', {m:money(hust)}) : '', ...after].filter(Boolean);
   let iouMsg = '';
   if (p.iou){ if (p.iou.repay){ p.cash += p.iou.amount; iouMsg = ' · ' + L('🤝 friend paid back {m}', {m:money(p.iou.amount)}); }
               else iouMsg = ' · ' + L('😬 your friend “forgot” the {m}', {m:money(p.iou.amount)}); p.iou = null; }
@@ -1573,9 +1758,12 @@ function endTurn(){
   if (S.over) return;
   $('#info').classList.add('hidden');
   const p = cur(); if (p) checkDebt(p);
+  if (p && !p.out && !p.cpu && D().credit && p.debt > 0 && p.cash + p.funMoney < minPayment(p))
+    toast(L('⚠️ {n}: your cash is less than your next minimum payment ({m}). Move money into cash before Payday!', {n:B(p.name), m:money(minPayment(p))}), 'warn');
   if (S.players.length > 1 && alive().length <= 1) return gameOver();
   const n = S.players.length; let next = S.turn, guard = 0, newRound = false;
   do { next = (next + 1) % n; if (next === 0){ S.round++; newRound = true; } guard++; } while (S.players[next].out && guard < 10);
+  if (newRound) snapHist(S.round - 1);
   if (S.round > S.maxRounds) return gameOver();
   if (newRound && D().inflation && S.round > 1 && (S.round - 1) % 5 === 0){
     S.priceLevel = Math.round(S.priceLevel*1.1*100)/100; refreshTile(4); Sound.inflation();
@@ -1647,6 +1835,9 @@ async function landVenture(p, i){
     if (p.cash - price >= 60) buy(p, i);
     else if (p.debt === 0 && p.cash + p.savings - price >= 100){ const w = Math.max(0, Math.min(p.savings, price + 40 - p.cash));
       if (w > 0){ p.savings -= w; p.cash += w; toast(L('🤖 {n} withdrew {m} from savings to invest.', {n:B(p.name), m:money(w)})); } buy(p, i); }
+    else if (D().credit && p.debt + price <= creditLimit(p)*.6 && Math.random() < .6){ const loan = Math.max(0, price + 40 - p.cash);
+      p.debt += loan; p.borrowed += loan; p.cash += loan; bumpCredit(p, -5); log(L('{n} borrowed {m}.', {n:p.name, m:money(loan)}));
+      toast(L('💳 {n} borrowed {m} to buy {v}.', {n:B(p.name), m:money(loan), v:tname(i)}), 'warn'); buy(p, i); }
     else toast(L('{e} {n} passed on {v} (keeping a cash cushion).', {e:t.emoji, n:B(p.name), v:tname(i)}));
     return;
   }
@@ -1715,14 +1906,25 @@ async function doLife(p){
   if (eff.raise){ p.paycheck += eff.raise; msgs.push(L('Paycheck is now {m}', {m:money(p.paycheck)})); Sound.good(); log(L('{n} got a raise.', {n:p.name})); }
   if (eff.cash){ gain(p, eff.cash, title); msgs.push(L('+{m} cash', {m:money(eff.cash)})); }
   if (eff.amount > 0){ gain(p, eff.amount, title, !!eff.toSavings); msgs.push(eff.toSavings ? L('+{m} to savings', {m:money(eff.amount)}) : `+${money(eff.amount)}`); }
-  if (eff.amount < 0){ const amt = infl(-eff.amount); const nt = charge(p, amt, title); msgs.push(`−${money(amt)}` + (nt.length ? ` (${nt.join(', ')})` : '')); }
+  let insNote = '';
+  if (eff.amount < 0){ let amt = infl(-eff.amount);
+    if (c.ins && !ch){ const ded = Math.min(amt, deductible());
+      if (p.ins){ const covered = amt - ded;
+        if (covered > 0){ p.insSaved += covered; p.claims++; msgs.push(L('🛡️ insurance paid {m}', {m:money(covered)})); Sound.good(); }
+        else msgs.push(L('🛡️ below your {d} deductible', {d:money(deductible())}));
+        amt = ded; }
+      else insNote = L('With 🛡️ insurance you would have paid only {m}.', {m:money(ded)}); }
+    if (amt > 0){ const nt = charge(p, amt, title); msgs.push(`−${money(amt)}` + (nt.length ? ` (${nt.join(', ')})` : '')); } }
+  if (eff.course){ if (COURSES.some(x => !courseState(p, x))){ p.eduDisc = Math.max(p.eduDisc || 0, eff.course); msgs.push(L('−{m} on your next 🎓 course', {m:money(eff.course)})); }
+    else msgs.push(L('You’ve already taken every course.')); }
+  if (ch && ch.smart) p.smart++;
   if (eff.debt){ p.debt += eff.debt; p.borrowed += eff.debt; p.treats += eff.fun || 0; p.impulse += eff.fun || 0; msgs.push(L('+{m} debt', {m:money(eff.debt)})); log(L('{n} took on {m} of debt.', {n:p.name, m:money(eff.debt)})); Sound.lose(); checkDebt(p); }
   if (eff.credit){ bumpCredit(p, eff.credit); msgs.push(L('credit score +{k}', {k:eff.credit})); }
   if (eff.lend){ p.iou = {amount:eff.lend, repay: Math.random() < .6}; }
   updateUI();
   const msg = msgs.join(' · '), lesson = ch ? chLesson(chIdx) : cardText(c, tx(c,'lesson'));
   if (p.cpu) toast(`${c.e} ${B(p.name)} — ${esc(title)}${ch ? ': ' + L('chose “{c}”', {c:esc(chLabel(chIdx).replace(/^[^\p{L}\p{N}]+/u,''))}) : ''} ${msg}`);
-  else await ask(p, {icon:c.e, title:esc(title), body:`${ch ? '' : `<p>${esc(text)}</p>`}${msg ? `<p class="big ${/−|debt|Schulden/.test(msg)?'bad-t':''}" style="font-size:22px">${msg}</p>` : ''}${lessonBox(esc(lesson))}`});
+  else await ask(p, {icon:c.e, title:esc(title), body:`${ch ? '' : `<p>${esc(text)}</p>`}${msg ? `<p class="big ${/−|debt|Schulden/.test(msg)?'bad-t':''}" style="font-size:22px">${msg}</p>` : ''}${insNote ? `<p class="muted">${insNote}</p>` : ''}${lessonBox(esc(lesson))}`});
 }
 
 async function doMall(p){
@@ -1746,7 +1948,7 @@ async function doMall(p){
     if (!p.cpu && p.impulse >= 3) toast(L('😅 That’s a lot of over-budget treats. Planned fun is great — these add up!'), 'warn');
     updateUI();
   }
-  else { p.skipped += price; toast(L('💪 {n} skipped {i} and kept {m}.', {n:B(p.name), i:nm, m:money(price)}), 'good'); log(L('{n} skipped {i}.', {n:p.name, i:nm})); }
+  else { p.skipped += price; p.skips++; toast(L('💪 {n} skipped {i} and kept {m}.', {n:B(p.name), i:nm, m:money(price)}), 'good'); log(L('{n} skipped {i}.', {n:p.name, i:nm})); }
 }
 
 async function doBank(p){
@@ -1761,8 +1963,13 @@ async function doBank(p){
 /* ---------------- CPU ---------------- */
 function cpuManage(p){ const pi = pidx(p);
   if (p.debt > 0){ const r = Math.min(p.debt, Math.max(0, p.cash - 80)); if (r > 0){ p.cash -= r; p.debt -= r; if (p.debt === 0) bumpCredit(p, 10); log(L('{n} repaid {m} of debt.', {n:p.name, m:money(r)})); toast(L('🤖 {n} repaid {m} of debt.', {n:B(p.name), m:money(r)})); } }
-  for (const i of owned(pi)){ const c = upgradeCost(i);
-    if (canUpgrade(pi, i) && p.debt === 0 && p.cash + p.savings - c >= 150){ if (p.cash < c + 40){ const w = Math.min(p.savings, c + 40 - p.cash); p.savings -= w; p.cash += w; } upgrade(p, i); } }
+  normPlayer(p);
+  if (!p.insDecided){ p.insDecided = true; if (Math.random() < .5 && p.cash >= premium() + 60) setInsurance(p, true); }
+  for (const c of COURSES){ const cost = courseCost(p, c);
+    if (!courseState(p, c) && p.debt === 0 && S.round <= S.maxRounds*.45 && p.cash + p.savings - cost >= 120 && Math.random() < .5){
+      if (p.cash < cost){ const w = Math.min(p.savings, cost - p.cash); p.savings -= w; p.cash += w; } takeCourse(p, c.id); } }
+  for (const i of owned(pi)){ const c = upgradeCost(i), keep = ownsSet(pi, TILES[i].g) ? 150 : 220;
+    if (canUpgrade(pi, i) && p.debt === 0 && p.cash + p.savings - c >= keep){ if (p.cash < c + 40){ const w = Math.min(p.savings, c + 40 - p.cash); p.savings -= w; p.cash += w; } upgrade(p, i); } }
   if (p.cash > 260 && p.debt === 0){ const d = p.cash - 180; p.cash -= d; p.savings += d; log(L('{n} deposited {m}.', {n:p.name, m:money(d)})); toast(L('🤖 {n} moved {m} into savings.', {n:B(p.name), m:money(d)})); }
   updateUI(); }
 function upgrade(p, i){ const c = upgradeCost(i); if (p.cash < c || !canUpgrade(pidx(p), i)) return false;
@@ -1772,8 +1979,8 @@ function upgrade(p, i){ const c = upgradeCost(i); if (p.cash < c || !canUpgrade(
 
 /* ---------------- trading ----------------
    Offer: {from, to, give:{v:[tiles], c:cash}, get:{v:[tiles], c:cash}} — "give" goes from → to, "get" goes to → from.
-   Ventures in a set that has ⭐ upgrades can't be traded. */
-function tradeable(pi){ return owned(pi).filter(i => !setTiles(TILES[i].g).some(j => S.levels[j] > 0)); }
+   A venture keeps its ⭐ upgrades when it changes hands. */
+function tradeable(pi){ return owned(pi); }
 function cleanOffer(o){ const side = x => ({v:[...new Set((x && Array.isArray(x.v) ? x.v : []).map(Number).filter(n => Number.isInteger(n) && n >= 0 && n < 24))], c:Math.max(0, Math.floor(+(x && x.c) || 0))});
   return {from:Math.floor(+o.from), to:Math.floor(+o.to), give:side(o.give), get:side(o.get)}; }
 function offerProblem(o){
@@ -1786,7 +1993,7 @@ function offerProblem(o){
   if (o.get.c > Bp.cash) return L('{n} doesn’t have enough cash for this offer.', {n:esc(Bp.name)});
   return ''; }
 /** how much a CPU values a venture when gaining or giving it away (set progress matters) */
-function ventureWorth(pi, i, gaining){ const mine = setTiles(TILES[i].g).filter(j => S.owners[j] === pi).length; let w = TILES[i].price;
+function ventureWorth(pi, i, gaining){ const mine = setTiles(TILES[i].g).filter(j => S.owners[j] === pi).length; let w = assetValue(i);
   if (gaining){ if (mine === 2) w *= 1.8; else if (mine === 1) w *= 1.25; }
   else { if (mine === 3) w *= 2.2; else if (mine === 2) w *= 1.5; }
   return w; }
@@ -1795,7 +2002,7 @@ function cpuAccepts(o){ const me = o.to;
   const lossV = o.get.v.reduce((s,i) => s + ventureWorth(me, i, false), 0) + o.get.c;
   const completes = o.get.v.some(i => setTiles(TILES[i].g).every(j => S.owners[j] === o.from || o.get.v.includes(j)));
   return gainV >= lossV*(completes ? 1.5 : 1.1) + 5 && S.players[me].cash - o.get.c >= 30; }
-function offerSide(side){ const items = side.v.map(i => `${TILES[i].emoji} ${tname(i)} <span class="muted">${money(TILES[i].price)}</span>`); if (side.c) items.push(`💵 ${money(side.c)}`);
+function offerSide(side){ const items = side.v.map(i => `${TILES[i].emoji} ${tname(i)}${'⭐'.repeat(S.levels[i])} <span class="muted">${money(assetValue(i))}</span>`); if (side.c) items.push(`💵 ${money(side.c)}`);
   return items.length ? items.join('<br>') : `<span class="muted">${L('nothing')}</span>`; }
 function offerHtml(o, viewer){
   const A = S.players[o.from], Bp = S.players[o.to];
@@ -1843,7 +2050,7 @@ async function cpuMaybeTrade(p){
     const j = st.find(x => S.owners[x] !== pi), o = S.owners[j];
     if (o < 0 || S.players[o].out || !tradeable(o).includes(j)) continue;
     const key = pi + '-' + j; if ((S.tradeCool[key] || 0) > S.round) continue;
-    const offer = Math.round(TILES[j].price*(1.5 + Math.random()*.4)/10)*10;
+    const offer = Math.round(assetValue(j)*(1.55 + Math.random()*.35)/10)*10;
     if (p.debt > 0 || p.cash + p.savings - offer < 80) continue;
     if (p.cash < offer){ const w = offer - p.cash; p.savings -= w; p.cash += w; }
     S.tradeCool[key] = S.round + 3;
@@ -1857,17 +2064,16 @@ function openTradeUI(pi){
   let to = others[0]; const give = new Set(), get = new Set(); let giveC = 0, getC = 0;
   const render = (sheet, done) => {
     const body = sheet.querySelector('.sheet-body'), other = S.players[to];
-    const list = (pidx2, set, key) => { const tv = tradeable(pidx2); return tv.length ? tv.map(i => `<label><input type="checkbox" data-${key}="${i}" ${set.has(i)?'checked':''}>${TILES[i].emoji} ${tname(i)} <span class="muted">${money(TILES[i].price)}</span></label>`).join('') : `<div class="none">${L('No tradeable ventures')}</div>`; };
+    const list = (pidx2, set, key) => { const tv = tradeable(pidx2); return tv.length ? tv.map(i => `<label><input type="checkbox" data-${key}="${i}" ${set.has(i)?'checked':''}>${TILES[i].emoji} ${tname(i)}${'⭐'.repeat(S.levels[i])} <span class="muted">${money(assetValue(i))}</span></label>`).join('') : `<div class="none">${L('No ventures')}</div>`; };
     body.innerHTML = `<div class="partners">${others.map(k => `<button data-to="${k}" class="${k===to?'sel':''}"><span class="dot" style="background:${S.players[k].color}"></span>${esc(S.players[k].name)}</button>`).join('')}</div>
       <div class="tcols">
         <div class="tcol"><h4>${L('You give')}</h4>${list(pi, give, 'g')}<label class="muted" style="display:block;margin-top:6px">💵 ${L('Cash (you have {m})', {m:money(me.cash)})}<input type="number" min="0" step="10" max="${me.cash}" value="${giveC}" id="tGiveC"></label></div>
         <div class="tcol"><h4>${L('{n} gives', {n:esc(other.name)})}</h4>${list(to, get, 'r')}<label class="muted" style="display:block;margin-top:6px">💵 ${L('Cash ({n} has {m})', {n:esc(other.name), m:money(other.cash)})}<input type="number" min="0" step="10" max="${other.cash}" value="${getC}" id="tGetC"></label></div>
       </div>
-      <p class="muted" style="font-size:12.5px">${L('Ventures in a set with ⭐ upgrades can’t be traded.')}</p>
       <div id="tSum" class="muted" style="font-size:13px"></div>
       <div class="rowb"><button class="btn primary" id="tSend">📨 ${L('Send offer')}</button></div>
       ${lessonBox(pick(LESSON.trade))}`;
-    const sum = () => { const gv = [...give].reduce((s,i) => s + TILES[i].price, 0) + giveC, rv = [...get].reduce((s,i) => s + TILES[i].price, 0) + getC;
+    const sum = () => { const gv = [...give].reduce((s,i) => s + assetValue(i), 0) + giveC, rv = [...get].reduce((s,i) => s + assetValue(i), 0) + getC;
       body.querySelector('#tSum').innerHTML = L('List value — you give {a}, you get {b}.', {a:money(gv), b:money(rv)});
       body.querySelector('#tSend').disabled = !(give.size || get.size || giveC || getC) || giveC > me.cash || getC > other.cash; };
     body.querySelectorAll('[data-to]').forEach(b => b.onclick = () => { to = +b.dataset.to; get.clear(); getC = 0; render(sheet, done); });
@@ -1942,6 +2148,8 @@ function applyAct(pi, a){
     case 'borrow': { if (!d.credit) return; const x = Math.min(v, Math.max(0, creditLimit(p) - p.debt)); if (x > 0){ p.debt += x; p.cash += x; p.borrowed += x; bumpCredit(p, -5);
         log(L('{n} borrowed {m}.', {n:p.name, m:money(x)})); toast(L('💳 {n} borrowed {m} at {r} per Payday.', {n:B(p.name), m:money(x), r:pct(loanRate(p))}), 'warn'); } break; }
     case 'up': upgrade(p, +a.i); break;
+    case 'ins': setInsurance(p, !!a.on); break;
+    case 'course': takeCourse(p, String(a.id)); break;
     case 'sell': if (S.owners[+a.i] === pi) sellVenture(p, +a.i); break;
   }
   updateUI(); save();
@@ -1985,6 +2193,19 @@ function openMoneyUI(pi){
         <button class="btn" id="mBor" ${room<=0?'disabled':''}>${L('💳 Borrow')}</button>` : ''}
       </div>
       <div style="min-height:20px;margin-top:8px;font-size:13px" class="muted">${note}</div>
+      <div class="msect">🛡️ ${L('Insurance')}</div>
+      <div class="vrow"><div class="grow"><div class="nm">${p.ins ? L('Insured ✓') : L('Not insured')}</div>
+        <div class="sm">${L('{m} per Payday · you pay the first {d} of each repair or accident (deductible)', {m:money(premium()), d:money(deductible())})}</div>
+        ${p.insPaid ? `<div class="sm">${L('Premiums paid {a} · insurance paid {b}', {a:money(p.insPaid), b:money(p.insSaved)})}</div>` : ''}</div>
+        <div class="acts">${p.ins ? `<button class="btn ghost sm" id="mInsOff">${L('Cancel')}</button>` : `<button class="btn primary sm" id="mInsOn" ${p.cash < premium() ? 'disabled' : ''}>${L('Get it ({m} now)', {m:money(premium())})}</button>`}</div></div>
+      <div class="msect">🎓 ${L('Invest in yourself')}</div>
+      ${COURSES.filter(c => LVL() >= c.lvl).map(c => { const cs = courseState(p, c), cost = courseCost(p, c);
+        const btn = cs === 'done' ? `<span class="good-t" style="font-weight:800">✓ ${L('Done')}</span>`
+          : cs === 'needs' ? `<span class="muted sm">${L('First: {c}', {c:tx(COURSES.find(x => x.id === c.needs), 'name')})}</span>`
+          : `<button class="btn gold sm" data-course="${c.id}" ${p.cash < cost ? 'disabled' : ''}>${L('Take it · {m}', {m:money(cost)})}</button>`;
+        return `<div class="vrow"><div class="em">${c.e}</div><div class="grow"><div class="nm">${tx(c,'name')}</div>
+          <div class="sm">${L('+{r} paycheck · pays for itself after {k} Paydays', {r:money(c.raise), k:Math.ceil(cost/c.raise)})}</div></div><div class="acts">${btn}</div></div>`; }).join('')}
+      <div class="sm muted" style="margin-top:4px">${L('About {k} Paydays left in this game.', {k:paydaysLeft()})}${p.eduDisc ? ' · ' + L('🎟️ {m} off your next course', {m:money(p.eduDisc)}) : ''}</div>
       ${lessonBox(d.credit ? (p.debt > 0 ? L('Debt grows {r} every Payday — paying it off is like earning a guaranteed {r}. Only borrow when what you buy will earn more than the interest.', {r:pct(tier.rate)}) : L('Borrowing builds credit only if you repay on time. Better credit = lower interest and a higher limit.')) : L('Savings are for goals and emergencies. Saving first, then spending what’s left, is how budgets win.'))}`;
     const commit = () => { note = L('Budget saved: {s}% savings, {f}% fun money.', {s:st.save, f:st.fun}); act(pi, {k:'budget', save:st.save, fun:st.fun}); };
     bindBudget(body.querySelector('#mBudget'), st, p.paycheck, commit);
@@ -1992,6 +2213,11 @@ function openMoneyUI(pi){
     body.querySelectorAll('.amts button').forEach(b => b.onclick = () => { amt = b.dataset.a === 'All' ? 'All' : +b.dataset.a; render(sheet); });
     body.querySelector('#mDep').onclick = () => { note = L('Deposited {m}. 🌱', {m:money(Math.min(p.cash, A()))}); act(pi, {k:'dep', v:A()}); };
     body.querySelector('#mWd').onclick = () => { note = L('Withdrew {m}. Use it wisely!', {m:money(Math.min(p.savings, A()))}); act(pi, {k:'wd', v:A()}); };
+    const io = body.querySelector('#mInsOn'), ix = body.querySelector('#mInsOff');
+    if (io) io.onclick = () => { note = L('🛡️ Insured! Covered Life Happens costs now cost you at most {d}.', {d:money(deductible())}); act(pi, {k:'ins', on:true}); };
+    if (ix) ix.onclick = () => { note = L('Insurance cancelled.'); act(pi, {k:'ins', on:false}); };
+    body.querySelectorAll('[data-course]').forEach(b => b.onclick = () => { const c = COURSES.find(x => x.id === b.dataset.course);
+      note = L('🎓 Course done! Your paycheck rises by {r}.', {r:money(c.raise)}); act(pi, {k:'course', id:c.id}); });
     body.querySelector('#mFun').onclick = () => { note = L('Moved {m} of fun money to cash.', {m:money(p.funMoney)}); act(pi, {k:'funToCash'}); };
     if (d.credit){
       body.querySelector('#mRep').onclick = () => { note = L('Repaid {m}. 💪', {m:money(Math.min(p.cash, p.debt, A()))}); act(pi, {k:'rep', v:A()}); };
@@ -2007,9 +2233,9 @@ function openVenturesUI(pi, allowTrade=false){
     const groups = [...new Set(mine.map(i => TILES[i].g))];
     const canTrade = allowTrade && canControl(p) && S.turn === pi && (S.phase === 'roll' || S.phase === 'manage') && alive().length > 1;
     body.innerHTML = `${canTrade ? `<div class="rowb" style="margin-top:0"><button class="btn gold" id="vTrade">🤝 ${L('Trade with another player')}</button></div>` : ''}
-      <p class="muted" style="font-size:13.5px;margin-top:6px">${D().upgrades ? L('Own all 3 ventures in a set to double fees and unlock ⭐ upgrades (up to 3).') : L('Own all 3 ventures in a set to double fees (⭐ upgrades unlock on Medium).')} ${L('Every venture pays side-hustle income each Payday.')} ${L('Cash: {m}', {m:`<b style="color:var(--ink)">${money(p.cash)}</b>`})}</p>
+      <p class="muted" style="font-size:13.5px;margin-top:6px">${D().upgrades ? L('Upgrade any venture to ⭐. Own all 3 ventures in a set to double fees and unlock ⭐⭐ and ⭐⭐⭐ (without the full set, upgraded ventures earn half).') : L('Own all 3 ventures in a set to double fees (⭐ upgrades unlock on Medium).')} ${L('Every venture pays side-hustle income each Payday.')} ${L('Cash: {m}', {m:`<b style="color:var(--ink)">${money(p.cash)}</b>`})}</p>
       ${mine.length ? mine.map(i => { const t = TILES[i], up = canUpgrade(pi,i), c = upgradeCost(i);
-        const why = !D().upgrades ? L('Medium+ only') : S.levels[i] >= 3 ? L('Max level') : !ownsSet(pi,t.g) ? L('Need full set') : '';
+        const why = !D().upgrades ? L('Medium+ only') : S.levels[i] >= 3 ? L('Max level') : !up ? L('Full set needed for ⭐⭐') : '';
         return `<div class="vrow"><div class="em">${t.emoji}</div><div class="grow"><div class="nm">${tname(i)} ${'⭐'.repeat(S.levels[i])}</div>
           <div class="sm"><span class="chip" style="background:${GROUPS[t.g].color}">${groupName(t.g)}</span> ${L('Fee {f} · Income {m}/Payday', {f:money(fee(i)), m:money(hustle(i))})}</div></div>
           <div class="acts"><button class="btn gold sm" data-up="${i}" ${(!up || p.cash < c) ? 'disabled' : ''}>${why || L('Upgrade {m}', {m:money(c)})}</button>
@@ -2036,7 +2262,8 @@ function showTileInfo(i){
       <tr><td>${L('Owner')}</td><td>${o >= 0 ? `<span style="color:${S.players[o].color}">${esc(S.players[o].name)}</span> ${'⭐'.repeat(S.levels[i])}` : L('For sale')}</td></tr>
       ${o >= 0 ? `<tr><td>${L('Fee right now')}</td><td>${money(fee(i))}</td></tr><tr><td>${L('Owner income / Payday')}</td><td>${money(hustle(i))}</td></tr>` : ''}
       <tr><td>${L('Fee: basic / full set')}</td><td>${money(b)} / ${money(b*2)}</td></tr>
-      ${D().upgrades ? `<tr><td>${L('Fee: ⭐ / ⭐⭐ / ⭐⭐⭐')}</td><td>${money(b*MULT[1])} / ${money(b*MULT[2])} / ${money(b*MULT[3])}</td></tr>
+      ${D().upgrades ? `<tr><td>${L('Fee with full set: ⭐ / ⭐⭐ / ⭐⭐⭐')}</td><td>${money(b*MULT[1])} / ${money(b*MULT[2])} / ${money(b*MULT[3])}</td></tr>
+      <tr><td>${L('Fee with ⭐, no full set')}</td><td>${money(Math.round(b*MULT[1]/2))}</td></tr>
       <tr><td>${L('Upgrade cost')}</td><td>${money(upgradeCost(i))}</td></tr>` : ''}</table>${lessonBox(pick(LESSON.venture))}`;
   } else {
     let desc = t.t === 'bill' ? `${pick(DESC.bill)} ${L('Right now: {m}.', {m:money(t.amount)})}` : pick(DESC[t.t]).replace('{fee}', money(infl(BOOTCAMP_FEE)));
@@ -2054,6 +2281,7 @@ function seatTag(p, k){
   return p.ctrl === 'cpu' ? 'CPU' : p.ctrl === 'remote' ? '📡 Online' : S.players.filter(x => x.ctrl === 'local').length > 1 ? L('Here') : L('You'); }
 function updateUI(){
   if (S.phase === 'setup') return;
+  checkBadges();
   const d = D();
   $('#round').innerHTML = `<span class="bt">${L('Round')} </span><b>${Math.min(S.round, S.maxRounds)}</b>/${S.maxRounds}`;
   $('#diffChip').innerHTML = `${d.emoji}<span class="bt"> ${tx(d,'name')}</span>${d.inflation && S.priceLevel > 1 ? ` <b>×${S.priceLevel.toFixed(2)}</b>` : ''}`;
@@ -2067,7 +2295,7 @@ function updateUI(){
       <div class="pname"><span class="dot"></span>${esc(p.name)} <span class="tag">${seatTag(p,k)}</span></div>
       <div class="pstats"><span>${L('Cash')}</span><b>${money(p.cash)}</b><span>${L('Fun money')}</span><b>${money(p.funMoney)}</b><span>${L('Savings')}</span><b>${money(p.savings)}</b>
         ${d.credit ? `<span>${L('Debt')}</span><b class="${p.debt?'debt':''}">${money(p.debt)}</b><span>${L('Credit')}</span><b>${p.credit}</b>` : ''}<span>${L('Net worth')}</span><b>${money(netWorth(p))}</b></div>
-      <div class="goal">${p.goal.emoji} ${goalName(p.goal)} · ${Math.round(pc)}%<div class="gbar"><i style="width:${pc}%"></i></div></div></div>`; }).join('');
+      <div class="goal">${p.goal.emoji} ${goalName(p.goal)} · ${Math.round(pc)}%<span class="pico">${p.ins ? '🛡️' : ''}${(p.courses || []).length ? '🎓' : ''}${(p.badges || []).length ? '🏅' + p.badges.length : ''}</span><div class="gbar"><i style="width:${pc}%"></i></div></div></div>`; }).join('');
   const p = cur(); if (!p) return;
   const st = $('#status'); st.querySelector('.dot').style.background = p.color;
   const me = canControl(p);
@@ -2095,7 +2323,10 @@ function clearSave(){ try { localStorage.removeItem(SAVE_KEY); } catch(e){} }
 function grade(p){ const nw = netWorth(p); const met = p.savings >= p.goal.amount;
   return { nw, goalMet: met, score: nw + (met ? GOAL_BONUS : 0) - (p.out ? 100000 : 0) }; }
 function gameOver(){
-  S.over = true; S.phase = 'over'; clearSave(); updateUI(); flushState(); bcast({t:'over'}); Sound.win();
+  S.phase = 'over'; snapHist(Math.min(S.round, S.maxRounds));
+  const ranked = S.players.map(p => ({p, g:grade(p)})).filter(x => !x.p.out).sort((a,b) => b.g.score - a.g.score);
+  if (ranked.length) ranked.filter(x => x.g.score === ranked[0].g.score).forEach(x => award(x.p, 'winner'));
+  S.over = true; clearSave(); updateUI(); flushState(); bcast({t:'over'}); Sound.win();
   showReport(true);
 }
 async function showReport(isHost){
@@ -2119,14 +2350,65 @@ async function showReport(isHost){
       <div class="row"><span>${L('Quiz')}</span><b>${p.quizRight}/${p.quizTotal}</b></div>
       <div class="row"><span>${L('Treats (over budget)')}</span><b>${p.treats} (${p.impulse}) · ${treats}</b></div>
       <div class="row"><span>${L('Impulse buys skipped')}</span><b>${money(p.skipped)}</b></div>
-      <div class="row"><span>${L('Ventures · trades')}</span><b>${owned(pidx(p)).length} · ${p.trades}</b></div></div>`; }).join('');
+      <div class="row"><span>${L('Ventures · trades')}</span><b>${owned(pidx(p)).length} · ${p.trades}</b></div>
+      ${p.insPaid ? `<div class="row"><span>🛡️ ${L('Insurance: paid / covered')}</span><b>${money(p.insPaid)} / ${money(p.insSaved || 0)}</b></div>` : ''}
+      ${(p.courses || []).length ? `<div class="row"><span>🎓 ${L('Courses · paycheck')}</span><b>${p.courses.length} · ${money(p.paycheck)}</b></div>` : ''}
+      <div class="row"><span>🏅 ${L('Badges')}</span><b class="bdgs">${(p.badges || []).map(id => { const b = BADGES.find(x => x.id === id); return b ? `<span title="${esc(tx(b,'name'))}">${b.e}</span>` : ''; }).join('') || '–'}</b></div></div>`; }).join('');
   const top = ranked[0].g.score, winners = ranked.filter(x => !x.p.out && x.g.score === top).map(x => esc(x.p.name));
   const r = await modal({icon:'🏆', title: winners.length > 1 ? L('It’s a tie: {w}!', {w:winners.join(' & ')}) : L('{w} wins!', {w:winners[0] || esc(ranked[0].p.name)}), wide:true,
-    body:`<p>${d.emoji} ${tx(d,'name')} · ${L('Score = net worth (cash + fun money + savings + ventures − debt) + {m} if you reached your savings goal.', {m:money(GOAL_BONUS)})}</p><div class="rep">${cards}</div>
+    body:`<p>${d.emoji} ${tx(d,'name')} · ${L('Score = net worth (cash + fun money + savings + ventures − debt) + {m} if you reached your savings goal.', {m:money(GOAL_BONUS)})}</p>
+      ${(S.hist || []).length > 1 ? `<div class="nwwrap"><div class="nwhead">📈 ${L('Net worth, round by round')}</div><div class="nwleg">${S.players.map(p => `<span><i style="background:${p.color}"></i>${esc(p.name)}</span>`).join('')}</div><div class="nwchart" id="nwChart"></div></div>` : ''}
+      <div class="rep">${cards}</div>
       ${lessonBox(L('Real-life takeaways: budget every paycheck, save first, keep an emergency fund, avoid high-interest debt, invest in things that earn, and plan your treats.'))}
       ${isHost ? '' : `<p class="muted">${L('The host can start a new game — you’ll stay connected.')}</p>`}`,
-    buttons: isHost ? [{label:L('🔁 Play again'), value:'again', kind:'primary'}, {label:L('👀 View board'), value:'board'}] : [{label:L('👀 View board'), value:'board', kind:'primary'}]});
+    buttons: isHost ? [{label:L('🔁 Play again'), value:'again', kind:'primary'}, {label:L('👀 View board'), value:'board'}] : [{label:L('👀 View board'), value:'board', kind:'primary'}],
+    onRender: sheet => { const el = sheet.querySelector('#nwChart'); if (el) requestAnimationFrame(() => drawNetWorthChart(el)); }});
   if (r === 'again') showSetup();
+}
+
+/* ---------------- 📈 net-worth chart (game-over report) ---------------- */
+function niceStep(raw){ const e = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw/e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10)*e; }
+function drawNetWorthChart(el){
+  const H = (S.hist || []).filter(h => h && Array.isArray(h.v) && Number.isFinite(h.r)); if (H.length < 2) return;
+  const W = Math.max(280, Math.round(el.clientWidth || 600)), narrow = W < 460, Ht = narrow ? 220 : 260;
+  const m = {l:56, r:narrow ? 88 : 118, t:12, b:38};
+  const x0 = H[0].r, x1 = H[H.length - 1].r;
+  const vals = H.flatMap(h => h.v.filter(v => v != null && Number.isFinite(v)));
+  let lo = Math.min(0, ...vals), hi = Math.max(10, ...vals);
+  const step = niceStep((hi - lo)/4); lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
+  const X = r => m.l + (r - x0)/((x1 - x0) || 1)*(W - m.l - m.r), Y = v => m.t + (hi - v)/((hi - lo) || 1)*(Ht - m.t - m.b);
+  const short = n => n.length > (narrow ? 9 : 12) ? n.slice(0, narrow ? 8 : 11) + '…' : n;
+  let g = '';
+  for (let v = lo; v <= hi + step*1e-6; v += step)
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" class="${Math.abs(v) < 1e-9 ? 'z' : 'gl'}"/><text x="${m.l - 7}" y="${Y(v) + 4}" class="yl">${money(v)}</text>`;
+  const xstep = Math.max(1, Math.ceil((x1 - x0)/(narrow ? 5 : 8)));
+  for (let r = Math.ceil(x0); r <= x1 + 1e-9; r += xstep) g += `<text x="${X(r)}" y="${Ht - m.b + 16}" class="xl">${r}</text>`;
+  g += `<text x="${(m.l + W - m.r)/2}" y="${Ht - 4}" class="xl">${L('Round')}</text>`;
+  const ends = [];
+  S.players.forEach((p, k) => { let d = '', pen = false, last = null;
+    H.forEach(h => { const v = h.v[k]; if (v == null || !Number.isFinite(v)){ pen = false; return; }
+      d += `${pen ? 'L' : 'M'}${X(h.r).toFixed(1)},${Y(v).toFixed(1)} `; pen = true; last = {x:X(h.r), y:Y(v), v}; });
+    if (d) g += `<path d="${d}" stroke="${p.color}" class="ln"/>`;
+    if (last) ends.push({p, ...last}); });
+  // direct labels at the line ends; pushed apart when lines finish close together (leader line shows which is which)
+  ends.sort((a,b) => a.y - b.y); let prev = -1e9;
+  ends.forEach(e => { e.ly = Math.max(e.y, prev + 15); prev = e.ly; });
+  const over = ends.length ? ends[ends.length - 1].ly - (Ht - m.b) : 0; if (over > 0) ends.forEach(e => e.ly -= over);
+  ends.forEach(e => { const lx = W - m.r + 12;
+    g += `<line x1="${e.x}" y1="${e.y}" x2="${lx - 3}" y2="${e.ly}" class="ld"/><circle cx="${e.x}" cy="${e.y}" r="4.5" fill="${e.p.color}" class="mk"/>
+      <text x="${lx}" y="${e.ly + 4}" class="el">${esc(short(e.p.name))}${narrow ? '' : ` <tspan class="ev">${money(e.v)}</tspan>`}</text>`; });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${Ht}" width="${W}" height="${Ht}" role="img" aria-label="${esc(L('Net worth, round by round'))}">${g}
+    <line class="xh" x1="0" x2="0" y1="${m.t}" y2="${Ht - m.b}" style="display:none"/><rect class="hit" x="${m.l - 10}" y="0" width="${W - m.l - m.r + 20}" height="${Ht}"/></svg><div class="nwtip hidden"></div>`;
+  // crosshair + one tooltip with every player at that round
+  const svg = el.querySelector('svg'), xh = svg.querySelector('.xh'), tip = el.querySelector('.nwtip');
+  const show = ev => { const r = svg.getBoundingClientRect(), px = (ev.clientX - r.left)*W/r.width; let best = 0;
+    H.forEach((h, j) => { if (Math.abs(X(h.r) - px) < Math.abs(X(H[best].r) - px)) best = j; });
+    const h = H[best], x = X(h.r); xh.setAttribute('x1', x); xh.setAttribute('x2', x); xh.style.display = '';
+    const rows = S.players.map((p, k) => ({p, v:h.v[k]})).filter(o => o.v != null).sort((a,b) => b.v - a.v);
+    tip.innerHTML = `<div class="th">${h.r === 0 ? L('Start') : L('After round {r}', {r:h.r})}</div>${rows.map(o => `<div><i style="background:${o.p.color}"></i>${esc(o.p.name)}<b>${money(o.v)}</b></div>`).join('')}`;
+    tip.classList.remove('hidden'); const sx = x*r.width/W, tw = tip.offsetWidth; tip.style.left = Math.max(0, sx + 14 + tw > r.width ? sx - tw - 14 : sx + 14) + 'px'; };
+  const hit = svg.querySelector('.hit'); hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show);
+  svg.addEventListener('pointerleave', () => { xh.style.display = 'none'; tip.classList.add('hidden'); });
 }
 
 /* =====================================================================
@@ -2266,7 +2548,12 @@ function sanitizeState(s){
   s.levels = Array.from({length:24}, (_,i) => clamp(Math.floor(num(s.levels && s.levels[i])), 0, 3));
   s.log = Array.isArray(s.log) ? s.log.slice(-120).map(String) : []; s.phase = String(s.phase || 'busy'); s.over = !!s.over;
   s.lang = s.lang === 'de' ? 'de' : 'en'; s.cur = s.cur === 'EUR' ? 'EUR' : 'USD';
-  s.players.forEach((p,k) => { ['cash','savings','debt','credit','pos','paycheck','skip','funMoney','treats','impulse','planned','wants','skipped','quizRight','quizTotal','intEarned','intPaid','borrowed','autoSaved','paidFun','missed','safety','given','trades'].forEach(f => p[f] = num(p[f]));
+  s.hist = (Array.isArray(s.hist) ? s.hist.slice(-80) : []).filter(h => h && Number.isFinite(+h.r) && Array.isArray(h.v))
+    .map(h => ({r:+h.r, v:Array.from({length:n}, (_,k) => Number.isFinite(+h.v[k]) && h.v[k] !== null ? +h.v[k] : null)}));
+  s.players.forEach((p,k) => { ['cash','savings','debt','credit','pos','paycheck','skip','funMoney','treats','impulse','planned','wants','skipped','quizRight','quizTotal','intEarned','intPaid','borrowed','autoSaved','paidFun','missed','safety','given','trades','insPaid','insSaved','claims','eduSpent','eduDisc','skips','goodBudgets','smart'].forEach(f => p[f] = num(p[f]));
+    p.ins = !!p.ins; p.hadDebt = !!p.hadDebt; p.insDecided = !!p.insDecided;
+    p.courses = [...new Set(Array.isArray(p.courses) ? p.courses.map(String) : [])].filter(id => COURSES.some(c => c.id === id));
+    p.badges = [...new Set(Array.isArray(p.badges) ? p.badges.map(String) : [])].filter(id => BADGES.some(b => b.id === id));
     p.pos = clamp(Math.floor(p.pos), 0, 23); p.credit = clamp(p.credit, 300, 850); p.out = !!p.out; p.cpu = !!p.cpu; p.ctrl = ['local','cpu','remote'].includes(p.ctrl) ? p.ctrl : 'cpu';
     p.budget = {save:clamp(Math.floor(num(p.budget && p.budget.save, 20)), 0, 100), fun:clamp(Math.floor(num(p.budget && p.budget.fun, 30)), 0, 100)}; p.askBudget = p.askBudget !== false;
     p.name = String(p.name || L('Player')).slice(0, 20); if (!/^#[0-9a-f]{6}$/i.test(p.color)) p.color = COLORS[k % 4];
@@ -2293,6 +2580,7 @@ function applyState(s){
     if (prevTurn !== S.turn){ $('#diceOut').textContent = ''; focusCam(cur()); }
     updateUI();
   }
+  const me = S.players[NET.mySeat]; if (me && Array.isArray(me.badges)) me.badges.forEach(id => recordTrophy(me.name, id, S.gameId));
   if (PANEL) PANEL.rerender();
 }
 function showLobby(){ $('#setup').classList.add('hidden'); $('#lobby').classList.remove('hidden'); const Lb = NET.lobby;
@@ -2492,9 +2780,11 @@ async function startGame(){
     return { name, ctrl:r.kind, rid:r.id, cpu:r.kind === 'cpu', color:COLORS[k], shape:SHAPES[r.shape].id, pos:0, cash:d.start, savings:0, funMoney:0, debt:0, credit:650,
       budget: r.kind === 'cpu' ? {save:[20,30,25][k % 3], fun:20} : {save:20, fun:30}, askBudget: r.kind !== 'cpu',
       skip:0, goal:{...GOALS[r.goal], amount:goalAmt(GOALS[r.goal])}, treats:0, impulse:0, planned:0, wants:0, skipped:0, quizRight:0, quizTotal:0,
-      paycheck:PAYCHECK, out:false, intEarned:0, intPaid:0, borrowed:0, autoSaved:0, paidFun:0, missed:0, safety:0, given:0, trades:0, iou:null, toBootcamp:false }; });
+      paycheck:PAYCHECK, out:false, intEarned:0, intPaid:0, borrowed:0, autoSaved:0, paidFun:0, missed:0, safety:0, given:0, trades:0, iou:null, toBootcamp:false,
+      ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, courses:[], eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false, badges:[] }; });
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), lang:LANG, cur:CUR, owners:Array(24).fill(-1), levels:Array(24).fill(0),
-    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{} });
+    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[] });
+  snapHist(0);
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
   GEN++; sendSeats();
   enterGame(); flushState();
@@ -2505,6 +2795,7 @@ async function startGame(){
 function enterGame(){ $('#setup').classList.add('hidden'); $('#lobby').classList.add('hidden'); $('#ui').classList.remove('hidden');
   spawnTokens(); refreshAllTiles(); rotateTip(); updateUI(); }
 function resume(){ const d = loadSave(); if (!d) return; GEN++; Object.assign(S, d); S.over = false; S.tradeCool = S.tradeCool || {};
+  S.players.forEach(normPlayer); if (!Array.isArray(S.hist)) S.hist = [];
   if (S.lang && (S.lang !== LANG || S.cur !== CUR)) applyLocale(S.lang, S.cur, false);
   S.players.forEach(p => { if (p.ctrl === 'remote' && !(NET.peers[p.rid] && NET.peers[p.rid].open)){ p.ctrl = 'cpu'; p.cpu = true; } });
   sendSeats(); enterGame(); flushState();
@@ -2518,12 +2809,22 @@ function showHelp(){ const d = DIFFS[S.phase === 'setup' ? setupDiff : S.diff] |
   <p>${L('<b>Each turn:</b> roll two dice and move. Pass <b>💵 Payday</b> to get your {m} paycheck and <b>budget it</b>: needs &amp; bills go to your cash, wants to your fun money, and the rest to savings (try 50/30/20). Savings earn <b>5%</b> interest and ventures pay side-hustle income.', {m:money(PAYCHECK)})}</p>
   <p>${L('<b>Ventures</b> (colored tiles): buy them when you land on them. Other players pay you a customer fee when they land there. Own a full set of 3 to double fees — use <b>🤝 Trade</b> in 🏪 Ventures to swap ventures and cash with other players.')}</p>
   <p>${L('<b>Special tiles:</b> 🧠 Money Quiz · 🎲 Life Happens · 🛍️ Impulse Mall (treats from fun money are planned; anything beyond is an impulse buy) · 🏦 Savings Bank (+10%) · 📱 Phone Bill · 🧾 Tax (💝 Give Back on Easy) · 🚨 Overspent → Budget Bootcamp.')}</p>
+  <p>${L('<b>Protect &amp; grow:</b> in 💰 Money you can buy 🛡️ insurance (a small premium at every Payday, and big repair bills from Life Happens cost you only the deductible) and take 🎓 courses that raise your paycheck. Smart money moves earn 🏅 badges.')}</p>
   <p><b>${L('Difficulty — {e} {n}:', {e:d.emoji, n:tx(d,'name')})}</b></p><ul class="dfeat">${(LANG === 'de' ? d.de.feats : d.feats).map(f => `<li>${f}</li>`).join('')}</ul>
   <p>${L('<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Everyone plays in the host’s language.')}</p>
   <p>${L('<b>Controls:</b> drag to rotate, pinch or scroll to zoom, tap a tile for details.')}</p>
   ${lessonBox(L('Interest here is paid every Payday to keep the game fast. Real savings accounts and loans usually quote yearly rates.'))}
   <p class="credits"><b>${L('Credits.')}</b> ${MUSIC_CREDIT()}<br>${SFX_CREDIT()}<br>${L('3D: A-Frame (MIT). QR codes: qrcode-generator (MIT), jsQR (Apache-2.0).')}</p>`}); }
 function showLog(){ return modal({icon:'📜', title:L('Game log'), body:`<div style="font-size:13px;max-height:55vh;overflow:auto">${S.log.slice().reverse().map(l => `<div style="padding:4px 0;border-bottom:1px solid var(--line)">${esc(l)}</div>`).join('') || L('Nothing yet.')}</div>`}); }
+
+/* ---------------- 🏅 trophy case (badges earned on this device) ---------------- */
+function showTrophies(){
+  const t = trophies(), got = BADGES.filter(b => t[b.id] && t[b.id].n > 0).length;
+  const lvlTag = b => b.only === 0 ? L('Easy only') : b.only === 2 ? L('Hard only') : b.lvl ? L('Medium & Hard') : '';
+  return modal({icon:'🏅', title:L('Badges'), wide:true, body:`<p>${L('{k} of {t} badges collected on this device.', {k:`<b>${got}</b>`, t:BADGES.length})}</p>
+    <div class="tgrid">${BADGES.map(b => { const e = t[b.id], has = e && e.n > 0;
+      return `<div class="tb ${has ? '' : 'lock'}"><div class="te">${b.e}</div><div class="tn">${tx(b,'name')}${has && e.n > 1 ? ` ×${e.n}` : ''}</div>
+        <div>${tx(b,'how')}</div>${lvlTag(b) ? `<div class="tl">${lvlTag(b)}</div>` : ''}${has ? `<div class="tw">${esc((e.who || []).join(', '))}</div>` : ''}</div>`; }).join('')}</div>`}); }
 
 /* ---------------- installable app (web build only) ---------------- */
 let installPrompt = null;
@@ -2559,6 +2860,7 @@ function boot(){
   $('#bContinue').onclick = () => { Sound.init(); resume(); };
   $('#bJoin').onclick = () => { Sound.init(); openJoin(); };
   $('#bLeave').onclick = () => leaveToMenu();
+  $('#bBadges').onclick = showTrophies;
   $('#bHow').onclick = showHelp; $('#bHelp').onclick = showHelp; $('#bLog').onclick = showLog;
   $('#bRoll').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'roll'}); };
   $('#bEnd').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'end'}); };
@@ -2691,6 +2993,7 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
       <button class="btn" id="bHow" data-i18n>❓ How to play</button>
       <button class="btn" id="bJoin" data-i18n>📡 Join a friend’s game</button>
       <button class="btn" id="bSoundSetup" data-i18n>🎵 Sound &amp; music</button>
+      <button class="btn" id="bBadges" data-i18n>🏅 Badges</button>
       <button class="btn hidden" id="bInstall" data-i18n>📲 Install app</button>
       <button class="btn hidden" id="bContinue"></button>
       <button class="btn primary" id="bStart" data-i18n>▶ Start game</button>
