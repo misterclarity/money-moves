@@ -12,6 +12,7 @@ The whole game is one HTML file (`index.html`). It works offline, so you can dow
 - **2–4 players**: people on one device, CPU players, or friends on their own devices.
 - **Money lessons built into the rules**: paychecks with automatic saving ("pay yourself first"), compound interest, side-hustle ventures that earn income, a quiz, surprise "Life Happens" cards, an impulse-buy mall, taxes and savings goals. Every game ends with a report card.
 - **Auto-save**: the host's device saves the game after every turn.
+- **Sound and music**: real recorded dice, chip, card and coin sounds, fanfares for big moments, and two background music tracks that alternate. Tap 🎵 to turn music or sound effects on or off and change their volume. Everything is embedded in the page, so it works offline too.
 
 ## Difficulty levels
 
@@ -44,6 +45,12 @@ The host's device runs the game. Guests see the same board and make their own mo
 
 - Devices on the **same Wi-Fi** can connect even without internet.
 - Devices on **different networks** need internet. The game uses a public STUN server only to find a route between the devices. Some strict networks (school, corporate, some mobile carriers) may block direct connections.
+
+## Credits: music and sound (bundled in `index.html`)
+
+- **Music:** “Sergio’s Magic Dustbin” and “Club Seamus” by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). The tracks were re-encoded to a smaller file size; the music itself is unchanged.
+- **Sound effects:** [Kenney](https://kenney.nl) Casino, UI, Digital and RPG audio packs, public domain ([CC0](https://creativecommons.org/publicdomain/zero/1.0/)).
+- **Fanfares:** Beatscribe, [Homebrew Free Jingle and Fanfare Music Assets](https://github.com/Beatscribe/homebrew_vgm), public domain (CC0).
 
 ## Third-party code (bundled in `index.html`)
 
