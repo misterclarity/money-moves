@@ -281,6 +281,20 @@ textarea.code{width:100%;min-height:62px;font:11.5px/1.35 ui-monospace,Menlo,Con
 .nwtip div{display:flex;align-items:center;gap:6px}
 .nwtip div b{margin-left:auto;padding-left:12px;font-variant-numeric:tabular-nums}
 .nwtip i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+/* stock market */
+.mkt{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0}
+.mkt.off{opacity:.55}
+.mkt .mh{display:flex;align-items:center;gap:10px}
+.mkt .em{font-size:26px}
+.mkt .grow{flex:1;min-width:0}
+.mkt .sm{font-size:12px}
+.mkt .mp{text-align:right;display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.mkt .mp small{font-size:11px;font-weight:700}
+.mkt .mbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.spark{display:block;width:100%;height:56px;margin:6px 0 2px}
+.spark .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.spark .base{stroke:rgba(255,255,255,.18);stroke-width:1;vector-effect:non-scaling-stroke}
+#mktChip{cursor:pointer;font:inherit;color:inherit}
 
 </style>
 <script>
@@ -304,13 +318,13 @@ const GOALS = [
 ];
 const DIFFS = {
   easy:  { name:'Easy', sub:'Budget basics', emoji:'🌱', lvl:0, start:400, upgrades:false, tax:false, sellOff:false, credit:false, inflation:false, quizOpts:3,
-           feats:['💵 Payday budget, savings &amp; interest','🏪 Buy and trade ventures, collect customer fees','🛡️ Insurance &amp; 🎓 courses that raise your paycheck','🧠 Money Quiz with 3 choices','🛟 Safety net: no debt or bankruptcy — if you can’t pay, you go to Budget Bootcamp','💝 “Give Back” tile instead of taxes'],
+           feats:['💵 Payday budget, savings &amp; interest','🏪 Buy and trade ventures, collect customer fees','📈 Invest in an index fund — prices move every round','🛡️ Insurance &amp; 🎓 courses that raise your paycheck','🧠 Money Quiz with 3 choices','🛟 Safety net: no debt or bankruptcy — if you can’t pay, you go to Budget Bootcamp','💝 “Give Back” tile instead of taxes'],
            de:{ name:'Leicht', sub:'Budget-Grundlagen',
-           feats:['💵 Zahltag-Budget, Sparen &amp; Zinsen','🏪 Unternehmen kaufen und tauschen, Kundengebühren kassieren','🛡️ Versicherung &amp; 🎓 Kurse für ein höheres Gehalt','🧠 Geld-Quiz mit 3 Antworten','🛟 Sicherheitsnetz: keine Schulden, keine Pleite – wer nicht zahlen kann, muss ins Budget-Bootcamp','💝 „Spenden“-Feld statt Steuern'] } },
+           feats:['💵 Zahltag-Budget, Sparen &amp; Zinsen','🏪 Unternehmen kaufen und tauschen, Kundengebühren kassieren','📈 In einen Indexfonds investieren – die Kurse ändern sich jede Runde','🛡️ Versicherung &amp; 🎓 Kurse für ein höheres Gehalt','🧠 Geld-Quiz mit 3 Antworten','🛟 Sicherheitsnetz: keine Schulden, keine Pleite – wer nicht zahlen kann, muss ins Budget-Bootcamp','💝 „Spenden“-Feld statt Steuern'] } },
   medium:{ name:'Medium', sub:'Real-world costs', emoji:'⚖️', lvl:1, start:300, upgrades:true, tax:true, sellOff:true, credit:false, inflation:false, quizOpts:4,
-           feats:['✅ Everything in Easy','⭐ Upgrade ventures (a full set unlocks ⭐⭐ and ⭐⭐⭐)','🧾 Income tax &amp; bigger surprise costs','🏚️ Short on cash? Ventures get sold at half price','💥 Can’t pay at all = bankrupt'],
+           feats:['✅ Everything in Easy','⭐ Upgrade ventures (a full set unlocks ⭐⭐ and ⭐⭐⭐)','🚀 A riskier single stock to invest in','🧾 Income tax &amp; bigger surprise costs','🏚️ Short on cash? Ventures get sold at half price','💥 Can’t pay at all = bankrupt'],
            de:{ name:'Mittel', sub:'Echte Kosten',
-           feats:['✅ Alles aus „Leicht“','⭐ Unternehmen ausbauen (eine ganze Gruppe schaltet ⭐⭐ und ⭐⭐⭐ frei)','🧾 Einkommensteuer &amp; größere Überraschungskosten','🏚️ Zu wenig Geld? Unternehmen werden zum halben Preis verkauft','💥 Gar nicht zahlen können = pleite'] } },
+           feats:['✅ Alles aus „Leicht“','⭐ Unternehmen ausbauen (eine ganze Gruppe schaltet ⭐⭐ und ⭐⭐⭐ frei)','🚀 Eine riskantere Einzelaktie zum Investieren','🧾 Einkommensteuer &amp; größere Überraschungskosten','🏚️ Zu wenig Geld? Unternehmen werden zum halben Preis verkauft','💥 Gar nicht zahlen können = pleite'] } },
   hard:  { name:'Hard', sub:'Credit & debt', emoji:'🔥', lvl:2, start:250, upgrades:true, tax:true, sellOff:true, credit:true, inflation:true, quizOpts:4,
            feats:['✅ Everything in Medium','💳 Borrow money — loans cover shortfalls too','📊 Credit score sets your interest rate and borrowing limit','📅 Minimum debt payment due at every Payday, before your paycheck arrives — miss it and your score drops','📈 Inflation: prices rise 10% every 5 rounds','🛒 Credit-card, buy-now-pay-later &amp; payday-loan cards'],
            de:{ name:'Schwer', sub:'Kredit & Schulden',
@@ -335,7 +349,7 @@ const TILES = [
   {t:'venture',g:'B', name:'Bake Sale',      emoji:'🧁', price:110, de:{name:'Kuchenverkauf'}},
   {t:'mall',      name:'Impulse Mall',    emoji:'🛍️', de:{name:'Impuls-Shop'}},
   {t:'venture',g:'B', name:'Babysitting',    emoji:'🧸', price:120, de:{name:'Babysitten'}},
-  {t:'chill',     name:'Chill Zone',      emoji:'😎', de:{name:'Chill-Zone'}},
+  {t:'market',    name:'Stock Market',    emoji:'📈', de:{name:'Börse'}},
   {t:'venture',g:'C', name:'Bike Repair',    emoji:'🚲', price:140, de:{name:'Radreparatur'}},
   {t:'bank',      name:'Savings Bank',    emoji:'🏦', de:{name:'Sparbank'}},
   {t:'venture',g:'C', name:'Thrift Flipping',emoji:'👕', price:150, de:{name:'Secondhand-Handel'}},
@@ -360,7 +374,7 @@ const DESC = {
   tax:{en:'Pay 10% of the cash in your wallet (minimum {$10}). Savings and fun money aren’t taxed in this game.', de:'Zahl 10 % deines Bargelds (mindestens {$10}). Erspartes und Spaß-Geld werden in diesem Spiel nicht besteuert.'},
   give:{en:'No taxes on Easy! Instead, choose whether to donate {$10} to a cause you care about.', de:'Auf „Leicht“ gibt es keine Steuern! Stattdessen entscheidest du, ob du {$10} für einen guten Zweck spendest.'},
   bootcamp:{en:'Just visiting! If you overspend you get sent here and sit out a turn (or pay {fee} to leave early).', de:'Nur zu Besuch! Wer zu viel ausgibt, muss hierher und eine Runde aussetzen (oder {fee} zahlen, um früher zu gehen).'},
-  chill:{en:'Free hangout. Not all fun costs money!', de:'Gratis abhängen. Nicht jeder Spaß kostet Geld!'},
+  market:{en:'Prices move every round. Land here to collect a 3% dividend on your index fund and to buy or sell. Investing can grow your money faster than savings — but it can also fall.', de:'Die Kurse ändern sich jede Runde. Landest du hier, bekommst du 3 % Dividende auf deinen Indexfonds und kannst kaufen oder verkaufen. Investieren kann dein Geld schneller wachsen lassen als Sparen – aber es kann auch fallen.'},
   gobootcamp:{en:'Overspent! Go straight to Budget Bootcamp and skip your next turn. No paycheck for passing Payday.', de:'Überzogen! Geh direkt ins Budget-Bootcamp und setz eine Runde aus. Kein Gehalt fürs Vorbeiziehen am Zahltag.'}
 };
 const LESSON = {
@@ -373,7 +387,7 @@ const LESSON = {
   tax:{en:'Your take-home (net) pay is less than your gross pay because of taxes.', de:'Dein Nettogehalt ist wegen der Steuern niedriger als dein Bruttogehalt.'},
   give:{en:'Many people budget a small “giving” amount. Generosity is part of a healthy money plan.', de:'Viele planen einen kleinen Betrag zum Spenden ein. Großzügigkeit gehört zu einem gesunden Geldplan.'},
   bootcamp:{en:'Tracking every expense for one week is the fastest way to find leaks in a budget.', de:'Eine Woche lang jede Ausgabe aufzuschreiben ist der schnellste Weg, Lecks im Budget zu finden.'},
-  chill:{en:'Free fun exists: parks, libraries, hanging out with friends.', de:'Gratis-Spaß gibt es: Parks, Büchereien, Zeit mit Freunden.'},
+  market:{en:'Spread your money out (diversify) and think long-term. Prices go up and down, but a broad index fund has grown over the long run.', de:'Verteil dein Geld (streuen) und denk langfristig. Kurse gehen rauf und runter, aber ein breiter Indexfonds ist langfristig gewachsen.'},
   gobootcamp:{en:'Overspending happens when you don’t track. A budget is a plan, not a punishment.', de:'Zu viel ausgeben passiert, wenn man nicht mitschreibt. Ein Budget ist ein Plan, keine Strafe.'},
   venture:{en:'Assets earn money for you. Buying something that earns income is investing, not just spending.', de:'Vermögenswerte verdienen Geld für dich. Etwas zu kaufen, das Einkommen bringt, ist Investieren – nicht nur Ausgeben.'},
   trade:{en:'A good trade helps both sides. Think about what a venture will EARN you, not just its price — completing a set doubles your fees.', de:'Ein guter Tausch hilft beiden Seiten. Denk daran, was ein Unternehmen dir EINBRINGT, nicht nur an den Preis – eine ganze Gruppe verdoppelt deine Gebühren.'},
@@ -560,6 +574,7 @@ const TIPS = [
   {t:'<b>Upgrades:</b> add a ⭐ to any venture for bigger fees and income. A full set unlocks ⭐⭐ and ⭐⭐⭐.', de:'<b>Ausbauen:</b> Gib jedem Unternehmen einen ⭐ für höhere Gebühren und mehr Einkommen. Eine ganze Gruppe schaltet ⭐⭐ und ⭐⭐⭐ frei.', lvl:1},
   {t:'<b>Insurance</b> (in 💰 Money) costs a little at every Payday and covers big repair bills from Life Happens cards — you only pay the deductible.', de:'<b>Versicherung</b> (unter 💰 Geld) kostet an jedem Zahltag ein bisschen und übernimmt große Reparaturkosten von Lebenskarten – du zahlst nur den Selbstbehalt.'},
   {t:'<b>Invest in yourself:</b> a 🎓 course (in 💰 Money) raises your paycheck for the rest of the game. Early is better!', de:'<b>Investier in dich selbst:</b> Ein 🎓 Kurs (unter 💰 Geld) erhöht dein Gehalt für den Rest des Spiels. Je früher, desto besser!'},
+  {t:'<b>Investing:</b> the 📈 index fund usually grows faster than savings, but it can drop. Don’t invest money you’ll need soon.', de:'<b>Investieren:</b> Der 📈 Indexfonds wächst meist schneller als Erspartes, kann aber fallen. Investier kein Geld, das du bald brauchst.'},
   {t:'<b>Badges:</b> smart money moves unlock 🏅 badges. See your collection on the start screen.', de:'<b>Abzeichen:</b> Kluge Geld-Entscheidungen schalten 🏅 Abzeichen frei. Deine Sammlung siehst du auf dem Startbildschirm.'},
   {t:'<b>Keep a cash cushion.</b> Life Happens cards can hit hard when your wallet is empty.', de:'<b>Behalte einen Bargeld-Puffer.</b> Lebenskarten können hart treffen, wenn die Geldbörse leer ist.'},
   {t:'<b>Ventures are assets:</b> they pay side-hustle income every Payday, even if no one visits.', de:'<b>Unternehmen sind Vermögenswerte:</b> Sie bringen an jedem Zahltag Nebenverdienst – auch ohne Kundschaft.'},
@@ -592,11 +607,22 @@ const BADGES = [
   {id:'deal',     e:'🤝', name:'Deal Maker',      how:'Complete a trade.',                                           de:{name:'Verhandlungsprofi',  how:'Schließ einen Tausch ab.'}},
   {id:'covered',  e:'🛡️', name:'Covered',         how:'Have your insurance pay for a claim.',                        de:{name:'Gut versichert',     how:'Lass deine Versicherung einen Schaden bezahlen.'}},
   {id:'learner',  e:'🎓', name:'Lifelong Learner',how:'Finish a course.',                                            de:{name:'Lernprofi',          how:'Schließ einen Kurs ab.'}},
+  {id:'longterm', e:'🧘', name:'Long-Term Investor', how:'Keep at least {$50} in the index fund for 8 rounds in a row.', de:{name:'Langfristig investiert', how:'Halte 8 Runden lang mindestens {$50} im Indexfonds.'}},
+  {id:'diverse',  e:'🧺', name:'Diversified',     how:'Have savings, investments and a venture at the same time.', de:{name:'Gut gestreut',     how:'Hab gleichzeitig Erspartes, Investments und ein Unternehmen.'}},
   {id:'giver',    e:'💝', name:'Giver',           how:'Donate to a good cause.', only:0,                             de:{name:'Großes Herz',        how:'Spende für einen guten Zweck.'}},
   {id:'debtfree', e:'🏆', name:'Debt Destroyer',  how:'Pay off all your debt after borrowing.', only:2,              de:{name:'Schuldenfrei',       how:'Zahl nach einem Kredit alle Schulden zurück.'}},
   {id:'credit',   e:'📈', name:'Credit Star',     how:'Reach a credit score of 750.', only:2,                        de:{name:'Bonitäts-Star',      how:'Erreiche eine Bonität von 750.'}},
   {id:'winner',   e:'🥇', name:'Champion',        how:'Win a game.',                                                 de:{name:'Champion',           how:'Gewinne ein Spiel.'}}
 ];
+
+/* 📈 the stock market: prices move once per round */
+const MARKET = [
+  {id:'idx', e:'📊', name:'Index fund', color:'#2ec4b6', lvl:0, sub:'Hundreds of companies in one fund: smaller ups and downs, steady growth over time.',
+   de:{name:'Indexfonds (ETF)', sub:'Hunderte Firmen in einem Fonds: kleinere Schwankungen, stetiges Wachstum über die Zeit.'}},
+  {id:'stk', e:'🚀', name:'TrendTech stock', color:'#f4a261', lvl:1, sub:'One single company: big swings. It can soar — or crash.',
+   de:{name:'TrendTech-Aktie', sub:'Eine einzige Firma: große Schwankungen. Sie kann abheben – oder abstürzen.'}}
+];
+const DIVIDEND = 0.03, MKT_START = 100;
 
 /* ---------------- language & currency ----------------
    UI text goes through L('English text', {params}); German comes from the DE dictionary.
@@ -625,6 +651,9 @@ function L(key, p){
 const tx = (o, f) => fmtTokens(LANG === 'de' && o.de && o.de[f] != null ? o.de[f] : o[f]);
 /** an {en, de} pair in the current language */
 const pick = o => fmtTokens(LANG === 'de' && o.de != null ? o.de : o.en);
+/** run fn with another UI language (used to build messages for a guest who reads a different language) */
+function inLang(lang, fn){ lang = lang === 'de' ? 'de' : 'en'; if (lang === LANG) return fn();
+  const sl = LANG, sn = NF; LANG = lang; NF = null; try { return fn(); } finally { LANG = sl; NF = sn; } }
 function setLocale(lang, cur, persist = true){
   LANG = lang === 'de' ? 'de' : 'en'; CUR = cur === 'EUR' ? 'EUR' : 'USD'; NF = null;
   document.documentElement.lang = LANG;
@@ -647,7 +676,6 @@ const DE = {
 'Just visiting':'Nur zu Besuch',
 'Draw a card':'Zieh eine Karte',
 'Want it… or skip it?':'Kaufen … oder lassen?',
-'Free hangout':'Gratis abhängen',
 '+10% on savings':'+10 % aufs Ersparte',
 'Go to Bootcamp':'Ab ins Bootcamp',
 'Pay 10% of cash':'10 % vom Bargeld',
@@ -714,7 +742,6 @@ const DE = {
 '{n} donated {m}.':'{n} hat {m} gespendet.',
 '💝 {n} skipped donating this time.':'💝 {n} spendet diesmal nicht.',
 '🏕️ {n} is just visiting Budget Bootcamp.':'🏕️ {n} ist nur zu Besuch im Budget-Bootcamp.',
-'😎 {n} chills in the Chill Zone.':'😎 {n} chillt in der Chill-Zone.',
 '🚨 {n} overspent! Off to Budget Bootcamp.':'🚨 {n} hat überzogen! Ab ins Budget-Bootcamp.',
 'Overspent!':'Überzogen!',
 'Your spending got out of hand. Go straight to <b>Budget Bootcamp</b> — no paycheck for passing Payday — and sit out your next turn.':'Deine Ausgaben sind aus dem Ruder gelaufen. Geh direkt ins <b>Budget-Bootcamp</b> – kein Gehalt fürs Vorbeiziehen am Zahltag – und setz eine Runde aus.',
@@ -1020,7 +1047,7 @@ const DE = {
 '<b>Ventures</b> (colored tiles): buy them when you land on them. Other players pay you a customer fee when they land there. Own a full set of 3 to double fees — use <b>🤝 Trade</b> in 🏪 Ventures to swap ventures and cash with other players.':'<b>Unternehmen</b> (bunte Felder): Kauf sie, wenn du darauf landest. Wer danach dort landet, zahlt dir eine Kundengebühr. Besitzt du alle 3 einer Gruppe, verdoppeln sich die Gebühren – mit <b>🤝 Tauschen</b> unter 🏪 Unternehmen tauschst du Unternehmen und Bargeld mit anderen.',
 '<b>Special tiles:</b> 🧠 Money Quiz · 🎲 Life Happens · 🛍️ Impulse Mall (treats from fun money are planned; anything beyond is an impulse buy) · 🏦 Savings Bank (+10%) · 📱 Phone Bill · 🧾 Tax (💝 Give Back on Easy) · 🚨 Overspent → Budget Bootcamp.':'<b>Sonderfelder:</b> 🧠 Geld-Quiz · 🎲 Lebenskarte · 🛍️ Impuls-Shop (Käufe aus dem Spaß-Geld sind geplant, alles darüber ist ein Spontankauf) · 🏦 Sparbank (+10 %) · 📱 Handyrechnung · 🧾 Steuer (💝 Spenden auf „Leicht“) · 🚨 Überzogen → Budget-Bootcamp.',
 'Difficulty — {e} {n}:':'Schwierigkeit – {e} {n}:',
-'<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Everyone plays in the host’s language.':'<b>Auf mehreren Geräten spielen:</b> Stell am Gastgeber-Gerät eine Person auf <b>📡 Anderes Gerät</b> und tippe auf Verbinden. Deine Freundin oder dein Freund öffnet dieselbe Seite, tippt auf <b>📡 Bei Freunden mitspielen</b>, fügt die Einladung ein oder scannt sie und schickt den Antwort-Code zurück. Im selben WLAN geht es ohne Internet; verschiedene Netze brauchen Internet (manche strengen Netze blockieren es). Alle spielen in der Sprache des Gastgebers.',
+'<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Each player can pick their own language in the ☰ menu.':'<b>Auf mehreren Geräten spielen:</b> Stell am Gastgeber-Gerät eine Person auf <b>📡 Anderes Gerät</b> und tippe auf Verbinden. Deine Freundin oder dein Freund öffnet dieselbe Seite, tippt auf <b>📡 Bei Freunden mitspielen</b>, fügt die Einladung ein oder scannt sie und schickt den Antwort-Code zurück. Im selben WLAN geht es ohne Internet; verschiedene Netze brauchen Internet (manche strengen Netze blockieren es). Alle können im ☰ Menü ihre eigene Sprache wählen.',
 '<b>Controls:</b> drag to rotate, pinch or scroll to zoom, tap a tile for details.':'<b>Steuerung:</b> Ziehen zum Drehen, mit zwei Fingern oder dem Mausrad zoomen, auf ein Feld tippen für Details.',
 'Interest here is paid every Payday to keep the game fast. Real savings accounts and loans usually quote yearly rates.':'Zinsen gibt es hier an jedem Zahltag, damit das Spiel schnell bleibt. Echte Sparkonten und Kredite geben meist Jahreszinsen an.',
 'Credits.':'Danksagung.',
@@ -1111,7 +1138,47 @@ const DE = {
 'Hard only':'Nur „Schwer“',
 'Medium & Hard':'„Mittel“ & „Schwer“',
 '{k} of {t} badges collected on this device.':'{k} von {t} Abzeichen auf diesem Gerät gesammelt.',
-'🏅 Badges':'🏅 Abzeichen'
+'🏅 Badges':'🏅 Abzeichen',
+'Index {p}':'Index {p}',
+'📈 Market: index {i}':'📈 Börse: Index {i}',
+'TrendTech {s}':'TrendTech {s}',
+'📉 <b>Market crash!</b> The index fell {i}. Prices often recover — selling in a panic locks in the loss.':'📉 <b>Börsencrash!</b> Der Index ist um {i} gefallen. Kurse erholen sich oft – wer in Panik verkauft, macht den Verlust endgültig.',
+'🚀 <b>Market boom!</b> The index rose {i}.':'🚀 <b>Börsenboom!</b> Der Index ist um {i} gestiegen.',
+'index fund dividend':'Dividende vom Indexfonds',
+'📈 {n} got a {m} dividend from the index fund.':'📈 {n} bekommt {m} Dividende vom Indexfonds.',
+'📈 {n} checks the stock market.':'📈 {n} schaut bei der Börse vorbei.',
+'Stock Market':'Börse',
+'Your index fund paid a {m} dividend (3%) — companies share part of their profit with owners.':'Dein Indexfonds hat {m} Dividende (3 %) gezahlt – Firmen geben einen Teil ihres Gewinns an die Eigentümer weiter.',
+'Own part of many companies with an index fund, or take a bigger risk with a single stock.':'Mit einem Indexfonds besitzt du einen kleinen Teil vieler Firmen – oder du gehst mit einer Einzelaktie ein größeres Risiko ein.',
+'📈 Buy or sell':'📈 Kaufen oder verkaufen',
+'You own':'Du besitzt',
+'{n} invested {m} in {a}.':'{n} hat {m} in {a} investiert.',
+'🤖 {n} invested {m} in {a}.':'🤖 {n} hat {m} in {a} investiert.',
+'{n} sold TrendTech for {m}.':'{n} hat TrendTech für {m} verkauft.',
+'🤖 {n} took profits: sold TrendTech for {m}.':'🤖 {n} nimmt Gewinne mit: TrendTech für {m} verkauft.',
+'sold {m} of investments':'Investments für {m} verkauft',
+'Counter-offer from {n}':'Gegenangebot von {n}',
+'🔁 Counter-offer':'🔁 Gegenangebot',
+'🔁 {a} made a counter-offer to {b}.':'🔁 {a} macht {b} ein Gegenangebot.',
+'Send counter-offer':'Gegenangebot senden',
+'Your counter-offer':'Dein Gegenangebot',
+'{n} sold {m} of {a}.':'{n} hat {a} für {m} verkauft.',
+'Investments':'Investments',
+'Stock market: the index moved {p} last round':'Börse: Der Index hat sich letzte Runde um {p} bewegt',
+'Invested':'Investiert',
+'Investments · gain':'Investments · Gewinn',
+'Price history':'Kursverlauf',
+'Money':'Geld',
+'Invested now':'Derzeit investiert',
+'Gain or loss so far':'Bisheriger Gewinn oder Verlust',
+'last round':'letzte Runde',
+'Since the start: {p} · you own {m}':'Seit Spielbeginn: {p} · du besitzt {m}',
+'Buy':'Kaufen',
+'Sell':'Verkaufen',
+'Unlocks on Medium and Hard.':'Gibt es auf „Mittel“ und „Schwer“.',
+'You can buy and sell on your turn.':'Kaufen und verkaufen kannst du, wenn du dran bist.',
+'<b>📈 Stock Market:</b> invest in an index fund (and on Medium and Hard a single stock) under 💰 Money. Prices move every round; landing on the Market tile pays a dividend on your index fund.':'<b>📈 Börse:</b> Unter 💰 Geld kannst du in einen Indexfonds investieren (auf „Mittel“ und „Schwer“ auch in eine Einzelaktie). Die Kurse ändern sich jede Runde; landest du auf dem Börsenfeld, bekommst du Dividende auf deinen Indexfonds.',
+'Language':'Sprache'
 };
 
 /* ---------------- state ---------------- */
@@ -1172,7 +1239,7 @@ function tokenWorld(pi, i){ const tp = tilePos(i), y = tileYaw(i), c = Math.cos(
 function T(i){ const t = TILES[i], name = tname(i);
   const sub = { payday:() => L('Collect {m}', {m:money(PAYCHECK)}), quiz:() => L('Answer right: +{m}', {m:money(QUIZ_REWARD)}),
     bill:() => L('Pay {m}', {m:money(infl(t.amount))}), bootcamp:() => L('Just visiting'), life:() => L('Draw a card'), mall:() => L('Want it… or skip it?'),
-    chill:() => L('Free hangout'), bank:() => L('+10% on savings'), gobootcamp:() => L('Go to Bootcamp'), tax:() => L('Pay 10% of cash') }[t.t];
+    market:() => L('Index {p}', {p:signedPct((mktPrice('idx') - MKT_START)/MKT_START)}), bank:() => L('+10% on savings'), gobootcamp:() => L('Go to Bootcamp'), tax:() => L('Pay 10% of cash') }[t.t];
   if (t.t === 'tax' && !D().tax) return {...t, t:'give', name:L('Give Back'), emoji:'💝', sub:L('Donate {m}?', {m:money(GIVE_AMT)})};
   if (t.t === 'bill') return {...t, name, amount:infl(t.amount), sub:sub()};
   return {...t, name, sub: sub ? sub() : ''}; }
@@ -1255,7 +1322,12 @@ const Sound = {
         const src = this.ctx.createBufferSource(); src.buffer = b; src.connect(this.musicBus);
         src.onended = () => { if (this.music.src !== src) return; this.music.src = null; this.music.playing = false; this.music.idx++; if (this.pref.music) this.startMusic(); };
         this.music.src = src; this.music.playing = true; this.musicBus.gain.setValueAtTime(0, this.ctx.currentTime); src.start(); this.applyVol(); }
-    } catch(e){}
+      this.music.fails = 0;
+    } catch(e){
+      // e.g. offline and this track isn't saved yet: try the next one (each once)
+      this.music.fails = (this.music.fails || 0) + 1;
+      if (this.music.fails < this.playlist().length){ this.music.idx++; this.music.starting = false; return this.startMusic(); }
+    }
     this.music.starting = false; refreshNowPlaying(); },
   stopMusic(){ const s = this.music.src; this.music.src = null; this.music.playing = false; if (s){ try { s.stop(); } catch(e){} } },
   playlist(){ const st = this.pref.musicStyle; const l = TRACKS.filter(t => st === 'mix' || t.style === st); return l.length ? l : TRACKS; },
@@ -1288,7 +1360,7 @@ function wrapText(x, text, cx, y, maxW, lh){ const words = String(text).split(' 
 function drawTile(c, i){
   const x = c.getContext('2d'), W = 512, t = T(i);
   const bgs = {venture:'#fbf6ec',quiz:'#e3f1ff',life:'#ffeede',mall:'#ffe4ef',bank:'#dff8ee',bill:'#ece6ff',tax:'#ece6ff',give:'#ffe6f0',
-               payday:'#dcf7dc',bootcamp:'#fff3cc',chill:'#dcf3ff',gobootcamp:'#ffdcdc'};
+               payday:'#dcf7dc',bootcamp:'#fff3cc',market:'#e2f5e6',gobootcamp:'#ffdcdc'};
   x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,W,W);
   x.fillStyle = bgs[t.t]; x.fillRect(0,0,W,W);
   x.textAlign = 'center'; x.textBaseline = 'middle';
@@ -1529,7 +1601,7 @@ function fee(i){ const o = S.owners[i]; if (o < 0) return baseFee(i); const lv =
 const hustle = i => Math.max(1, Math.round(fee(i)/3));
 const owned = pi => S.owners.map((o,i) => o === pi ? i : -1).filter(i => i >= 0);
 const assetValue = i => TILES[i].price + S.levels[i]*upgradeCost(i);
-function netWorth(p){ const pi = pidx(p); return p.cash + p.savings + (p.funMoney || 0) - p.debt + owned(pi).reduce((s,i) => s + assetValue(i), 0); }
+function netWorth(p){ const pi = pidx(p); return p.cash + p.savings + (p.funMoney || 0) + investValue(p) - p.debt + owned(pi).reduce((s,i) => s + assetValue(i), 0); }
 function canUpgrade(pi, i){ return D().upgrades && S.owners[i] === pi && S.levels[i] < 3 && (S.levels[i] === 0 || ownsSet(pi, TILES[i].g)); }
 /* credit (Hard) */
 function creditTier(score){ return score >= 740 ? {rate:.08, limit:800, label:L('Excellent')} : score >= 670 ? {rate:.12, limit:600, label:L('Good')}
@@ -1544,8 +1616,8 @@ const deductible = () => infl(LVL() === 0 ? 10 : 25);
 function setInsurance(p, on){
   if (!!on === !!p.ins) return false;
   if (on){ const pr = premium(); if (p.cash < pr) return false; p.cash -= pr; p.insPaid += pr; p.ins = true; Sound.good();
-    log(L('{n} bought insurance ({m} per Payday).', {n:p.name, m:money(pr)})); toast(L('🛡️ {n} is now insured.', {n:B(p.name)}), 'good'); }
-  else { p.ins = false; log(L('{n} cancelled the insurance.', {n:p.name})); toast(L('🛡️ {n} cancelled the insurance.', {n:B(p.name)})); }
+    log(() => (L('{n} bought insurance ({m} per Payday).', {n:p.name, m:money(pr)}))); toast(() => (L('🛡️ {n} is now insured.', {n:B(p.name)})), 'good'); }
+  else { p.ins = false; log(() => (L('{n} cancelled the insurance.', {n:p.name}))); toast(() => (L('🛡️ {n} cancelled the insurance.', {n:B(p.name)}))); }
   return true; }
 /* 🎓 courses: pay once, earn more at every Payday after */
 const courseCost = (p, c) => Math.max(0, infl(c.cost) - (p.eduDisc || 0));
@@ -1555,13 +1627,68 @@ const paydaysLeft = () => Math.max(0, Math.round((S.maxRounds - S.round + 1)*7/2
 function takeCourse(p, id){ const c = COURSES.find(x => x.id === id); if (!c || courseState(p, c)) return false;
   const cost = courseCost(p, c); if (p.cash < cost) return false;
   p.cash -= cost; p.eduSpent += cost; p.eduDisc = 0; p.courses.push(c.id); p.paycheck += c.raise; Sound.upgrade();
-  log(L('{n} finished the course “{c}” — paycheck +{r}.', {n:p.name, c:tx(c,'name'), r:money(c.raise)}));
-  toast(L('🎓 {n} finished “{c}”: paycheck +{r}, now {m}.', {n:B(p.name), c:tx(c,'name'), r:money(c.raise), m:money(p.paycheck)}), 'good'); return true; }
+  log(() => (L('{n} finished the course “{c}” — paycheck +{r}.', {n:p.name, c:tx(c,'name'), r:money(c.raise)})));
+  toast(() => (L('🎓 {n} finished “{c}”: paycheck +{r}, now {m}.', {n:B(p.name), c:tx(c,'name'), r:money(c.raise), m:money(p.paycheck)})), 'good'); return true; }
+/* 📈 stock market: an index fund (all levels) and a single stock (Medium+); prices move once per round */
+const mktOn = a => LVL() >= a.lvl;
+const mktPrice = id => (S.mkt && S.mkt.p && S.mkt.p[id]) || MKT_START;
+const holdValue = (p, id) => Math.round(((p.units && p.units[id]) || 0)*mktPrice(id));
+const investValue = p => MARKET.reduce((s, a) => s + holdValue(p, a.id), 0);
+const signedPct = r => (r >= 0 ? '+' : '−') + pct(Math.abs(r));
+function newMarket(){ return {p:{idx:MKT_START, stk:MKT_START}, h:[{idx:MKT_START, stk:MKT_START}], last:{idx:0, stk:0}}; }
+function buyInvest(p, id, amt){ const a = MARKET.find(x => x.id === id); if (!a || !mktOn(a)) return 0;
+  amt = Math.min(Math.floor(amt), p.cash); if (amt <= 0) return 0;
+  p.cash -= amt; p.units[id] = (p.units[id] || 0) + amt/mktPrice(id); p.invIn += amt; return amt; }
+function sellInvest(p, id, amt){ const have = holdValue(p, id); amt = Math.min(Math.floor(amt), have); if (amt <= 0) return 0;
+  if (amt >= have) p.units[id] = 0; else p.units[id] = Math.max(0, p.units[id] - amt/mktPrice(id));
+  p.cash += amt; p.invOut += amt; return amt; }
+/** sell what is needed to cover a shortfall (riskier holdings first) */
+function sellInvestments(p, need){ let got = 0; for (const id of ['stk', 'idx']){ if (got >= need) break; got += sellInvest(p, id, need - got); } return got; }
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+/** once per round: move the prices (small drift up, random swings, rare crashes and booms) */
+function marketMove(){
+  if (!S.mkt) S.mkt = newMarket();
+  const crash = Math.random() < .05, boom = !crash && Math.random() < .05;
+  let ri = .03 + gauss()*.045; if (crash) ri = -.14 - Math.random()*.1; else if (boom) ri = .09 + Math.random()*.06; ri = clamp(ri, -.3, .2);
+  let rs = .02 + ri*.8 + gauss()*.14; const sh = Math.random(); if (sh < .06) rs -= .35; else if (sh < .12) rs += .3; rs = clamp(rs, -.6, .8);
+  const m = S.mkt; m.p.idx = Math.max(5, Math.round(m.p.idx*(1 + ri)*100)/100); m.p.stk = Math.max(2, Math.round(m.p.stk*(1 + rs)*100)/100);
+  m.last = {idx:ri, stk:rs}; m.h.push({...m.p}); if (m.h.length > 80) m.h.shift();
+  S.players.forEach(p => { normPlayer(p); if (holdValue(p, 'idx') >= 50) p.holdRounds++; else p.holdRounds = 0; });
+  refreshTile(TILES.findIndex(t => t.t === 'market'));
+  const stockOn = mktOn(MARKET[1]), invested = S.players.some(p => !p.out && investValue(p) > 0);
+  const line = () => L('📈 Market: index {i}', {i:signedPct(ri)}) + (stockOn ? ' · ' + L('TrendTech {s}', {s:signedPct(rs)}) : '');
+  if (crash) toast(() => L('📉 <b>Market crash!</b> The index fell {i}. Prices often recover — selling in a panic locks in the loss.', {i:pct(-ri)}), 'warn');
+  else if (boom) toast(() => L('🚀 <b>Market boom!</b> The index rose {i}.', {i:pct(ri)}), 'good');
+  else if (invested) toast(line, ri >= 0 ? '' : 'warn');
+  log(line);
+}
+async function doMarket(p){
+  const div = Math.round(holdValue(p, 'idx')*DIVIDEND);
+  if (div > 0){ p.divs += div; gain(p, div, () => L('index fund dividend')); }
+  if (p.cpu){ toast(() => div > 0 ? L('📈 {n} got a {m} dividend from the index fund.', {n:B(p.name), m:money(div)}) : L('📈 {n} checks the stock market.', {n:B(p.name)})); cpuInvest(p, true); return; }
+  const r = await ask(p, () => ({icon:'📈', title:L('Stock Market'), body:`<p>${div > 0 ? L('Your index fund paid a {m} dividend (3%) — companies share part of their profit with owners.', {m:`<b>${money(div)}</b>`}) : L('Own part of many companies with an index fund, or take a bigger risk with a single stock.')}</p>
+      ${mktSummary(p)}${lessonBox(pick(LESSON.market))}`,
+    buttons:[{label:L('📈 Buy or sell'), value:'inv', kind:'gold'}, {label:L('OK'), value:'ok', kind:'primary'}], dflt:'ok'}));
+  if (r === 'inv') await ask(p, {panel:'invest'});
+}
+/** a short table of prices and what this player owns */
+function mktSummary(p){ return `<div class="kv">${MARKET.filter(mktOn).map(a => `<span>${a.e} ${tx(a,'name')}</span><b>${money(mktPrice(a.id))} <small class="${S.mkt && S.mkt.last[a.id] < 0 ? 'bad-t' : 'good-t'}">${signedPct(S.mkt ? S.mkt.last[a.id] : 0)}</small></b>
+  <span>${L('You own')}</span><b>${money(holdValue(p, a.id))}</b>`).join('')}</div>`; }
+/** CPU: invest spare cash now and then (more often on the Market tile); take profits on the stock sometimes */
+function cpuInvest(p, onTile=false){ const pi = pidx(p); if (p.debt > 0 || p.out) return; const risk = [.3, .6, .9][pi % 3];
+  const spare = p.cash - 170;
+  if (spare >= 30 && Math.random() < (onTile ? .7 : .3)){ const amt = Math.min(spare, 30 + rnd(4)*20), stk = mktOn(MARKET[1]) && Math.random() < risk*.4;
+    const a = MARKET[stk ? 1 : 0]; if (buyInvest(p, a.id, amt)){ log(() => L('{n} invested {m} in {a}.', {n:p.name, m:money(amt), a:tx(a,'name')}));
+      toast(() => L('🤖 {n} invested {m} in {a}.', {n:B(p.name), m:money(amt), a:tx(a,'name')})); } }
+  const sv = holdValue(p, 'stk'); if (sv > 0 && mktPrice('stk') > MKT_START*1.6 && Math.random() < .3){ sellInvest(p, 'stk', sv);
+    log(() => L('{n} sold TrendTech for {m}.', {n:p.name, m:money(sv)})); toast(() => L('🤖 {n} took profits: sold TrendTech for {m}.', {n:B(p.name), m:money(sv)})); }
+}
 /** fill in fields added in later versions (old saves) */
 function normPlayer(p){
-  const d0 = {funMoney:0, trades:0, ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false};
+  const d0 = {invIn:0, invOut:0, divs:0, holdRounds:0, funMoney:0, trades:0, ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false};
   for (const k in d0) if (p[k] === undefined) p[k] = d0[k];
-  if (!Array.isArray(p.courses)) p.courses = []; if (!Array.isArray(p.badges)) p.badges = []; return p; }
+  if (!Array.isArray(p.courses)) p.courses = []; if (!Array.isArray(p.badges)) p.badges = [];
+  if (!p.units || typeof p.units !== 'object') p.units = {idx:0, stk:0}; return p; }
 /* 📈 net worth after every round, for the end-of-game chart */
 function snapHist(r){ if (!Array.isArray(S.hist)) S.hist = []; const last = S.hist[S.hist.length - 1]; if (last && last.r === r) S.hist.pop();
   S.hist.push({r, v:S.players.map(p => p.out ? null : netWorth(p))}); if (S.hist.length > 80) S.hist.shift(); }
@@ -1579,8 +1706,8 @@ function award(p, id){
   if (NET.role === 'guest' || !p || S.phase === 'setup') return; normPlayer(p);
   const b = BADGES.find(x => x.id === id); if (!b || !badgeOk(b) || p.badges.includes(id)) return;
   p.badges.push(id); Sound.badge();
-  log(L('{n} earned the badge {b}.', {n:p.name, b:`${b.e} ${tx(b,'name')}`}));
-  toast(`<span class="bdg">${b.e}</span> ${L('{n} earned a badge: {b}', {n:B(p.name), b:`<b>${tx(b,'name')}</b>`})}<br><small>${tx(b,'how')}</small>`, 'gold');
+  log(() => (L('{n} earned the badge {b}.', {n:p.name, b:`${b.e} ${tx(b,'name')}`})));
+  toast(() => (`<span class="bdg">${b.e}</span> ${L('{n} earned a badge: {b}', {n:B(p.name), b:`<b>${tx(b,'name')}</b>`})}<br><small>${tx(b,'how')}</small>`), 'gold');
   if (p.ctrl === 'local') recordTrophy(p.name, id, S.gameId); }
 /** award every badge whose condition is met (host or single device; runs with each UI update) */
 function checkBadges(){
@@ -1591,77 +1718,86 @@ function checkBadges(){
     chk('interest', p.intEarned >= 100); chk('willpower', p.skips >= 3); chk('planned', p.planned > 0); chk('quiz', p.quizRight >= 3);
     chk('smart', p.smart >= 2); chk('owner', mine.length >= 3); chk('set', Object.keys(GROUPS).some(g => ownsSet(pi, g)));
     chk('investor', mine.some(i => S.levels[i] > 0)); chk('deal', p.trades > 0); chk('covered', p.claims > 0); chk('learner', p.courses.length > 0);
+    chk('longterm', p.holdRounds >= 8); chk('diverse', p.savings >= 50 && investValue(p) >= 50 && mine.length > 0);
     chk('giver', p.given > 0); chk('debtfree', p.hadDebt && p.debt === 0); chk('credit', p.credit >= 750); }); }
 /* payday budget: shares in percent; needs (cash) = the rest */
 const budgetOf = p => { const b = p.budget || {save:20, fun:30}; const save = clamp(Math.round(b.save), 0, 100); return {save, fun:clamp(Math.round(b.fun), 0, 100 - save)}; };
 function splitPay(gross, b){ gross = Math.max(0, Math.round(gross)); const s = Math.min(gross, Math.round(gross*b.save/100)), f = Math.min(gross - s, Math.round(gross*b.fun/100)); return {save:s, fun:f, needs:gross - s - f}; }
 
-function log(msg){ S.log.push(`R${S.round} · ${msg}`); if (S.log.length > 120) S.log.shift(); }
-function toast(html, kind='', fromNet=false){ const box = $('#toasts'); const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = html; box.appendChild(t);
+/** game log: every entry is kept in both languages, so each device shows its own */
+function log(msg){ const f = typeof msg === 'function' ? msg : () => String(msg), r = `R${S.round} · `;
+  S.log.push({en:r + inLang('en', f), de:r + inLang('de', f)}); if (S.log.length > 120) S.log.shift(); }
+const logText = l => typeof l === 'string' ? l : (l && (l[LANG] || l.en)) || '';
+/** show a message; h may be a function so the host can build it again in each guest's language */
+function toast(h, kind='', fromNet=false){ const html = typeof h === 'function' ? h() : String(h);
+  const box = $('#toasts'); const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = html; box.appendChild(t);
   while (box.children.length > 3) box.firstChild.remove();
   setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 4600);
-  if (!fromNet) bcast({t:'toast', html, kind}); }
+  if (!fromNet) bcastL(lang => ({t:'toast', html: typeof h === 'function' ? inLang(lang, h) : html, kind})); }
 const B = n => `<b>${esc(n)}</b>`;
 
 function sellVenture(p, i, silent){ const v = Math.round(assetValue(i)/2); S.owners[i] = -1; S.levels[i] = 0; p.cash += v; refreshSet(TILES[i].g);
-  log(L('{n} sold {v} for {m}.', {n:p.name, v:tname(i), m:money(v)})); Sound.coin();
-  if (!silent) toast(L('🏷️ {n} sold {v} for {m}.', {n:B(p.name), v:tname(i), m:money(v)})); return v; }
+  log(() => (L('{n} sold {v} for {m}.', {n:p.name, v:tname(i), m:money(v)}))); Sound.coin();
+  if (!silent) toast(() => (L('🏷️ {n} sold {v} for {m}.', {n:B(p.name), v:tname(i), m:money(v)}))); return v; }
 function bankrupt(p){ if (p.out) return; const pi = pidx(p); p.out = true;
   owned(pi).forEach(i => { S.owners[i] = -1; S.levels[i] = 0; }); refreshAllTiles();
   if (TOK[pi]) TOK[pi].object3D.visible = false;
-  toast(L('💥 {n} couldn’t pay and went bankrupt. Out of the game.', {n:B(p.name)}), 'warn'); log(L('{n} went bankrupt.', {n:p.name})); Sound.bankrupt(); }
+  toast(() => (L('💥 {n} couldn’t pay and went bankrupt. Out of the game.', {n:B(p.name)})), 'warn'); log(() => (L('{n} went bankrupt.', {n:p.name}))); Sound.bankrupt(); }
 
 /** Take money from a player. Shortfalls are covered according to the difficulty. Returns notes. */
 function charge(p, amt, reason, to=null){
   amt = Math.round(amt); if (amt <= 0 || p.out) return [];
-  const d = D(); p.cash -= amt; if (to) to.cash += amt;
-  const notes = [];
-  if (p.cash < 0 && p.funMoney > 0){ const pull = Math.min(p.funMoney, -p.cash); p.funMoney -= pull; p.cash += pull; notes.push(L('{m} of fun money was used', {m:money(pull)})); }
-  if (p.cash < 0 && p.savings > 0){ const pull = Math.min(p.savings, -p.cash); p.savings -= pull; p.cash += pull; notes.push(L('{m} came out of savings', {m:money(pull)})); }
-  if (p.cash < 0 && d.credit){ const room = Math.max(0, creditLimit(p) - p.debt), loan = Math.min(room, -p.cash);
-    if (loan > 0){ p.debt += loan; p.borrowed += loan; p.cash += loan; notes.push(L('borrowed {m} at {r} per Payday', {m:money(loan), r:pct(loanRate(p))})); bumpCredit(p, -5); } }
+  const d = D(), why = typeof reason === 'function' ? reason : () => String(reason); p.cash -= amt; if (to) to.cash += amt;
+  const notes = [];      // functions, so each language can render them
+  if (p.cash < 0 && p.funMoney > 0){ const pull = Math.min(p.funMoney, -p.cash); p.funMoney -= pull; p.cash += pull; notes.push(() => L('{m} of fun money was used', {m:money(pull)})); }
+  if (p.cash < 0 && p.savings > 0){ const pull = Math.min(p.savings, -p.cash); p.savings -= pull; p.cash += pull; notes.push(() => L('{m} came out of savings', {m:money(pull)})); }
+  if (p.cash < 0 && investValue(p) > 0){ const got = sellInvestments(p, -p.cash); if (got > 0) notes.push(() => L('sold {m} of investments', {m:money(got)})); }
+  if (p.cash < 0 && d.credit){ const room = Math.max(0, creditLimit(p) - p.debt), loan = Math.min(room, -p.cash), rate = loanRate(p);
+    if (loan > 0){ p.debt += loan; p.borrowed += loan; p.cash += loan; notes.push(() => L('borrowed {m} at {r} per Payday', {m:money(loan), r:pct(rate)})); bumpCredit(p, -5); } }
   if (p.cash < 0 && d.sellOff){ const mine = owned(pidx(p)).sort((a,b) => assetValue(a) - assetValue(b));
-    for (const i of mine){ if (p.cash >= 0) break; const v = sellVenture(p, i, true); notes.push(L('had to sell {v} for {m}', {v:tname(i), m:money(v)})); } }
-  if (p.cash < 0){
-    if (!d.sellOff){ notes.push(L('the family safety net covered {m} — you’re off to Budget Bootcamp and skip your next turn', {m:money(-p.cash)})); p.safety += -p.cash; p.cash = 0; p.skip = Math.max(p.skip, 1); p.toBootcamp = true; }
-    else { notes.push(L('still couldn’t cover {m}', {m:money(-p.cash)})); p.cash = 0; bankrupt(p); }
+    for (const i of mine){ if (p.cash >= 0) break; const v = sellVenture(p, i, true); notes.push(() => L('had to sell {v} for {m}', {v:tname(i), m:money(v)})); } }
+  if (p.cash < 0){ const short = -p.cash;
+    if (!d.sellOff){ notes.push(() => L('the family safety net covered {m} — you’re off to Budget Bootcamp and skip your next turn', {m:money(short)})); p.safety += short; p.cash = 0; p.skip = Math.max(p.skip, 1); p.toBootcamp = true; }
+    else { notes.push(() => L('still couldn’t cover {m}', {m:money(short)})); p.cash = 0; bankrupt(p); }
   }
-  log(L('{n} paid {m} — {why}', {n:p.name, m:money(amt), why:reason}) + (notes.length ? ' (' + notes.join(', ') + ')' : ''));
-  if (notes.length) toast(L('⚠️ {n} was short on cash: {notes}.', {n:B(p.name), notes:notes.join('; ')}), 'warn');
+  const nj = sep => notes.map(f => f()).join(sep);
+  log(() => L('{n} paid {m} — {why}', {n:p.name, m:money(amt), why:why()}) + (notes.length ? ' (' + nj(', ') + ')' : ''));
+  if (notes.length) toast(() => L('⚠️ {n} was short on cash: {notes}.', {n:B(p.name), notes:nj('; ')}), 'warn');
   Sound.lose(); updateUI();
   return notes;
 }
-function gain(p, amt, reason, toSavings=false){ amt = Math.round(amt); if (toSavings) p.savings += amt; else p.cash += amt; log(L('{n} got {m} — {why}', {n:p.name, m:money(amt), why:reason})); Sound.coin(); updateUI(); }
+function gain(p, amt, reason, toSavings=false){ amt = Math.round(amt); const why = typeof reason === 'function' ? reason : () => String(reason);
+  if (toSavings) p.savings += amt; else p.cash += amt; log(() => L('{n} got {m} — {why}', {n:p.name, m:money(amt), why:why()})); Sound.coin(); updateUI(); }
 
 /** Hard mode: if debt grows far past the limit, collections forces sales, then bankruptcy */
 function checkDebt(p){
   if (p.out || !D().credit || p.debt <= creditLimit(p)*1.5) return;
   const mine = owned(pidx(p)).sort((a,b) => assetValue(b) - assetValue(a));
   for (const i of mine){ if (p.debt <= creditLimit(p)) break; const v = Math.round(assetValue(i)/2); S.owners[i] = -1; S.levels[i] = 0; p.debt -= v; refreshSet(TILES[i].g);
-    toast(L('🏚️ Debt collectors made {n} sell {v} for {m}.', {n:B(p.name), v:tname(i), m:money(v)}), 'warn'); }
+    toast(() => (L('🏚️ Debt collectors made {n} sell {v} for {m}.', {n:B(p.name), v:tname(i), m:money(v)})), 'warn'); }
   if (p.debt < 0){ p.cash += -p.debt; p.debt = 0; }
   if (p.debt > creditLimit(p)*1.5) bankrupt(p);
   updateUI();
 }
 
 async function payday(p){
-  const d = D(), pi = pidx(p), gross = p.paycheck, after = [], bad = x => `<span class="bad-t">${x}</span>`;
+  const d = D(), pi = pidx(p), gross = p.paycheck, after = [], bad = x => `<span class="bad-t">${x}</span>`;   // after: functions (each language renders them)
   // 1. interest on what was already saved
   const interest = Math.round(p.savings*SAVE_RATE); p.savings += interest; p.intEarned += interest;
   // 2. Hard: loan interest and the minimum payment are due BEFORE the paycheck arrives (cash first, then fun money)
   if (d.credit && p.debt > 0){
     p.hadDebt = true;
-    const li = Math.ceil(p.debt*loanRate(p)); p.debt += li; p.intPaid += li; after.push(bad(L('−{m} loan interest ({r})', {m:money(li), r:pct(loanRate(p))})));
+    const li = Math.ceil(p.debt*loanRate(p)); p.debt += li; p.intPaid += li; const lr = loanRate(p); after.push(() => bad(L('−{m} loan interest ({r})', {m:money(li), r:pct(lr)})));
     const mp = minPayment(p);
     if (p.cash + p.funMoney >= mp){ const c = Math.min(p.cash, mp); p.cash -= c; p.funMoney -= mp - c; p.debt -= mp; bumpCredit(p, 8);
-      after.push(L('paid {m} minimum ✓ credit +8', {m:money(mp)})); if (p.debt === 0) bumpCredit(p, 10); }
+      after.push(() => L('paid {m} minimum ✓ credit +8', {m:money(mp)})); if (p.debt === 0) bumpCredit(p, 10); }
     else { const lf = infl(LATE_FEE); p.debt += lf; p.missed++; bumpCredit(p, -45); Sound.bad();
-      after.push(bad(L('MISSED the {m} minimum! +{f} late fee, credit −45', {m:money(mp), f:money(lf)}))); }
-    if (p.debt > creditLimit(p)*.8){ bumpCredit(p, -10); after.push(bad(L('maxed-out credit −10'))); }
+      after.push(() => bad(L('MISSED the {m} minimum! +{f} late fee, credit −45', {m:money(mp), f:money(lf)}))); }
+    if (p.debt > creditLimit(p)*.8){ bumpCredit(p, -10); after.push(() => bad(L('maxed-out credit −10'))); }
   }
   // 3. the player budgets the paycheck (people are asked unless they chose “use automatically”)
   if (!p.cpu && p.askBudget !== false){
-    const r = await ask(p, {panel:'budget', gross});
+    const r = await ask(p, () => ({panel:'budget', gross}));
     if (r && typeof r === 'object'){ const save = clamp(Math.floor(+r.save || 0), 0, 100); p.budget = {save, fun:clamp(Math.floor(+r.fun || 0), 0, 100 - save)}; p.askBudget = r.ask !== false; }
   }
   const b = budgetOf(p), sp = splitPay(gross, b);
@@ -1671,16 +1807,16 @@ async function payday(p){
   let hust = 0; owned(pi).forEach(i => hust += hustle(i)); p.cash += hust;
   // 5. insurance premium (from cash; no cash = the policy lapses)
   if (p.ins){ const pr = premium();
-    if (p.cash >= pr){ p.cash -= pr; p.insPaid += pr; after.push(L('−{m} insurance', {m:money(pr)})); }
-    else { p.ins = false; after.push(bad(L('insurance cancelled — no cash for the {m} premium', {m:money(pr)}))); log(L('{n} cancelled the insurance.', {n:p.name})); } }
-  const parts = [L('+{m} paycheck → {c} cash · {f} fun money · {s} savings', {m:money(gross), c:money(sp.needs), f:money(sp.fun), s:money(sp.save)}),
-                 interest ? L('+{m} interest', {m:money(interest)}) : '', hust ? L('+{m} side hustles', {m:money(hust)}) : '', ...after].filter(Boolean);
-  let iouMsg = '';
-  if (p.iou){ if (p.iou.repay){ p.cash += p.iou.amount; iouMsg = ' · ' + L('🤝 friend paid back {m}', {m:money(p.iou.amount)}); }
-              else iouMsg = ' · ' + L('😬 your friend “forgot” the {m}', {m:money(p.iou.amount)}); p.iou = null; }
+    if (p.cash >= pr){ p.cash -= pr; p.insPaid += pr; after.push(() => L('−{m} insurance', {m:money(pr)})); }
+    else { p.ins = false; after.push(() => bad(L('insurance cancelled — no cash for the {m} premium', {m:money(pr)}))); log(() => (L('{n} cancelled the insurance.', {n:p.name}))); } }
+  const parts = () => [L('+{m} paycheck → {c} cash · {f} fun money · {s} savings', {m:money(gross), c:money(sp.needs), f:money(sp.fun), s:money(sp.save)}),
+                 interest ? L('+{m} interest', {m:money(interest)}) : '', hust ? L('+{m} side hustles', {m:money(hust)}) : '', ...after.map(x => x())].filter(Boolean);
+  let iouMsg = () => '';
+  if (p.iou){ const io = p.iou; if (io.repay){ p.cash += io.amount; iouMsg = () => ' · ' + L('🤝 friend paid back {m}', {m:money(io.amount)}); }
+              else iouMsg = () => ' · ' + L('😬 your friend “forgot” the {m}', {m:money(io.amount)}); p.iou = null; }
   Sound.payday();
-  toast(`💵 <b>${L('{n} — Payday!', {n:esc(p.name)})}</b><br>${parts.join(' · ')}${iouMsg}`, 'gold');
-  log(L('{n} Payday: {parts}', {n:p.name, parts:parts.join(', ').replace(/<[^>]+>/g,'')}) + iouMsg);
+  toast(() => (`💵 <b>${L('{n} — Payday!', {n:esc(p.name)})}</b><br>${parts().join(' · ')}${iouMsg()}`), 'gold');
+  log(() => (L('{n} Payday: {parts}', {n:p.name, parts:parts().join(', ').replace(/<[^>]+>/g,'')}) + iouMsg()));
   checkDebt(p); updateUI(); await sleep(350);
 }
 
@@ -1704,7 +1840,9 @@ const modalOpen = () => $('#modal').classList.contains('open');
 const lessonBox = s => `<div class="lesson">${s}</div>`;
 
 /** Ask the player controlling p a question: a local dialog, or a prompt sent to their device. */
-function ask(p, opts){ const g = GEN; return askRaw(p, opts).then(v => g === GEN ? v : halt()); }
+/** the language a player reads in: guests choose their own */
+const langOf = p => (p && p.ctrl === 'remote' && NET.peers[p.rid] && NET.peers[p.rid].lang) || LANG;
+function ask(p, opts){ const g = GEN; const o = typeof opts === 'function' ? inLang(langOf(p), opts) : opts; return askRaw(p, o).then(v => g === GEN ? v : halt()); }
 function askRaw(p, opts){
   if (p.ctrl === 'remote'){
     const peer = NET.peers[p.rid];
@@ -1717,9 +1855,11 @@ function askRaw(p, opts){
   if (opts.panel === 'money') return openMoneyUI(pidx(p));
   if (opts.panel === 'ventures') return openVenturesUI(pidx(p));
   if (opts.panel === 'budget') return openBudgetUI(pidx(p), opts.gross);
+  if (opts.panel === 'counter') return openTradeUI(pidx(p), opts.offer);
+  if (opts.panel === 'invest') return openInvestUI(pidx(p));
   return modal(opts);
 }
-function defaultAnswer(o){ if (o.panel) return o.panel === 'budget' ? null : 'ok'; if ('dflt' in o) return o.dflt; const b = (o.buttons || []).find(x => !x.disabled); return b ? b.value : 'ok'; }
+function defaultAnswer(o){ if (o.panel) return o.panel === 'budget' || o.panel === 'counter' ? null : 'ok'; if ('dflt' in o) return o.dflt; const b = (o.buttons || []).find(x => !x.disabled); return b ? b.value : 'ok'; }
 function info(p, opts){ if (p.cpu) return Promise.resolve(); return ask(p, opts); }
 
 /* ---------------- turn flow (runs on the host / single device) ---------------- */
@@ -1733,12 +1873,12 @@ async function startTurn(){
     const feeAmt = infl(BOOTCAMP_FEE);
     let leave = false;
     if (p.cpu) leave = p.cash >= 200;
-    else { const r = await ask(p, {icon:'🏕️', title:L('{n} is at Budget Bootcamp', {n:esc(p.name)}), body:`<p>${L('You overspent, so you sit out this turn.')}</p>
+    else { const r = await ask(p, () => ({icon:'🏕️', title:L('{n} is at Budget Bootcamp', {n:esc(p.name)}), body:`<p>${L('You overspent, so you sit out this turn.')}</p>
              <p>${L('Or pay {m} tuition to leave early and roll now.', {m:`<b>${money(feeAmt)}</b>`})}</p>${lessonBox(pick(LESSON.bootcamp))}`,
-             buttons:[{label:L('Pay {m} & roll', {m:money(feeAmt)}), value:'pay', kind:'gold', disabled:p.cash < feeAmt},{label:L('Sit out this turn'), value:'sit'}], dflt:'sit'});
+             buttons:[{label:L('Pay {m} & roll', {m:money(feeAmt)}), value:'pay', kind:'gold', disabled:p.cash < feeAmt},{label:L('Sit out this turn'), value:'sit'}], dflt:'sit'}));
            leave = r === 'pay' && p.cash >= feeAmt; }
-    if (leave){ charge(p, feeAmt, L('Bootcamp tuition')); p.skip = 0; toast(L('🏕️ {n} paid {m} to leave Bootcamp early.', {n:B(p.name), m:money(feeAmt)})); }
-    else { p.skip--; toast(L('🏕️ {n} sits out this turn at Budget Bootcamp.', {n:B(p.name)})); log(L('{n} sat out at Bootcamp.', {n:p.name})); await sleep(p.cpu ? 1200 : 300); return endTurn(); }
+    if (leave){ charge(p, feeAmt, () => (L('Bootcamp tuition'))); p.skip = 0; toast(() => (L('🏕️ {n} paid {m} to leave Bootcamp early.', {n:B(p.name), m:money(feeAmt)}))); }
+    else { p.skip--; toast(() => (L('🏕️ {n} sits out this turn at Budget Bootcamp.', {n:B(p.name)}))); log(() => (L('{n} sat out at Bootcamp.', {n:p.name}))); await sleep(p.cpu ? 1200 : 300); return endTurn(); }
   }
   S.phase = 'roll'; updateUI(); save();
   if (p.cpu){ await sleep(900); await doRoll(); }
@@ -1748,7 +1888,7 @@ async function doRoll(){
   if (S.phase !== 'roll' || S.over) return;
   const p = cur(), pi = pidx(p); S.phase = 'busy'; $('#info').classList.add('hidden'); updateUI(); flushState();
   const [a,b] = await rollDice();
-  log(L('{n} rolled {r}.', {n:p.name, r:a+b}));
+  log(() => (L('{n} rolled {r}.', {n:p.name, r:a+b})));
   await sleep(250);
   for (let s=0; s<a+b; s++){ const from = p.pos; p.pos = (p.pos + 1) % 24; await hop(pi, from, p.pos); if (p.pos === 0) await payday(p); }
   focusCam(p);
@@ -1766,16 +1906,16 @@ function endTurn(){
   $('#info').classList.add('hidden');
   const p = cur(); if (p) checkDebt(p);
   if (p && !p.out && !p.cpu && D().credit && p.debt > 0 && p.cash + p.funMoney < minPayment(p))
-    toast(L('⚠️ {n}: your cash is less than your next minimum payment ({m}). Move money into cash before Payday!', {n:B(p.name), m:money(minPayment(p))}), 'warn');
+    toast(() => (L('⚠️ {n}: your cash is less than your next minimum payment ({m}). Move money into cash before Payday!', {n:B(p.name), m:money(minPayment(p))})), 'warn');
   if (S.players.length > 1 && alive().length <= 1) return gameOver();
   const n = S.players.length; let next = S.turn, guard = 0, newRound = false;
   do { next = (next + 1) % n; if (next === 0){ S.round++; newRound = true; } guard++; } while (S.players[next].out && guard < 10);
-  if (newRound) snapHist(S.round - 1);
+  if (newRound){ marketMove(); snapHist(S.round - 1); }
   if (S.round > S.maxRounds) return gameOver();
   if (newRound && D().inflation && S.round > 1 && (S.round - 1) % 5 === 0){
     S.priceLevel = Math.round(S.priceLevel*1.1*100)/100; refreshTile(4); Sound.inflation();
-    toast(L('📈 <b>Inflation!</b> Prices rose 10% (bills, shopping, surprises). Your paycheck didn’t — that’s how inflation squeezes budgets.'), 'warn');
-    log(L('Inflation: price level is now ×{x}.', {x:S.priceLevel.toFixed(2)}));
+    toast(() => (L('📈 <b>Inflation!</b> Prices rose 10% (bills, shopping, surprises). Your paycheck didn’t — that’s how inflation squeezes budgets.')), 'warn');
+    log(() => (L('Inflation: price level is now ×{x}.', {x:S.priceLevel.toFixed(2)})));
   }
   S.turn = next; startTurn();
 }
@@ -1790,32 +1930,32 @@ async function resolveTile(p){
     case 'mall': return doMall(p);
     case 'bank': return doBank(p);
     case 'bill': {
-      charge(p, t.amount, t.name);
-      if (p.cpu) toast(L('📱 {n} paid the {m} phone bill.', {n:B(p.name), m:money(t.amount)}));
-      return info(p, {icon:'📱', title:L('Phone bill due'), body:`<p>${L('You pay {m}.', {m:`<b>${money(t.amount)}</b>`})}</p>${lessonBox(pick(LESSON.bill))}`});
+      charge(p, t.amount, () => (t.name));
+      if (p.cpu) toast(() => (L('📱 {n} paid the {m} phone bill.', {n:B(p.name), m:money(t.amount)})));
+      return info(p, () => ({icon:'📱', title:L('Phone bill due'), body:`<p>${L('You pay {m}.', {m:`<b>${money(t.amount)}</b>`})}</p>${lessonBox(pick(LESSON.bill))}`}));
     }
     case 'tax': {
       const amt = Math.max(10, Math.round(p.cash*0.10));
-      charge(p, amt, t.name);
-      if (p.cpu) toast(L('🧾 {n} paid {m} income tax.', {n:B(p.name), m:money(amt)}));
-      return info(p, {icon:'🧾', title:L('Income tax'), body:`<p>${L('10% of your cash: you pay {m}.', {m:`<b>${money(amt)}</b>`})}</p><p>${L('Savings and fun money weren’t taxed — one more reason to budget.')}</p>${lessonBox(pick(LESSON.tax))}`});
+      charge(p, amt, () => (t.name));
+      if (p.cpu) toast(() => (L('🧾 {n} paid {m} income tax.', {n:B(p.name), m:money(amt)})));
+      return info(p, () => ({icon:'🧾', title:L('Income tax'), body:`<p>${L('10% of your cash: you pay {m}.', {m:`<b>${money(amt)}</b>`})}</p><p>${L('Savings and fun money weren’t taxed — one more reason to budget.')}</p>${lessonBox(pick(LESSON.tax))}`}));
     }
     case 'give': {
       let give;
       if (p.cpu) give = p.cash >= 60 && Math.random() < .5;
-      else give = (await ask(p, {icon:'💝', title:L('Give Back'), body:`<p>${L('Donate {m} to a cause you care about?', {m:`<b>${money(GIVE_AMT)}</b>`})}</p>${lessonBox(pick(LESSON.give))}`,
-                buttons:[{label:L('💝 Donate {m}', {m:money(GIVE_AMT)}), value:'yes', kind:'primary', disabled:p.cash < GIVE_AMT}, {label:L('Not this time'), value:'no'}], dflt:'no'})) === 'yes';
-      if (give && p.cash >= GIVE_AMT){ p.cash -= GIVE_AMT; p.given += GIVE_AMT; Sound.good(); toast(L('💝 {n} donated {m} to a good cause.', {n:B(p.name), m:money(GIVE_AMT)}), 'good'); log(L('{n} donated {m}.', {n:p.name, m:money(GIVE_AMT)})); updateUI(); }
-      else toast(L('💝 {n} skipped donating this time.', {n:B(p.name)}));
+      else give = (await ask(p, () => ({icon:'💝', title:L('Give Back'), body:`<p>${L('Donate {m} to a cause you care about?', {m:`<b>${money(GIVE_AMT)}</b>`})}</p>${lessonBox(pick(LESSON.give))}`,
+                buttons:[{label:L('💝 Donate {m}', {m:money(GIVE_AMT)}), value:'yes', kind:'primary', disabled:p.cash < GIVE_AMT}, {label:L('Not this time'), value:'no'}], dflt:'no'}))) === 'yes';
+      if (give && p.cash >= GIVE_AMT){ p.cash -= GIVE_AMT; p.given += GIVE_AMT; Sound.good(); toast(() => (L('💝 {n} donated {m} to a good cause.', {n:B(p.name), m:money(GIVE_AMT)})), 'good'); log(() => (L('{n} donated {m}.', {n:p.name, m:money(GIVE_AMT)}))); updateUI(); }
+      else toast(() => (L('💝 {n} skipped donating this time.', {n:B(p.name)})));
       return;
     }
-    case 'bootcamp': toast(L('🏕️ {n} is just visiting Budget Bootcamp.', {n:B(p.name)})); return;
-    case 'chill': toast(L('😎 {n} chills in the Chill Zone.', {n:B(p.name)}) + ' ' + pick(LESSON.chill)); return;
+    case 'bootcamp': toast(() => (L('🏕️ {n} is just visiting Budget Bootcamp.', {n:B(p.name)}))); return;
+    case 'market': return doMarket(p);
     case 'payday': return;
     case 'gobootcamp': {
-      toast(L('🚨 {n} overspent! Off to Budget Bootcamp.', {n:B(p.name)}), 'warn'); Sound.fail();
-      await info(p, {icon:'🚨', title:L('Overspent!'), body:`<p>${L('Your spending got out of hand. Go straight to <b>Budget Bootcamp</b> — no paycheck for passing Payday — and sit out your next turn.')}</p>${lessonBox(pick(LESSON.gobootcamp))}`});
-      await jumpTo(pidx(p), 6); p.skip = 1; log(L('{n} was sent to Budget Bootcamp.', {n:p.name})); updateUI(); return;
+      toast(() => (L('🚨 {n} overspent! Off to Budget Bootcamp.', {n:B(p.name)})), 'warn'); Sound.fail();
+      await info(p, () => ({icon:'🚨', title:L('Overspent!'), body:`<p>${L('Your spending got out of hand. Go straight to <b>Budget Bootcamp</b> — no paycheck for passing Payday — and sit out your next turn.')}</p>${lessonBox(pick(LESSON.gobootcamp))}`}));
+      await jumpTo(pidx(p), 6); p.skip = 1; log(() => (L('{n} was sent to Budget Bootcamp.', {n:p.name}))); updateUI(); return;
     }
   }
 }
@@ -1829,69 +1969,66 @@ function setBox(pi, g){
 
 async function landVenture(p, i){
   const t = TILES[i], pi = pidx(p), o = S.owners[i];
-  if (o === pi){ toast(L('{e} {n} checks on their {v}. Business is good!', {e:t.emoji, n:B(p.name), v:tname(i)})); return; }
+  if (o === pi){ toast(() => (L('{e} {n} checks on their {v}. Business is good!', {e:t.emoji, n:B(p.name), v:tname(i)}))); return; }
   if (o >= 0 && !S.players[o].out){
     const owner = S.players[o], f = fee(i);
-    if (!p.cpu) await ask(p, {icon:t.emoji, title:L('Customer at {p} {v}', {p:esc(poss(owner.name)), n:esc(owner.name), v:tname(i)}), body:`<p>${L('You’re a customer here — pay {m} to {n}.', {m:`<b>${money(f)}</b>`, n:esc(owner.name)})}</p>${lessonBox(L('Owning businesses means other people’s spending becomes your income.'))}`, buttons:[{label:L('Pay {m}', {m:money(f)}), value:'ok', kind:'primary'}]});
-    charge(p, f, L('customer at {p} {v}', {p:poss(owner.name), n:owner.name, v:tname(i)}), owner);
-    toast(L('{e} {n} paid {m} to {o} at {v}.', {e:t.emoji, n:B(p.name), m:money(f), o:B(owner.name), v:tname(i)}));
+    if (!p.cpu) await ask(p, () => ({icon:t.emoji, title:L('Customer at {p} {v}', {p:esc(poss(owner.name)), n:esc(owner.name), v:tname(i)}), body:`<p>${L('You’re a customer here — pay {m} to {n}.', {m:`<b>${money(f)}</b>`, n:esc(owner.name)})}</p>${lessonBox(L('Owning businesses means other people’s spending becomes your income.'))}`, buttons:[{label:L('Pay {m}', {m:money(f)}), value:'ok', kind:'primary'}]}));
+    charge(p, f, () => (L('customer at {p} {v}', {p:poss(owner.name), n:owner.name, v:tname(i)})), owner);
+    toast(() => (L('{e} {n} paid {m} to {o} at {v}.', {e:t.emoji, n:B(p.name), m:money(f), o:B(owner.name), v:tname(i)})));
     return;
   }
   const price = t.price;
   if (p.cpu){
     if (p.cash - price >= 60) buy(p, i);
     else if (p.debt === 0 && p.cash + p.savings - price >= 100){ const w = Math.max(0, Math.min(p.savings, price + 40 - p.cash));
-      if (w > 0){ p.savings -= w; p.cash += w; toast(L('🤖 {n} withdrew {m} from savings to invest.', {n:B(p.name), m:money(w)})); } buy(p, i); }
+      if (w > 0){ p.savings -= w; p.cash += w; toast(() => (L('🤖 {n} withdrew {m} from savings to invest.', {n:B(p.name), m:money(w)}))); } buy(p, i); }
     else if (D().credit && p.debt + price <= creditLimit(p)*.6 && Math.random() < .6){ const loan = Math.max(0, price + 40 - p.cash);
-      p.debt += loan; p.borrowed += loan; p.cash += loan; bumpCredit(p, -5); log(L('{n} borrowed {m}.', {n:p.name, m:money(loan)}));
-      toast(L('💳 {n} borrowed {m} to buy {v}.', {n:B(p.name), m:money(loan), v:tname(i)}), 'warn'); buy(p, i); }
-    else toast(L('{e} {n} passed on {v} (keeping a cash cushion).', {e:t.emoji, n:B(p.name), v:tname(i)}));
+      p.debt += loan; p.borrowed += loan; p.cash += loan; bumpCredit(p, -5); log(() => (L('{n} borrowed {m}.', {n:p.name, m:money(loan)})));
+      toast(() => (L('💳 {n} borrowed {m} to buy {v}.', {n:B(p.name), m:money(loan), v:tname(i)})), 'warn'); buy(p, i); }
+    else toast(() => (L('{e} {n} passed on {v} (keeping a cash cushion).', {e:t.emoji, n:B(p.name), v:tname(i)})));
     return;
   }
   while (true){
     if (p.out) return;
     const can = p.cash >= price, d = D(), nOwned = owned(pi).length;
-    const short = can ? '' : `<p class="bad-t">${d.credit ? L('<b>Not enough cash.</b> You could withdraw savings or <b>borrow</b> in 💰 Money — is it worth it?') : L('<b>Not enough cash.</b> You could withdraw from savings in 💰 Money — but is it worth dipping into your goal?')}</p>`;
-    const body = `<div class="kv"><span>${L('Price')}</span><b>${money(price)}</b><span>${L('Customer fee')}</span><b>${money(baseFee(i))} <small>${L('(×2 with full set)')}</small></b>
+    const short = () => can ? '' : `<p class="bad-t">${d.credit ? L('<b>Not enough cash.</b> You could withdraw savings or <b>borrow</b> in 💰 Money — is it worth it?') : L('<b>Not enough cash.</b> You could withdraw from savings in 💰 Money — but is it worth dipping into your goal?')}</p>`;
+    const body = () => `<div class="kv"><span>${L('Price')}</span><b>${money(price)}</b><span>${L('Customer fee')}</span><b>${money(baseFee(i))} <small>${L('(×2 with full set)')}</small></b>
       <span>${L('Side-hustle income')}</span><b>${L('{m}+ / Payday', {m:money(Math.max(1,Math.round(baseFee(i)/3)))})}</b><span>${L('Your cash')}</span><b>${money(p.cash)}</b></div>
-      ${setBox(pi, t.g)}${short}${lessonBox(d.credit && !can ? L('Borrowing to buy an asset can pay off — but only if it earns more than the loan costs in interest.') : pick(LESSON.venture))}`;
-    const btns = [];
-    if (can) btns.push({label:L('Buy for {m}', {m:money(price)}), value:'buy', kind:'primary'});
-    else btns.push({label: d.credit ? L('💰 Money / Borrow') : L('💰 Open Money'), value:'money', kind:'gold'});
-    btns.push({label:L('🏪 My ventures ({k})', {k:nOwned}), value:'mine'});
-    btns.push({label:L('Pass'), value:'pass'});
-    const r = await ask(p, {icon:t.emoji, title:L('{v} is for sale', {v:tname(i)}), body, buttons:btns, dflt:'pass'});
+      ${setBox(pi, t.g)}${short()}${lessonBox(d.credit && !can ? L('Borrowing to buy an asset can pay off — but only if it earns more than the loan costs in interest.') : pick(LESSON.venture))}`;
+    const btns = () => [can ? {label:L('Buy for {m}', {m:money(price)}), value:'buy', kind:'primary'} : {label: d.credit ? L('💰 Money / Borrow') : L('💰 Open Money'), value:'money', kind:'gold'},
+      {label:L('🏪 My ventures ({k})', {k:nOwned}), value:'mine'}, {label:L('Pass'), value:'pass'}];
+    const r = await ask(p, () => ({icon:t.emoji, title:L('{v} is for sale', {v:tname(i)}), body:body(), buttons:btns(), dflt:'pass'}));
     if (r === 'buy' && p.cash >= price){ buy(p, i); return; }
     if (r === 'money'){ await ask(p, {panel:'money'}); continue; }
     if (r === 'mine'){ await ask(p, {panel:'ventures'}); continue; }
     if (r === 'buy') continue;
-    toast(L('{e} {n} passed on {v}.', {e:t.emoji, n:B(p.name), v:tname(i)})); return;
+    toast(() => (L('{e} {n} passed on {v}.', {e:t.emoji, n:B(p.name), v:tname(i)}))); return;
   }
 }
-function buy(p, i){ const t = TILES[i]; p.cash -= t.price; S.owners[i] = pidx(p); log(L('{n} bought {v} for {m}.', {n:p.name, v:tname(i), m:money(t.price)}));
-  Sound.buy(); toast(L('{e} {n} bought {v} for {m}!', {e:t.emoji, n:B(p.name), v:`<b>${tname(i)}</b>`, m:money(t.price)}), 'good');
+function buy(p, i){ const t = TILES[i]; p.cash -= t.price; S.owners[i] = pidx(p); log(() => (L('{n} bought {v} for {m}.', {n:p.name, v:tname(i), m:money(t.price)})));
+  Sound.buy(); toast(() => (L('{e} {n} bought {v} for {m}!', {e:t.emoji, n:B(p.name), v:`<b>${tname(i)}</b>`, m:money(t.price)})), 'good');
   refreshSet(t.g);
   if (ownsSet(pidx(p), t.g)) announceSet(p, t.g);
   updateUI(); }
-function announceSet(p, g){ Sound.set(); toast(L('🎉 {n} owns the full {g} set — fees doubled{u}!', {n:B(p.name), g:`<b>${groupName(g)}</b>`, u: D().upgrades ? L(' & upgrades unlocked') : ''}), 'gold'); }
+function announceSet(p, g){ Sound.set(); toast(() => (L('🎉 {n} owns the full {g} set — fees doubled{u}!', {n:B(p.name), g:`<b>${groupName(g)}</b>`, u: D().upgrades ? L(' & upgrades unlocked') : ''})), 'gold'); }
 
 function drawCard(deck, src){ if (!S[deck].length) S[deck] = shuffle(src.map((c,i) => i).filter(i => (src[i].lvl || 0) <= LVL())); return src[S[deck].pop()]; }
 
 async function doQuiz(p){
-  const q = drawCard('quizDeck', QUIZ), qa = LANG === 'de' && q.de ? q.de.a : q.a;
+  const q = drawCard('quizDeck', QUIZ), qa = () => LANG === 'de' && q.de ? q.de.a : q.a;
   p.quizTotal++; Sound.card();
   let right;
-  if (p.cpu){ right = Math.random() < .7; toast((right ? L('🧠 {n} aced a Money Quiz (+{m}): “{q}”', {n:B(p.name), m:money(QUIZ_REWARD), q:esc(tx(q,'q'))}) : L('🧠 {n} missed a Money Quiz: “{q}”', {n:B(p.name), q:esc(tx(q,'q'))})), right ? 'good' : ''); }
+  if (p.cpu){ right = Math.random() < .7; toast((() => (right ? L('🧠 {n} aced a Money Quiz (+{m}): “{q}”', {n:B(p.name), m:money(QUIZ_REWARD), q:esc(tx(q,'q'))}) : L('🧠 {n} missed a Money Quiz: “{q}”', {n:B(p.name), q:esc(tx(q,'q'))}))), right ? 'good' : ''); }
   else {
     const n = D().quizOpts;
-    const opts = shuffle([{txt:qa[0], k:0}, ...shuffle(qa.slice(1).map((txt,k) => ({txt, k:k+1}))).slice(0, n-1)]);
-    const pickA = await ask(p, {icon:'🧠', title:L('Money Quiz'), body:`<p style="font-size:17px;font-weight:700">${esc(tx(q,'q'))}</p><p class="muted" style="font-size:13px">${L('Correct answer = +{m}', {m:money(QUIZ_REWARD)})}</p>`,
-      stack:true, buttons: opts.map((o,m) => ({label:`${'ABCD'[m]}. ${esc(fmtTokens(o.txt))}`, value:o.k})), dflt:-1});
+    const opts = shuffle([{k:0}, ...shuffle(q.a.slice(1).map((_,k) => ({k:k+1}))).slice(0, n-1)]);   // answer texts are looked up per language
+    const pickA = await ask(p, () => ({icon:'🧠', title:L('Money Quiz'), body:`<p style="font-size:17px;font-weight:700">${esc(tx(q,'q'))}</p><p class="muted" style="font-size:13px">${L('Correct answer = +{m}', {m:money(QUIZ_REWARD)})}</p>`,
+      stack:true, buttons: opts.map((o,m) => ({label:`${'ABCD'[m]}. ${esc(fmtTokens(qa()[o.k]))}`, value:o.k})), dflt:-1}));
     right = pickA === 0;
-    await ask(p, {icon: right ? '✅' : '❌', title: right ? L('Correct! +{m}', {m:money(QUIZ_REWARD)}) : L('Not quite'),
-      body:`${right ? '' : `<p>${L('The answer is: {a}', {a:`<b>${esc(fmtTokens(qa[0]))}</b>`})}</p>`}${lessonBox(esc(tx(q,'why')))}`});
+    await ask(p, () => ({icon: right ? '✅' : '❌', title: right ? L('Correct! +{m}', {m:money(QUIZ_REWARD)}) : L('Not quite'),
+      body:`${right ? '' : `<p>${L('The answer is: {a}', {a:`<b>${esc(fmtTokens(qa()[0]))}</b>`})}</p>`}${lessonBox(esc(tx(q,'why')))}`}));
   }
-  if (right){ p.quizRight++; gain(p, QUIZ_REWARD, L('Money Quiz')); Sound.good(); } else Sound.bad();
+  if (right){ p.quizRight++; gain(p, QUIZ_REWARD, () => (L('Money Quiz'))); Sound.good(); } else Sound.bad();
 }
 
 /** Life card text in the current language, with {cost}/{gain} filled in */
@@ -1899,77 +2036,77 @@ function cardText(c, s){ return fmtTokens(s).replace(/\{cost\}/g, money(infl(Mat
 async function doLife(p){
   const c = drawCard('lifeDeck', LIFE);
   let ch = null, chIdx = -1; Sound.card();
-  const title = cardText(c, tx(c,'title')), text = cardText(c, tx(c,'text'));
+  const title = () => cardText(c, tx(c,'title')), text = () => cardText(c, tx(c,'text'));
   const chLabel = k => cardText(c, LANG === 'de' && c.de && c.de.choices ? c.de.choices[k].label : c.choices[k].label);
   const chLesson = k => cardText(c, LANG === 'de' && c.de && c.de.choices ? c.de.choices[k].lesson : c.choices[k].lesson);
   if (c.choices){
     const smartIdx = Math.max(0, c.choices.findIndex(x => x.smart));
     if (p.cpu){ chIdx = Math.random() < .75 ? smartIdx : rnd(c.choices.length); }
-    else { const k = await ask(p, {icon:c.e, title:esc(title), body:`<p>${esc(text)}</p>`, stack:true, buttons:c.choices.map((x,n) => ({label:esc(chLabel(n)), value:n})), dflt:smartIdx}); chIdx = c.choices[k] ? k : smartIdx; }
+    else { const k = await ask(p, () => ({icon:c.e, title:esc(title()), body:`<p>${esc(text())}</p>`, stack:true, buttons:c.choices.map((x,n) => ({label:esc(chLabel(n)), value:n})), dflt:smartIdx})); chIdx = c.choices[k] ? k : smartIdx; }
     ch = c.choices[chIdx];
   }
   const eff = ch || c;
-  const msgs = [];
-  if (eff.raise){ p.paycheck += eff.raise; msgs.push(L('Paycheck is now {m}', {m:money(p.paycheck)})); Sound.good(); log(L('{n} got a raise.', {n:p.name})); }
-  if (eff.cash){ gain(p, eff.cash, title); msgs.push(L('+{m} cash', {m:money(eff.cash)})); }
-  if (eff.amount > 0){ gain(p, eff.amount, title, !!eff.toSavings); msgs.push(eff.toSavings ? L('+{m} to savings', {m:money(eff.amount)}) : `+${money(eff.amount)}`); }
-  let insNote = '';
+  const msgs = []; let bad = false;      // msgs: functions, rendered in each reader's language
+  if (eff.raise){ p.paycheck += eff.raise; const pc = p.paycheck; msgs.push(() => L('Paycheck is now {m}', {m:money(pc)})); Sound.good(); log(() => (L('{n} got a raise.', {n:p.name}))); }
+  if (eff.cash){ gain(p, eff.cash, title); msgs.push(() => L('+{m} cash', {m:money(eff.cash)})); }
+  if (eff.amount > 0){ gain(p, eff.amount, title, !!eff.toSavings); msgs.push(() => eff.toSavings ? L('+{m} to savings', {m:money(eff.amount)}) : `+${money(eff.amount)}`); }
+  let insNote = null;
   if (eff.amount < 0){ let amt = infl(-eff.amount);
     if (c.ins && !ch){ const ded = Math.min(amt, deductible());
       if (p.ins){ const covered = amt - ded;
-        if (covered > 0){ p.insSaved += covered; p.claims++; msgs.push(L('🛡️ insurance paid {m}', {m:money(covered)})); Sound.good(); }
-        else msgs.push(L('🛡️ below your {d} deductible', {d:money(deductible())}));
+        if (covered > 0){ p.insSaved += covered; p.claims++; msgs.push(() => L('🛡️ insurance paid {m}', {m:money(covered)})); Sound.good(); }
+        else msgs.push(() => L('🛡️ below your {d} deductible', {d:money(ded)}));
         amt = ded; }
-      else insNote = L('With 🛡️ insurance you would have paid only {m}.', {m:money(ded)}); }
-    if (amt > 0){ const nt = charge(p, amt, title); msgs.push(`−${money(amt)}` + (nt.length ? ` (${nt.join(', ')})` : '')); } }
-  if (eff.course){ if (COURSES.some(x => !courseState(p, x))){ p.eduDisc = Math.max(p.eduDisc || 0, eff.course); msgs.push(L('−{m} on your next 🎓 course', {m:money(eff.course)})); }
-    else msgs.push(L('You’ve already taken every course.')); }
+      else insNote = () => L('With 🛡️ insurance you would have paid only {m}.', {m:money(ded)}); }
+    if (amt > 0){ const paid = amt, nt = charge(p, amt, title); bad = true; msgs.push(() => `−${money(paid)}` + (nt.length ? ` (${nt.map(f => f()).join(', ')})` : '')); } }
+  if (eff.course){ if (COURSES.some(x => !courseState(p, x))){ p.eduDisc = Math.max(p.eduDisc || 0, eff.course); msgs.push(() => L('−{m} on your next 🎓 course', {m:money(eff.course)})); }
+    else msgs.push(() => L('You’ve already taken every course.')); }
   if (ch && ch.smart) p.smart++;
-  if (eff.debt){ p.debt += eff.debt; p.borrowed += eff.debt; p.treats += eff.fun || 0; p.impulse += eff.fun || 0; msgs.push(L('+{m} debt', {m:money(eff.debt)})); log(L('{n} took on {m} of debt.', {n:p.name, m:money(eff.debt)})); Sound.lose(); checkDebt(p); }
-  if (eff.credit){ bumpCredit(p, eff.credit); msgs.push(L('credit score +{k}', {k:eff.credit})); }
+  if (eff.debt){ p.debt += eff.debt; p.borrowed += eff.debt; p.treats += eff.fun || 0; p.impulse += eff.fun || 0; bad = true; msgs.push(() => L('+{m} debt', {m:money(eff.debt)})); log(() => (L('{n} took on {m} of debt.', {n:p.name, m:money(eff.debt)}))); Sound.lose(); checkDebt(p); }
+  if (eff.credit){ bumpCredit(p, eff.credit); msgs.push(() => L('credit score +{k}', {k:eff.credit})); }
   if (eff.lend){ p.iou = {amount:eff.lend, repay: Math.random() < .6}; }
   updateUI();
-  const msg = msgs.join(' · '), lesson = ch ? chLesson(chIdx) : cardText(c, tx(c,'lesson'));
-  if (p.cpu) toast(`${c.e} ${B(p.name)} — ${esc(title)}${ch ? ': ' + L('chose “{c}”', {c:esc(chLabel(chIdx).replace(/^[^\p{L}\p{N}]+/u,''))}) : ''} ${msg}`);
-  else await ask(p, {icon:c.e, title:esc(title), body:`${ch ? '' : `<p>${esc(text)}</p>`}${msg ? `<p class="big ${/−|debt|Schulden/.test(msg)?'bad-t':''}" style="font-size:22px">${msg}</p>` : ''}${insNote ? `<p class="muted">${insNote}</p>` : ''}${lessonBox(esc(lesson))}`});
+  const msg = () => msgs.map(f => f()).join(' · '), lesson = () => ch ? chLesson(chIdx) : cardText(c, tx(c,'lesson'));
+  if (p.cpu) toast(() => (`${c.e} ${B(p.name)} — ${esc(title())}${ch ? ': ' + L('chose “{c}”', {c:esc(chLabel(chIdx).replace(/^[^\p{L}\p{N}]+/u,''))}) : ''} ${msg()}`));
+  else await ask(p, () => ({icon:c.e, title:esc(title()), body:`${ch ? '' : `<p>${esc(text())}</p>`}${msgs.length ? `<p class="big ${bad ? 'bad-t' : ''}" style="font-size:22px">${msg()}</p>` : ''}${insNote ? `<p class="muted">${insNote()}</p>` : ''}${lessonBox(esc(lesson()))}`}));
 }
 
 async function doMall(p){
-  const it = MALL[rnd(MALL.length)], price = infl(it.price), nm = tx(it, 'name');
+  const it = MALL[rnd(MALL.length)], price = infl(it.price), nm = () => tx(it, 'name');
   const fromFun = Math.min(p.funMoney, price), rest = price - fromFun;
   let buyIt;
   if (p.cpu){ buyIt = rest === 0 ? Math.random() < .6 : (p.cash > price + 150 && p.treats < 3 && Math.random() < .3); }
   else {
-    const cover = rest === 0 ? `<p class="good-t">${L('✅ Your fun money covers it — this treat is in your budget.')}</p>`
+    const cover = () => rest === 0 ? `<p class="good-t">${L('✅ Your fun money covers it — this treat is in your budget.')}</p>`
       : `<div class="warnbox">${fromFun > 0 ? L('⚠️ Your fun money covers {f}; the other {r} would come from your cash — that’s over budget.', {f:money(fromFun), r:money(rest)}) : L('⚠️ You have no fun money left — the whole {r} would come from your cash. That’s an impulse buy.', {r:money(rest)})}</div>`;
-    const r = await ask(p, {icon:it.e, title:L('Impulse Mall'), body:`<p>${L('You spot {i} for {m}. Want it?', {i:`<b>${nm}</b>`, m:`<b>${money(price)}</b>`})}</p>
+    const r = await ask(p, () => ({icon:it.e, title:L('Impulse Mall'), body:`<p>${L('You spot {i} for {m}. Want it?', {i:`<b>${nm()}</b>`, m:`<b>${money(price)}</b>`})}</p>
       <div class="kv"><span>🎉 ${L('Fun money')}</span><b>${money(p.funMoney)}</b><span>💵 ${L('Cash')}</span><b>${money(p.cash)}</b><span>${p.goal.emoji} ${goalName(p.goal)}</span><b>${money(p.savings)} / ${money(p.goal.amount)}</b></div>
-      ${cover}${lessonBox(pick(LESSON.mall))}`,
-      buttons:[{label:L('🛍️ Treat yourself (−{m})', {m:money(price)}), value:'buy', kind: rest ? 'danger' : 'primary'}, {label:L('💪 Skip it'), value:'skip', kind: rest ? 'primary' : ''}], dflt:'skip'});
+      ${cover()}${lessonBox(pick(LESSON.mall))}`,
+      buttons:[{label:L('🛍️ Treat yourself (−{m})', {m:money(price)}), value:'buy', kind: rest ? 'danger' : 'primary'}, {label:L('💪 Skip it'), value:'skip', kind: rest ? 'primary' : ''}], dflt:'skip'}));
     buyIt = r === 'buy';
   }
   if (buyIt){
     p.treats++; p.wants += price; p.funMoney -= fromFun;
-    if (rest > 0){ p.impulse++; charge(p, rest, L('bought {i}', {i:nm})); toast(L('{e} {n} bought {i} — {r} over the fun budget.', {e:it.e, n:B(p.name), i:nm, r:money(rest)}), 'warn'); }
-    else { p.planned++; Sound.buy(); toast(L('{e} {n} treated themselves to {i}, paid with fun money ✅', {e:it.e, n:B(p.name), i:nm}), 'good'); log(L('{n} bought {i} with fun money.', {n:p.name, i:nm})); }
-    if (!p.cpu && p.impulse >= 3) toast(L('😅 That’s a lot of over-budget treats. Planned fun is great — these add up!'), 'warn');
+    if (rest > 0){ p.impulse++; charge(p, rest, () => (L('bought {i}', {i:nm()}))); toast(() => (L('{e} {n} bought {i} — {r} over the fun budget.', {e:it.e, n:B(p.name), i:nm(), r:money(rest)})), 'warn'); }
+    else { p.planned++; Sound.buy(); toast(() => (L('{e} {n} treated themselves to {i}, paid with fun money ✅', {e:it.e, n:B(p.name), i:nm()})), 'good'); log(() => (L('{n} bought {i} with fun money.', {n:p.name, i:nm()}))); }
+    if (!p.cpu && p.impulse >= 3) toast(() => (L('😅 That’s a lot of over-budget treats. Planned fun is great — these add up!')), 'warn');
     updateUI();
   }
-  else { p.skipped += price; p.skips++; toast(L('💪 {n} skipped {i} and kept {m}.', {n:B(p.name), i:nm, m:money(price)}), 'good'); log(L('{n} skipped {i}.', {n:p.name, i:nm})); }
+  else { p.skipped += price; p.skips++; toast(() => (L('💪 {n} skipped {i} and kept {m}.', {n:B(p.name), i:nm(), m:money(price)})), 'good'); log(() => (L('{n} skipped {i}.', {n:p.name, i:nm()}))); }
 }
 
 async function doBank(p){
   const bonus = Math.round(p.savings*BANK_BONUS);
-  if (bonus > 0){ p.intEarned += bonus; gain(p, bonus, L('Savings Bank bonus'), true); }
-  if (p.cpu){ toast(L('🏦 {n} earned a {m} savings bonus.', {n:B(p.name), m:money(bonus)}), 'good'); return; }
-  const r = await ask(p, {icon:'🏦', title:L('Savings Bank'), body:`<p>${bonus > 0 ? L('Your savings earned a {m} bonus (10%).', {m:`<b>${money(bonus)}</b>`}) : L('You have no savings yet, so there’s no bonus this time.')}</p>${lessonBox(pick(LESSON.bank))}`,
-    buttons:[{label:L('💰 Deposit now'), value:'money', kind:'gold'}, {label:L('OK'), value:'ok', kind:'primary'}], dflt:'ok'});
+  if (bonus > 0){ p.intEarned += bonus; gain(p, bonus, () => (L('Savings Bank bonus')), true); }
+  if (p.cpu){ toast(() => (L('🏦 {n} earned a {m} savings bonus.', {n:B(p.name), m:money(bonus)})), 'good'); return; }
+  const r = await ask(p, () => ({icon:'🏦', title:L('Savings Bank'), body:`<p>${bonus > 0 ? L('Your savings earned a {m} bonus (10%).', {m:`<b>${money(bonus)}</b>`}) : L('You have no savings yet, so there’s no bonus this time.')}</p>${lessonBox(pick(LESSON.bank))}`,
+    buttons:[{label:L('💰 Deposit now'), value:'money', kind:'gold'}, {label:L('OK'), value:'ok', kind:'primary'}], dflt:'ok'}));
   if (r === 'money') await ask(p, {panel:'money'});
 }
 
 /* ---------------- CPU ---------------- */
 function cpuManage(p){ const pi = pidx(p);
-  if (p.debt > 0){ const r = Math.min(p.debt, Math.max(0, p.cash - 80)); if (r > 0){ p.cash -= r; p.debt -= r; if (p.debt === 0) bumpCredit(p, 10); log(L('{n} repaid {m} of debt.', {n:p.name, m:money(r)})); toast(L('🤖 {n} repaid {m} of debt.', {n:B(p.name), m:money(r)})); } }
+  if (p.debt > 0){ const r = Math.min(p.debt, Math.max(0, p.cash - 80)); if (r > 0){ p.cash -= r; p.debt -= r; if (p.debt === 0) bumpCredit(p, 10); log(() => (L('{n} repaid {m} of debt.', {n:p.name, m:money(r)}))); toast(() => (L('🤖 {n} repaid {m} of debt.', {n:B(p.name), m:money(r)}))); } }
   normPlayer(p);
   if (!p.insDecided){ p.insDecided = true; if (Math.random() < .5 && p.cash >= premium() + 60) setInsurance(p, true); }
   for (const c of COURSES){ const cost = courseCost(p, c);
@@ -1977,12 +2114,13 @@ function cpuManage(p){ const pi = pidx(p);
       if (p.cash < cost){ const w = Math.min(p.savings, cost - p.cash); p.savings -= w; p.cash += w; } takeCourse(p, c.id); } }
   for (const i of owned(pi)){ const c = upgradeCost(i), keep = ownsSet(pi, TILES[i].g) ? 150 : 220;
     if (canUpgrade(pi, i) && p.debt === 0 && p.cash + p.savings - c >= keep){ if (p.cash < c + 40){ const w = Math.min(p.savings, c + 40 - p.cash); p.savings -= w; p.cash += w; } upgrade(p, i); } }
-  if (p.cash > 260 && p.debt === 0){ const d = p.cash - 180; p.cash -= d; p.savings += d; log(L('{n} deposited {m}.', {n:p.name, m:money(d)})); toast(L('🤖 {n} moved {m} into savings.', {n:B(p.name), m:money(d)})); }
+  cpuInvest(p);
+  if (p.cash > 260 && p.debt === 0){ const d = p.cash - 180; p.cash -= d; p.savings += d; log(() => (L('{n} deposited {m}.', {n:p.name, m:money(d)}))); toast(() => (L('🤖 {n} moved {m} into savings.', {n:B(p.name), m:money(d)}))); }
   updateUI(); }
 function upgrade(p, i){ const c = upgradeCost(i); if (p.cash < c || !canUpgrade(pidx(p), i)) return false;
   p.cash -= c; S.levels[i]++; refreshTile(i); Sound.upgrade();
-  toast(L('⭐ {n} upgraded {v} to level {l} — fee now {m}.', {n:B(p.name), v:tname(i), l:S.levels[i], m:money(fee(i))}), 'gold');
-  log(L('{n} upgraded {v} to L{l}.', {n:p.name, v:tname(i), l:S.levels[i]})); updateUI(); return true; }
+  toast(() => (L('⭐ {n} upgraded {v} to level {l} — fee now {m}.', {n:B(p.name), v:tname(i), l:S.levels[i], m:money(fee(i))})), 'gold');
+  log(() => (L('{n} upgraded {v} to L{l}.', {n:p.name, v:tname(i), l:S.levels[i]}))); updateUI(); return true; }
 
 /* ---------------- trading ----------------
    Offer: {from, to, give:{v:[tiles], c:cash}, get:{v:[tiles], c:cash}} — "give" goes from → to, "get" goes to → from.
@@ -2021,29 +2159,52 @@ function executeTrade(o){
   A.cash += o.get.c - o.give.c; Bp.cash += o.give.c - o.get.c; A.trades++; Bp.trades++;
   const groups = new Set([...o.give.v, ...o.get.v].map(i => TILES[i].g)); groups.forEach(g => { refreshSet(g); });
   groups.forEach(g => { [o.from, o.to].forEach(pi => { if (ownsSet(pi, g)) announceSet(S.players[pi], g); }); });
-  log(L('{a} and {b} traded: {x} ⇄ {y}.', {a:A.name, b:Bp.name, x:offerSide(o.give).replace(/<[^>]+>/g,' ').replace(/\s+/g,' '), y:offerSide(o.get).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ')})); }
+  log(() => (L('{a} and {b} traded: {x} ⇄ {y}.', {a:A.name, b:Bp.name, x:offerSide(o.give).replace(/<[^>]+>/g,' ').replace(/\s+/g,' '), y:offerSide(o.get).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ')}))); }
 let tradeBusy = -1;          // the game generation a trade is running in (a new game frees it)
+const MAX_COUNTERS = 2;
+/** the same deal seen from the other side, for a counter-offer */
+const flipOffer = o => ({from:o.to, to:o.from, give:{v:[...o.get.v], c:o.get.c}, get:{v:[...o.give.v], c:o.give.c}});
+/** a CPU that would say no asks for more cash instead (if the other player has it) */
+function cpuCounter(o){ const me = o.to;
+  const gainV = o.give.v.reduce((s,i) => s + ventureWorth(me, i, true), 0) + o.give.c;
+  const lossV = o.get.v.reduce((s,i) => s + ventureWorth(me, i, false), 0) + o.get.c;
+  const completes = o.get.v.some(i => setTiles(TILES[i].g).every(j => S.owners[j] === o.from || o.get.v.includes(j)));
+  const need = Math.ceil((lossV*(completes ? 1.5 : 1.1) + 5 - gainV)/10)*10;
+  if (need <= 0 || need > 400 || o.give.c + need > S.players[o.from].cash || S.players[me].cash - o.get.c < 30) return null;
+  const c = flipOffer(o); c.get.c += need; return c; }
+/** Run a trade: the receiver accepts, declines or makes a counter-offer (up to MAX_COUNTERS times). */
 async function runTrade(raw){
   if (tradeBusy === GEN) return false;
-  const o = cleanOffer(raw), problem = offerProblem(o);
-  if (problem){ toast('🤝 ' + problem, 'warn'); return false; }
+  let o = cleanOffer(raw);
+  if (offerProblem(o)){ toast(() => '🤝 ' + offerProblem(o), 'warn'); return false; }
   tradeBusy = GEN;
-  const A = S.players[o.from], Bp = S.players[o.to], prev = S.phase;
+  const prev = S.phase;
   S.phase = 'busy'; updateUI(); flushState();
-  toast(L('🤝 {a} offers {b} a trade…', {a:B(A.name), b:B(Bp.name)}));
+  toast(() => L('🤝 {a} offers {b} a trade…', {a:B(S.players[o.from].name), b:B(S.players[o.to].name)}));
   let yes = false;
   try {
-    if (Bp.cpu){ await sleep(1000); yes = cpuAccepts(o); }
-    else {
-      const sameDevice = Bp.ctrl === 'local' && A.ctrl === 'local' && NET.role !== 'guest';
-      const r = await ask(Bp, {icon:'🤝', title:L('Trade offer from {n}', {n:esc(A.name)}),
-        body:`${sameDevice ? `<div class="warnbox">${L('📱 Pass the device to {n}.', {n:`<b>${esc(Bp.name)}</b>`})}</div>` : ''}${offerHtml(o, o.to)}
-          <div class="kv"><span>${L('Your cash')}</span><b>${money(Bp.cash)}</b></div>${lessonBox(pick(LESSON.trade))}`,
-        buttons:[{label:L('✅ Accept'), value:'yes', kind:'primary'}, {label:L('❌ Decline'), value:'no'}], dflt:'no'});
-      yes = r === 'yes';
+    for (let round = 0; ; round++){
+      const A = S.players[o.from], Bp = S.players[o.to], canCounter = round < MAX_COUNTERS;
+      let r;
+      if (Bp.cpu){ await sleep(1000); r = cpuAccepts(o) ? 'yes' : 'no';
+        if (r === 'no' && canCounter){ const c = cpuCounter(o); if (c){ r = 'counter'; o.next = c; } } }
+      else {
+        const sameDevice = Bp.ctrl === 'local' && A.ctrl === 'local' && NET.role !== 'guest';
+        r = await ask(Bp, () => ({icon:'🤝', title: round ? L('Counter-offer from {n}', {n:esc(A.name)}) : L('Trade offer from {n}', {n:esc(A.name)}),
+          body:`${sameDevice ? `<div class="warnbox">${L('📱 Pass the device to {n}.', {n:`<b>${esc(Bp.name)}</b>`})}</div>` : ''}${offerHtml(o, o.to)}
+            <div class="kv"><span>${L('Your cash')}</span><b>${money(Bp.cash)}</b></div>${lessonBox(pick(LESSON.trade))}`,
+          buttons:[{label:L('✅ Accept'), value:'yes', kind:'primary'}, ...(canCounter ? [{label:L('🔁 Counter-offer'), value:'counter', kind:'gold'}] : []), {label:L('❌ Decline'), value:'no'}], dflt:'no'}));
+        if (r === 'counter'){ const v = await ask(Bp, {panel:'counter', offer:flipOffer(o)});
+          const c = v && typeof v === 'object' ? cleanOffer({...v, from:o.to, to:o.from}) : null;
+          if (c && !offerProblem(c)) o.next = c; else r = 'no'; }
+      }
+      if (r === 'counter' && o.next){ const c = o.next; delete o.next; o = c;
+        toast(() => L('🔁 {a} made a counter-offer to {b}.', {a:B(S.players[o.from].name), b:B(S.players[o.to].name)})); continue; }
+      yes = r === 'yes' && !offerProblem(o);
+      if (yes){ executeTrade(o); Sound.buy(); toast(() => L('🤝 {b} accepted {a}’s trade!', {a:esc(A.name), b:B(Bp.name)}), 'good'); }
+      else toast(() => L('🤝 {b} declined the trade.', {b:B(Bp.name)}));
+      break;
     }
-    if (yes && !offerProblem(o)){ executeTrade(o); Sound.buy(); toast(L('🤝 {b} accepted {a}’s trade!', {a:esc(A.name), b:B(Bp.name)}), 'good'); }
-    else { yes = false; toast(L('🤝 {b} declined the trade.', {b:B(Bp.name)})); }
   } finally { tradeBusy = -1; }
   if (S.phase === 'busy' && prev !== 'busy') S.phase = prev;
   updateUI(); save(); flushState();
@@ -2065,10 +2226,12 @@ async function cpuMaybeTrade(p){
     return;
   }
 }
-function openTradeUI(pi){
-  const me = S.players[pi]; const others = S.players.map((x,k) => k).filter(k => k !== pi && !S.players[k].out);
-  if (!others.length) return Promise.resolve();
-  let to = others[0]; const give = new Set(), get = new Set(); let giveC = 0, getC = 0;
+/** Trade editor. counter = an offer (from = this player) to edit and return as a counter-offer. */
+function openTradeUI(pi, counter=null){
+  const me = S.players[pi]; const others = counter ? [counter.to] : S.players.map((x,k) => k).filter(k => k !== pi && !S.players[k].out);
+  if (!others.length || !S.players[others[0]]) return Promise.resolve();
+  let to = others[0]; const give = new Set(counter ? counter.give.v : []), get = new Set(counter ? counter.get.v : []);
+  let giveC = counter ? counter.give.c : 0, getC = counter ? counter.get.c : 0;
   const render = (sheet, done) => {
     const body = sheet.querySelector('.sheet-body'), other = S.players[to];
     const list = (pidx2, set, key) => { const tv = tradeable(pidx2); return tv.length ? tv.map(i => `<label><input type="checkbox" data-${key}="${i}" ${set.has(i)?'checked':''}>${TILES[i].emoji} ${tname(i)}${'⭐'.repeat(S.levels[i])} <span class="muted">${money(assetValue(i))}</span></label>`).join('') : `<div class="none">${L('No ventures')}</div>`; };
@@ -2078,20 +2241,21 @@ function openTradeUI(pi){
         <div class="tcol"><h4>${L('{n} gives', {n:esc(other.name)})}</h4>${list(to, get, 'r')}<label class="muted" style="display:block;margin-top:6px">💵 ${L('Cash ({n} has {m})', {n:esc(other.name), m:money(other.cash)})}<input type="number" min="0" step="10" max="${other.cash}" value="${getC}" id="tGetC"></label></div>
       </div>
       <div id="tSum" class="muted" style="font-size:13px"></div>
-      <div class="rowb"><button class="btn primary" id="tSend">📨 ${L('Send offer')}</button></div>
+      <div class="rowb"><button class="btn primary" id="tSend">${counter ? '🔁 ' + L('Send counter-offer') : '📨 ' + L('Send offer')}</button></div>
       ${lessonBox(pick(LESSON.trade))}`;
     const sum = () => { const gv = [...give].reduce((s,i) => s + assetValue(i), 0) + giveC, rv = [...get].reduce((s,i) => s + assetValue(i), 0) + getC;
       body.querySelector('#tSum').innerHTML = L('List value — you give {a}, you get {b}.', {a:money(gv), b:money(rv)});
       body.querySelector('#tSend').disabled = !(give.size || get.size || giveC || getC) || giveC > me.cash || getC > other.cash; };
-    body.querySelectorAll('[data-to]').forEach(b => b.onclick = () => { to = +b.dataset.to; get.clear(); getC = 0; render(sheet, done); });
+    body.querySelectorAll('[data-to]').forEach(b => b.onclick = () => { if (counter) return; to = +b.dataset.to; get.clear(); getC = 0; render(sheet, done); });
     body.querySelectorAll('[data-g]').forEach(c => c.onchange = () => { c.checked ? give.add(+c.dataset.g) : give.delete(+c.dataset.g); sum(); });
     body.querySelectorAll('[data-r]').forEach(c => c.onchange = () => { c.checked ? get.add(+c.dataset.r) : get.delete(+c.dataset.r); sum(); });
     body.querySelector('#tGiveC').oninput = e => { giveC = clamp(Math.floor(+e.target.value || 0), 0, 1e6); sum(); };
     body.querySelector('#tGetC').oninput = e => { getC = clamp(Math.floor(+e.target.value || 0), 0, 1e6); sum(); };
-    body.querySelector('#tSend').onclick = () => { act(pi, {k:'trade', to, give:{v:[...give], c:giveC}, get:{v:[...get], c:getC}}); done('sent'); };
+    body.querySelector('#tSend').onclick = () => { const offer = {from:pi, to, give:{v:[...give], c:giveC}, get:{v:[...get], c:getC}};
+      if (counter) done(offer); else { act(pi, {k:'trade', ...offer}); done('sent'); } };
     sum();
   };
-  return modal({icon:'🤝', title:L('Propose a trade'), wide:true, body:'', buttons:[{label:L('Cancel'), value:'cancel'}], onRender:render});
+  return modal({icon:'🤝', title: counter ? L('Your counter-offer') : L('Propose a trade'), wide:true, body:'', buttons:[{label:L('Cancel'), value:'cancel'}], onRender:render});
 }
 
 /* ---------------- payday budget ---------------- */
@@ -2148,15 +2312,19 @@ function applyAct(pi, a){
     case 'end': if (S.turn === pi && S.phase === 'manage'){ S.phase = 'busy'; updateUI(); endTurn(); } return;
     case 'trade': if (S.turn === pi && (S.phase === 'roll' || S.phase === 'manage')) runTrade({...a, from:pi}); return;
     case 'budget': { const save = clamp(Math.floor(+a.save || 0), 0, 100); p.budget = {save, fun:clamp(Math.floor(+a.fun || 0), 0, 100 - save)}; if (a.ask !== undefined) p.askBudget = !!a.ask; break; }
-    case 'funToCash': { const x = p.funMoney; if (x > 0){ p.funMoney = 0; p.cash += x; log(L('{n} moved {m} of fun money to cash.', {n:p.name, m:money(x)})); } break; }
-    case 'dep': { const x = Math.min(p.cash, v); if (x > 0){ p.cash -= x; p.savings += x; Sound.coin(); log(L('{n} deposited {m}.', {n:p.name, m:money(x)})); } break; }
-    case 'wd':  { const x = Math.min(p.savings, v); if (x > 0){ p.savings -= x; p.cash += x; log(L('{n} withdrew {m}.', {n:p.name, m:money(x)})); } break; }
-    case 'rep': { const x = Math.min(p.cash, p.debt, v); if (x > 0){ p.cash -= x; p.debt -= x; if (p.debt === 0) bumpCredit(p, 10); Sound.good(); log(L('{n} repaid {m}.', {n:p.name, m:money(x)})); } break; }
+    case 'funToCash': { const x = p.funMoney; if (x > 0){ p.funMoney = 0; p.cash += x; log(() => (L('{n} moved {m} of fun money to cash.', {n:p.name, m:money(x)}))); } break; }
+    case 'dep': { const x = Math.min(p.cash, v); if (x > 0){ p.cash -= x; p.savings += x; Sound.coin(); log(() => (L('{n} deposited {m}.', {n:p.name, m:money(x)}))); } break; }
+    case 'wd':  { const x = Math.min(p.savings, v); if (x > 0){ p.savings -= x; p.cash += x; log(() => (L('{n} withdrew {m}.', {n:p.name, m:money(x)}))); } break; }
+    case 'rep': { const x = Math.min(p.cash, p.debt, v); if (x > 0){ p.cash -= x; p.debt -= x; if (p.debt === 0) bumpCredit(p, 10); Sound.good(); log(() => (L('{n} repaid {m}.', {n:p.name, m:money(x)}))); } break; }
     case 'borrow': { if (!d.credit) return; const x = Math.min(v, Math.max(0, creditLimit(p) - p.debt)); if (x > 0){ p.debt += x; p.cash += x; p.borrowed += x; bumpCredit(p, -5);
-        log(L('{n} borrowed {m}.', {n:p.name, m:money(x)})); toast(L('💳 {n} borrowed {m} at {r} per Payday.', {n:B(p.name), m:money(x), r:pct(loanRate(p))}), 'warn'); } break; }
+        log(() => (L('{n} borrowed {m}.', {n:p.name, m:money(x)}))); toast(() => (L('💳 {n} borrowed {m} at {r} per Payday.', {n:B(p.name), m:money(x), r:pct(loanRate(p))})), 'warn'); } break; }
     case 'up': upgrade(p, +a.i); break;
     case 'ins': setInsurance(p, !!a.on); break;
     case 'course': takeCourse(p, String(a.id)); break;
+    case 'inv': { const id = a.id === 'stk' ? 'stk' : 'idx', asset = MARKET.find(x => x.id === id);
+      if (a.side === 'sell'){ const x = sellInvest(p, id, v); if (x > 0){ Sound.coin(); log(() => L('{n} sold {m} of {a}.', {n:p.name, m:money(x), a:tx(asset,'name')})); } }
+      else { const x = buyInvest(p, id, v); if (x > 0){ Sound.buy(); log(() => L('{n} invested {m} in {a}.', {n:p.name, m:money(x), a:tx(asset,'name')})); } }
+      break; }
     case 'sell': if (S.owners[+a.i] === pi) sellVenture(p, +a.i); break;
   }
   updateUI(); save();
@@ -2173,10 +2341,12 @@ function openPanel(head, render){ return new Promise(res => {
   modal({...head, body:'', buttons:[{label:L('Done'), value:'ok', kind:'primary'}],
     onRender: (sheet, done) => { PANEL = {rerender: () => sheet.isConnected && render(sheet, done)}; render(sheet, done); } }).then(v => { PANEL = null; res(v); }); }); }
 
-function openMoneyUI(pi){
+function openInvestUI(pi){ return openMoneyUI(pi, 'invest'); }
+function openMoneyUI(pi, view='money'){
   let amt = 50, note = '', st = null;
-  const render = sheet => {
+  const render = (sheet, done) => {
     const p = S.players[pi]; if (!p) return; const d = D(); const body = sheet.querySelector('.sheet-body');
+    if (view === 'invest') return renderInvest(body, pi, amt, a => { amt = a; render(sheet, done); }, () => { view = 'money'; note = ''; render(sheet, done); });
     if (!st) st = {...budgetOf(p)};
     const A = () => amt === 'All' ? ALL : amt;
     const tier = creditTier(p.credit), room = d.credit ? Math.max(0, creditLimit(p) - p.debt) : 0;
@@ -2190,6 +2360,7 @@ function openMoneyUI(pi){
       <div style="font-weight:800;margin-top:12px">${L('Payday budget')} <small class="muted">${L('(for your {m} paycheck)', {m:money(p.paycheck)})}</small></div>
       <div id="mBudget">${budgetBlock(p.paycheck, st)}</div>
       <label class="chk"><input type="checkbox" id="mAsk" ${p.askBudget !== false ? 'checked' : ''}> ${L('Ask me at every Payday')}</label>
+      <div class="rowb" style="margin-top:12px"><button class="btn gold" id="mInv">📈 ${L('Investments')} · ${money(investValue(p))}</button></div>
       <div style="font-weight:800;margin-top:12px">${L('Move money')}</div>
       <div class="amts">${[10,50,100,'All'].map(a => `<button data-a="${a}" class="${a===amt?'sel':''}">${a==='All'?L('All'):money(a)}</button>`).join('')}</div>
       <div class="mbtns">
@@ -2225,6 +2396,7 @@ function openMoneyUI(pi){
     if (ix) ix.onclick = () => { note = L('Insurance cancelled.'); act(pi, {k:'ins', on:false}); };
     body.querySelectorAll('[data-course]').forEach(b => b.onclick = () => { const c = COURSES.find(x => x.id === b.dataset.course);
       note = L('🎓 Course done! Your paycheck rises by {r}.', {r:money(c.raise)}); act(pi, {k:'course', id:c.id}); });
+    body.querySelector('#mInv').onclick = () => { view = 'invest'; render(sheet, done); };
     body.querySelector('#mFun').onclick = () => { note = L('Moved {m} of fun money to cash.', {m:money(p.funMoney)}); act(pi, {k:'funToCash'}); };
     if (d.credit){
       body.querySelector('#mRep').onclick = () => { note = L('Repaid {m}. 💪', {m:money(Math.min(p.cash, p.debt, A()))}); act(pi, {k:'rep', v:A()}); };
@@ -2292,6 +2464,8 @@ function updateUI(){
   const d = D();
   $('#round').innerHTML = `<span class="bt">${L('Round')} </span><b>${Math.min(S.round, S.maxRounds)}</b>/${S.maxRounds}`;
   $('#diffChip').innerHTML = `${d.emoji}<span class="bt"> ${tx(d,'name')}</span>${d.inflation && S.priceLevel > 1 ? ` <b>×${S.priceLevel.toFixed(2)}</b>` : ''}`;
+  const mc = $('#mktChip'), lr = S.mkt ? S.mkt.last.idx : 0;
+  mc.innerHTML = `${lr < 0 ? '📉' : '📈'}<b class="${lr < 0 ? 'bad-t' : 'good-t'}"> ${signedPct(lr)}</b>`; mc.title = L('Stock market: the index moved {p} last round', {p:signedPct(lr)});
   const nc = $('#netChip');
   if (NET.role === 'host'){ const n = Object.values(NET.peers).filter(x => x.open).length; nc.classList.remove('hidden'); nc.innerHTML = `📡 <b>${n}</b>`; nc.title = L('Hosting: {k} device(s) connected', {k:n}); }
   else if (NET.role === 'guest'){ nc.classList.remove('hidden'); nc.innerHTML = `📡<b class="bt"> ${L('Online')}</b>`; nc.title = L('Connected to host'); }
@@ -2301,6 +2475,7 @@ function updateUI(){
       ${p.skip > 0 ? `<span class="badge">🏕️ Bootcamp</span>` : ''}${p.out ? `<span class="badge">${L('Bankrupt')}</span>` : ''}
       <div class="pname"><span class="dot"></span>${esc(p.name)} <span class="tag">${seatTag(p,k)}</span></div>
       <div class="pstats"><span>${L('Cash')}</span><b>${money(p.cash)}</b><span>${L('Fun money')}</span><b>${money(p.funMoney)}</b><span>${L('Savings')}</span><b>${money(p.savings)}</b>
+        ${investValue(p) ? `<span>${L('Invested')}</span><b>${money(investValue(p))}</b>` : ''}
         ${d.credit ? `<span>${L('Debt')}</span><b class="${p.debt?'debt':''}">${money(p.debt)}</b><span>${L('Credit')}</span><b>${p.credit}</b>` : ''}<span>${L('Net worth')}</span><b>${money(netWorth(p))}</b></div>
       <div class="goal">${p.goal.emoji} ${goalName(p.goal)} · ${Math.round(pc)}%<span class="pico">${p.ins ? '🛡️' : ''}${(p.courses || []).length ? '🎓' : ''}${(p.badges || []).length ? '🏅' + p.badges.length : ''}</span><div class="gbar"><i style="width:${pc}%"></i></div></div></div>`; }).join('');
   const p = cur(); if (!p) return;
@@ -2359,6 +2534,7 @@ async function showReport(isHost){
       <div class="row"><span>${L('Impulse buys skipped')}</span><b>${money(p.skipped)}</b></div>
       <div class="row"><span>${L('Ventures · trades')}</span><b>${owned(pidx(p)).length} · ${p.trades}</b></div>
       ${p.insPaid ? `<div class="row"><span>🛡️ ${L('Insurance: paid / covered')}</span><b>${money(p.insPaid)} / ${money(p.insSaved || 0)}</b></div>` : ''}
+      ${p.invIn ? `<div class="row"><span>📈 ${L('Investments · gain')}</span><b>${money(investValue(p))} · <span class="${investValue(p) + p.invOut - p.invIn + (p.divs || 0) < 0 ? 'bad-t' : 'good-t'}">${investValue(p) + p.invOut - p.invIn + (p.divs || 0) < 0 ? '−' : '+'}${money(Math.abs(investValue(p) + p.invOut - p.invIn + (p.divs || 0)))}</span></b></div>` : ''}
       ${(p.courses || []).length ? `<div class="row"><span>🎓 ${L('Courses · paycheck')}</span><b>${p.courses.length} · ${money(p.paycheck)}</b></div>` : ''}
       <div class="row"><span>🏅 ${L('Badges')}</span><b class="bdgs">${(p.badges || []).map(id => { const b = BADGES.find(x => x.id === id); return b ? `<span title="${esc(tx(b,'name'))}">${b.e}</span>` : ''; }).join('') || '–'}</b></div></div>`; }).join('');
   const top = ranked[0].g.score, winners = ranked.filter(x => !x.p.out && x.g.score === top).map(x => esc(x.p.name));
@@ -2418,6 +2594,35 @@ function drawNetWorthChart(el){
   svg.addEventListener('pointerleave', () => { xh.style.display = 'none'; tip.classList.add('hidden'); });
 }
 
+/* ---------------- 📈 investments view (inside the money panel) ---------------- */
+function sparkline(id, color){ const h = (S.mkt && S.mkt.h || []).map(x => x[id]).filter(Number.isFinite); if (h.length < 2) return '';
+  const W = 300, H = 56, lo = Math.min(MKT_START, ...h), hi = Math.max(MKT_START, ...h), Y = v => 4 + (hi - v)/((hi - lo) || 1)*(H - 8), X = k => k/(h.length - 1)*W;
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(L('Price history'))}">
+    <line x1="0" x2="${W}" y1="${Y(MKT_START)}" y2="${Y(MKT_START)}" class="base"/>
+    <polyline points="${h.map((v,k) => `${X(k).toFixed(1)},${Y(v).toFixed(1)}`).join(' ')}" stroke="${color}" class="ln"/></svg>`; }
+function renderInvest(body, pi, amt, setAmt, back){
+  const p = S.players[pi]; normPlayer(p);
+  const can = canControl(p) && S.turn === pi && !S.over;
+  const A = () => amt === 'All' ? ALL : amt, val = investValue(p), gainV = val + p.invOut - p.invIn;
+  body.innerHTML = `<button class="btn ghost sm" id="ivBack">← ${L('Money')}</button>
+    <div class="kv" style="margin-top:8px"><span>💵 ${L('Cash')}</span><b>${money(p.cash)}</b><span>📈 ${L('Invested now')}</span><b>${money(val)}</b>
+      <span>${L('Gain or loss so far')}</span><b class="${gainV < 0 ? 'bad-t' : gainV > 0 ? 'good-t' : ''}">${gainV < 0 ? '−' : '+'}${money(Math.abs(gainV))}</b></div>
+    <div class="amts" style="margin-top:10px">${[10,50,100,'All'].map(a => `<button data-a="${a}" class="${a===amt?'sel':''}">${a==='All'?L('All'):money(a)}</button>`).join('')}</div>
+    ${MARKET.map(a => { const on = mktOn(a), pr = mktPrice(a.id), last = S.mkt ? S.mkt.last[a.id] : 0, tot = (pr - MKT_START)/MKT_START, own = holdValue(p, a.id);
+      return `<div class="mkt ${on ? '' : 'off'}"><div class="mh"><span class="em">${a.e}</span><div class="grow"><b>${tx(a,'name')}</b><div class="sm">${tx(a,'sub')}</div></div>
+        <div class="mp"><b>${money(pr)}</b><small class="${last < 0 ? 'bad-t' : 'good-t'}">${signedPct(last)} ${L('last round')}</small></div></div>
+        ${on ? `${sparkline(a.id, a.color)}<div class="sm muted">${L('Since the start: {p} · you own {m}', {p:signedPct(tot), m:`<b>${money(own)}</b>`})}</div>
+        <div class="mbtns"><button class="btn primary sm" data-buy="${a.id}" ${!can || p.cash <= 0 ? 'disabled' : ''}>${L('Buy')} ${amt === 'All' ? L('All') : money(amt)}</button>
+          <button class="btn sm" data-sell="${a.id}" ${!can || own <= 0 ? 'disabled' : ''}>${L('Sell')} ${amt === 'All' ? L('All') : money(amt)}</button></div>`
+        : `<div class="sm muted">${L('Unlocks on Medium and Hard.')}</div>`}</div>`; }).join('')}
+    ${can ? '' : `<p class="muted sm">${L('You can buy and sell on your turn.')}</p>`}
+    ${lessonBox(pick(LESSON.market))}`;
+  body.querySelector('#ivBack').onclick = back;
+  body.querySelectorAll('.amts button').forEach(b => b.onclick = () => setAmt(b.dataset.a === 'All' ? 'All' : +b.dataset.a));
+  body.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => act(pi, {k:'inv', id:b.dataset.buy, side:'buy', v:A()}));
+  body.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => act(pi, {k:'inv', id:b.dataset.sell, side:'sell', v:A()}));
+}
+
 /* =====================================================================
    MULTIPLAYER — WebRTC data channels, no server.
    Host and guests swap a code (or scan a QR) once; the host's device runs the game,
@@ -2442,6 +2647,11 @@ const inviteText = code => /^https?:/.test(location.protocol) ? `${location.orig
 
 /* --- host side --- */
 function sendPeer(peer, msg){ if (peer && peer.open && peer.dc.readyState === 'open'){ try { peer.dc.send(JSON.stringify(msg)); } catch(e){} } }
+/** send to every guest a message built in that guest's language (built at most once per language) */
+function bcastL(build){ if (NET.role !== 'host') return; const cache = {};
+  for (const k in NET.peers){ const pr = NET.peers[k]; if (!(pr.open && pr.dc.readyState === 'open')) continue;
+    const lang = pr.lang === 'de' ? 'de' : pr.lang === 'en' ? 'en' : LANG;
+    try { pr.dc.send(cache[lang] || (cache[lang] = JSON.stringify(build(lang)))); } catch(e){} } }
 function bcast(msg){ if (NET.role !== 'host') return; const s = JSON.stringify(msg);
   for (const k in NET.peers){ const pr = NET.peers[k]; if (pr.open && pr.dc.readyState === 'open'){ try { pr.dc.send(s); } catch(e){} } } }
 let stateTimer = null;
@@ -2476,15 +2686,16 @@ function hostPeerLost(rid, which){
   const pi = S.players.findIndex(p => p.rid === rid && p.ctrl === 'remote');
   if (pi >= 0 && S.phase !== 'setup' && !S.over){
     const p = S.players[pi]; p.ctrl = 'cpu'; p.cpu = true;
-    toast(L('📡 {n} disconnected — a CPU takes over their seat.', {n:B(p.name)}), 'warn'); log(L('{n} disconnected; CPU took over.', {n:p.name}));
+    toast(() => (L('📡 {n} disconnected — a CPU takes over their seat.', {n:B(p.name)})), 'warn'); log(() => (L('{n} disconnected; CPU took over.', {n:p.name})));
     if (S.turn === pi){ if (S.phase === 'roll') doRoll(); else if (S.phase === 'manage'){ cpuManage(p); S.phase = 'busy'; endTurn(); } }
     updateUI();
-  } else { toast(L('📡 {n} disconnected.', {n:esc(pr.name || L('A friend'))}), 'warn'); renderSetup(); }
+  } else { toast(() => (L('📡 {n} disconnected.', {n:esc(pr.name || L('A friend'))})), 'warn'); renderSetup(); }
 }
 function hostOnMsg(rid, m){
   const peer = NET.peers[rid]; if (!peer) return;
   if (m.t === 'bye'){ hostPeerLost(rid, peer); try { peer.pc.close(); } catch(e){} return; }
-  if (m.t === 'join'){ peer.name = String(m.name || L('Friend')).slice(0, 14);
+  if (m.t === 'lang'){ peer.lang = m.lang === 'de' ? 'de' : 'en'; return; }
+  if (m.t === 'join'){ peer.name = String(m.name || L('Friend')).slice(0, 14); peer.lang = m.lang === 'de' ? 'de' : m.lang === 'en' ? 'en' : LANG;
     const row = setupRows.find(r => r.id === rid); if (row) row.name = peer.name;
     if (S.phase === 'setup') renderSetup(); return; }
   if (m.t === 'answer'){ const pd = NET.pending.get(m.id); if (pd && pd.rid === rid){ NET.pending.delete(m.id); pd.res(m.v); } return; }
@@ -2500,7 +2711,7 @@ async function guestCreateAnswer(code, name, onOpen){
   guestReset(); NET.lost = false;
   const pc = new RTCPeerConnection({iceServers:ICE}); NET.pc = pc;
   pc.ondatachannel = e => { const dc = e.channel; NET.dc = dc;
-    dc.onopen = () => { NET.role = 'guest'; dc.send(JSON.stringify({t:'join', name})); onOpen(); };
+    dc.onopen = () => { NET.role = 'guest'; dc.send(JSON.stringify({t:'join', name, lang:LANG})); onOpen(); };
     dc.onmessage = ev => { try { GQ.push(JSON.parse(ev.data)); pumpGuest(); } catch(err){ console.error(err); } };
     dc.onclose = () => guestLost(); };
   pc.onconnectionstatechange = () => { if (pc.connectionState === 'failed') guestLost(); };
@@ -2525,7 +2736,7 @@ async function guestHandle(m){
   switch (m.t){
     case 'hello': NET.myRid = m.rid; return;
     case 'lobby': NET.lobby = m; NET.mySeat = -1;
-      if ((m.lang === 'en' || m.lang === 'de') && (m.lang !== LANG || m.cur !== CUR)) applyLocale(m.lang, m.cur, false);
+      if ((m.cur === 'USD' || m.cur === 'EUR') && m.cur !== CUR) applyLocale(LANG, m.cur, false);    // the game's currency; each guest keeps their own language
       if (NET.inGame){ NET.inGame = false; clearTokens(); S.phase = 'setup'; S.over = false; $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); if (modalOpen()){ $('#modal').classList.remove('open'); $('#modal').innerHTML=''; } }
       showLobby(); return;
     case 'seat': NET.mySeat = Math.floor(+m.seat); return;
@@ -2533,7 +2744,7 @@ async function guestHandle(m){
     case 'roll': await rollDice((m.vals || []).map(v => clamp(Math.floor(+v) || 1, 1, 6))); return;
     case 'hop': await hop(Math.floor(+m.pi), Math.floor(+m.a) % 24, Math.floor(+m.b) % 24); return;
     case 'jump': await jumpTo(Math.floor(+m.pi), Math.floor(+m.to) % 24); return;
-    case 'toast': toast(clean(m.html), String(m.kind || '').replace(/[^a-z]/g, ''), true); return;
+    case 'toast': toast(() => (clean(m.html)), String(m.kind || '').replace(/[^a-z]/g, ''), true); return;
     case 'sfx': if (SFX[m.n]) Sound[m.n](true); return;
     case 'prompt': answerPrompt(m); return;        // not awaited: the queue keeps flowing while the dialog is open
     case 'over': showReport(false); return;
@@ -2543,6 +2754,8 @@ async function answerPrompt(m){ const o = m.opts || {}; let v;
   if (o.panel === 'money') v = await openMoneyUI(NET.mySeat);
   else if (o.panel === 'ventures') v = await openVenturesUI(NET.mySeat);
   else if (o.panel === 'budget') v = await openBudgetUI(NET.mySeat, +o.gross || 0);
+  else if (o.panel === 'counter') v = await openTradeUI(NET.mySeat, cleanOffer({...(o.offer || {}), from:NET.mySeat}));
+  else if (o.panel === 'invest') v = await openInvestUI(NET.mySeat);
   else v = await modal({icon:clean(o.icon), title:clean(o.title), body:clean(o.body), stack:!!o.stack, wide:!!o.wide,
     buttons:(Array.isArray(o.buttons) && o.buttons.length ? o.buttons : [{label:L('OK'), value:'ok'}]).slice(0, 8).map(b => ({label:clean(b.label), value:b.value, kind:String(b.kind || '').replace(/[^a-z ]/g, ''), disabled:!!b.disabled}))});
   netSend({t:'answer', id:m.id, v}); }
@@ -2553,11 +2766,14 @@ function sanitizeState(s){
   s.round = num(s.round, 1); s.maxRounds = num(s.maxRounds, 20); s.priceLevel = Math.max(1, num(s.priceLevel, 1)); s.turn = clamp(Math.floor(num(s.turn)), 0, Math.max(0, n-1));
   s.owners = Array.from({length:24}, (_,i) => { const o = Math.floor(num(s.owners && s.owners[i], -1)); return o >= 0 && o < n ? o : -1; });
   s.levels = Array.from({length:24}, (_,i) => clamp(Math.floor(num(s.levels && s.levels[i])), 0, 3));
-  s.log = Array.isArray(s.log) ? s.log.slice(-120).map(String) : []; s.phase = String(s.phase || 'busy'); s.over = !!s.over;
+  s.log = Array.isArray(s.log) ? s.log.slice(-120).map(l => l && typeof l === 'object' ? {en:String(l.en || ''), de:String(l.de || l.en || '')} : String(l)) : []; s.phase = String(s.phase || 'busy'); s.over = !!s.over;
   s.lang = s.lang === 'de' ? 'de' : 'en'; s.cur = s.cur === 'EUR' ? 'EUR' : 'USD';
+  const mp = x => ({idx:Math.max(1, num(x && x.idx, MKT_START)), stk:Math.max(1, num(x && x.stk, MKT_START))});
+  s.mkt = s.mkt && typeof s.mkt === 'object' ? {p:mp(s.mkt.p), h:(Array.isArray(s.mkt.h) ? s.mkt.h.slice(-80) : []).map(mp), last:{idx:num(s.mkt.last && s.mkt.last.idx), stk:num(s.mkt.last && s.mkt.last.stk)}} : newMarket();
   s.hist = (Array.isArray(s.hist) ? s.hist.slice(-80) : []).filter(h => h && Number.isFinite(+h.r) && Array.isArray(h.v))
     .map(h => ({r:+h.r, v:Array.from({length:n}, (_,k) => Number.isFinite(+h.v[k]) && h.v[k] !== null ? +h.v[k] : null)}));
-  s.players.forEach((p,k) => { ['cash','savings','debt','credit','pos','paycheck','skip','funMoney','treats','impulse','planned','wants','skipped','quizRight','quizTotal','intEarned','intPaid','borrowed','autoSaved','paidFun','missed','safety','given','trades','insPaid','insSaved','claims','eduSpent','eduDisc','skips','goodBudgets','smart'].forEach(f => p[f] = num(p[f]));
+  s.players.forEach((p,k) => { ['cash','savings','debt','credit','pos','paycheck','skip','funMoney','treats','impulse','planned','wants','skipped','quizRight','quizTotal','intEarned','intPaid','borrowed','autoSaved','paidFun','missed','safety','given','trades','insPaid','insSaved','claims','eduSpent','eduDisc','skips','goodBudgets','smart','invIn','invOut','divs','holdRounds'].forEach(f => p[f] = num(p[f]));
+    p.units = {idx:Math.max(0, num(p.units && p.units.idx)), stk:Math.max(0, num(p.units && p.units.stk))};
     p.ins = !!p.ins; p.hadDebt = !!p.hadDebt; p.insDecided = !!p.insDecided;
     p.courses = [...new Set(Array.isArray(p.courses) ? p.courses.map(String) : [])].filter(id => COURSES.some(c => c.id === id));
     p.badges = [...new Set(Array.isArray(p.badges) ? p.badges.map(String) : [])].filter(id => BADGES.some(b => b.id === id));
@@ -2576,13 +2792,13 @@ function clean(html){ const t = document.createElement('template'); t.innerHTML 
 function applyState(s){
   s = sanitizeState(s);
   const first = !NET.inGame || s.gameId !== S.gameId;
-  const sig = JSON.stringify([S.owners, S.levels, S.priceLevel, S.diff, S.players.map(p => p.color)]);
+  const sig = JSON.stringify([S.owners, S.levels, S.priceLevel, S.diff, S.players.map(p => p.color), S.mkt && S.mkt.p.idx]);
   const prevTurn = S.turn;
-  if (s.lang !== LANG || s.cur !== CUR) applyLocale(s.lang, s.cur, false);
+  if (s.cur !== CUR) applyLocale(LANG, s.cur, false);
   Object.assign(S, s);
   if (first){ NET.inGame = true; $('#lobby').classList.add('hidden'); enterGame(); focusCam(cur()); }
   else {
-    if (JSON.stringify([S.owners, S.levels, S.priceLevel, S.diff, S.players.map(p => p.color)]) !== sig) refreshAllTiles();
+    if (JSON.stringify([S.owners, S.levels, S.priceLevel, S.diff, S.players.map(p => p.color), S.mkt && S.mkt.p.idx]) !== sig) refreshAllTiles();
     S.players.forEach((p,pi) => { const t = TOK[pi]; if (!t) return; t.object3D.visible = !p.out; t.object3D.position.copy(tokenWorld(pi, p.pos)); });
     if (prevTurn !== S.turn){ $('#diceOut').textContent = ''; focusCam(cur()); }
     updateUI();
@@ -2591,6 +2807,7 @@ function applyState(s){
   if (PANEL) PANEL.rerender();
 }
 function showLobby(){ $('#setup').classList.add('hidden'); $('#lobby').classList.remove('hidden'); const Lb = NET.lobby;
+  $('#lobbyLang').querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.dataset.lang === LANG));
   if (!Lb){ $('#lobbyList').innerHTML = `<p class="muted">${L('Waiting for the host…')}</p>`; return; }
   const d = DIFFS[Lb.diff] || DIFFS.medium, feats = LANG === 'de' ? d.de.feats : d.feats;
   $('#lobbyList').innerHTML = Lb.rows.map(r => `<div class="lrow"><span class="dot" style="background:${COLORS[r.k] || '#888'};--pc:${COLORS[r.k] || '#888'}"></span><b>${esc(r.name)}</b>${r.rid === NET.myRid ? ` <span class="tag">${L('You')}</span>` : ''}<span class="spacer"></span><span class="tag">${r.kind === 'cpu' ? 'CPU' : r.kind === 'remote' ? (r.conn ? L('📡 Connected') : L('📡 Waiting')) : L('Host device')}</span></div>`).join('')
@@ -2765,6 +2982,13 @@ function renderSetup(){
 function showSetup(){ GEN++; for (const [, pd] of NET.pending) pd.res(defaultAnswer(pd.opts)); NET.pending.clear(); NET.panelOpen = {};
   S.phase = 'setup'; S.over = false; $('#setup').classList.remove('hidden'); $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); renderSetup(); }
 /** switch language/currency and redraw everything that shows text */
+/** switch only the language while connected or playing (keeps the game's currency); guests tell the host */
+function switchLanguage(lang){ lang = lang === 'de' ? 'de' : 'en'; if (lang === LANG) return;
+  const sv = savedLocale() || {};
+  applyLocale(lang, CUR, false);
+  try { localStorage.setItem(LOCALE_KEY, JSON.stringify({lang, cur: NET.role === 'guest' ? (sv.cur === 'EUR' ? 'EUR' : sv.cur === 'USD' ? 'USD' : CUR) : CUR})); } catch(e){}
+  if (NET.role === 'guest'){ netSend({t:'lang', lang}); if (!NET.inGame) showLobby(); }
+  else if (S.phase !== 'setup') S.lang = lang; }
 function applyLocale(lang, cur, persist=true){
   const wasDefault = setupRows.map(r => isDefaultName(r.name));
   setLocale(lang, cur, persist);
@@ -2788,25 +3012,26 @@ async function startGame(){
       budget: r.kind === 'cpu' ? {save:[20,30,25][k % 3], fun:20} : {save:20, fun:30}, askBudget: r.kind !== 'cpu',
       skip:0, goal:{...GOALS[r.goal], amount:goalAmt(GOALS[r.goal])}, treats:0, impulse:0, planned:0, wants:0, skipped:0, quizRight:0, quizTotal:0,
       paycheck:PAYCHECK, out:false, intEarned:0, intPaid:0, borrowed:0, autoSaved:0, paidFun:0, missed:0, safety:0, given:0, trades:0, iou:null, toBootcamp:false,
-      ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, courses:[], eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false, badges:[] }; });
+      ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, courses:[], eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false, badges:[],
+      units:{idx:0, stk:0}, invIn:0, invOut:0, divs:0, holdRounds:0 }; });
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), lang:LANG, cur:CUR, owners:Array(24).fill(-1), levels:Array(24).fill(0),
-    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[] });
+    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[], mkt:newMarket() });
   snapHist(0);
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
   GEN++; sendSeats();
   enterGame(); flushState();
   Sound.start();
-  toast(L('👋 Welcome to {d}! Everyone starts with {m}. At every Payday you split your paycheck into needs, wants and savings.', {d:`${d.emoji} <b>${tx(d,'name')}</b>`, m:`<b>${money(d.start)}</b>`}), 'gold');
+  toast(() => (L('👋 Welcome to {d}! Everyone starts with {m}. At every Payday you split your paycheck into needs, wants and savings.', {d:`${d.emoji} <b>${tx(d,'name')}</b>`, m:`<b>${money(d.start)}</b>`})), 'gold');
   startTurn();
 }
 function enterGame(){ $('#setup').classList.add('hidden'); $('#lobby').classList.add('hidden'); $('#ui').classList.remove('hidden');
   spawnTokens(); refreshAllTiles(); rotateTip(); updateUI(); }
 function resume(){ const d = loadSave(); if (!d) return; GEN++; Object.assign(S, d); S.over = false; S.tradeCool = S.tradeCool || {};
-  S.players.forEach(normPlayer); if (!Array.isArray(S.hist)) S.hist = [];
+  S.players.forEach(normPlayer); if (!Array.isArray(S.hist)) S.hist = []; if (!S.mkt) S.mkt = newMarket();
   if (S.lang && (S.lang !== LANG || S.cur !== CUR)) applyLocale(S.lang, S.cur, false);
   S.players.forEach(p => { if (p.ctrl === 'remote' && !(NET.peers[p.rid] && NET.peers[p.rid].open)){ p.ctrl = 'cpu'; p.cpu = true; } });
   sendSeats(); enterGame(); flushState();
-  toast(L('↻ Welcome back! Round {r}.', {r:S.round}), 'gold');
+  toast(() => (L('↻ Welcome back! Round {r}.', {r:S.round})), 'gold');
   if (S.phase === 'manage' && canControl(cur())){ updateUI(); focusCam(cur()); } else { S.phase = 'busy'; startTurn(); } }
 
 /* ---------------- help / log ---------------- */
@@ -2816,13 +3041,14 @@ function showHelp(){ const d = DIFFS[S.phase === 'setup' ? setupDiff : S.diff] |
   <p>${L('<b>Each turn:</b> roll two dice and move. Pass <b>💵 Payday</b> to get your {m} paycheck and <b>budget it</b>: needs &amp; bills go to your cash, wants to your fun money, and the rest to savings (try 50/30/20). Savings earn <b>5%</b> interest and ventures pay side-hustle income.', {m:money(PAYCHECK)})}</p>
   <p>${L('<b>Ventures</b> (colored tiles): buy them when you land on them. Other players pay you a customer fee when they land there. Own a full set of 3 to double fees — use <b>🤝 Trade</b> in 🏪 Ventures to swap ventures and cash with other players.')}</p>
   <p>${L('<b>Special tiles:</b> 🧠 Money Quiz · 🎲 Life Happens · 🛍️ Impulse Mall (treats from fun money are planned; anything beyond is an impulse buy) · 🏦 Savings Bank (+10%) · 📱 Phone Bill · 🧾 Tax (💝 Give Back on Easy) · 🚨 Overspent → Budget Bootcamp.')}</p>
+  <p>${L('<b>📈 Stock Market:</b> invest in an index fund (and on Medium and Hard a single stock) under 💰 Money. Prices move every round; landing on the Market tile pays a dividend on your index fund.')}</p>
   <p>${L('<b>Protect &amp; grow:</b> in 💰 Money you can buy 🛡️ insurance (a small premium at every Payday, and big repair bills from Life Happens cost you only the deductible) and take 🎓 courses that raise your paycheck. Smart money moves earn 🏅 badges.')}</p>
   <p><b>${L('Difficulty — {e} {n}:', {e:d.emoji, n:tx(d,'name')})}</b></p><ul class="dfeat">${(LANG === 'de' ? d.de.feats : d.feats).map(f => `<li>${f}</li>`).join('')}</ul>
-  <p>${L('<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Everyone plays in the host’s language.')}</p>
+  <p>${L('<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Each player can pick their own language in the ☰ menu.')}</p>
   <p>${L('<b>Controls:</b> drag to rotate, pinch or scroll to zoom, tap a tile for details.')}</p>
   ${lessonBox(L('Interest here is paid every Payday to keep the game fast. Real savings accounts and loans usually quote yearly rates.'))}
   <p class="credits"><b>${L('Credits.')}</b> ${MUSIC_CREDIT()}<br>${SFX_CREDIT()}<br>${L('3D: A-Frame (MIT). QR codes: qrcode-generator (MIT), jsQR (Apache-2.0).')}</p>`}); }
-function showLog(){ return modal({icon:'📜', title:L('Game log'), body:`<div style="font-size:13px;max-height:55vh;overflow:auto">${S.log.slice().reverse().map(l => `<div style="padding:4px 0;border-bottom:1px solid var(--line)">${esc(l)}</div>`).join('') || L('Nothing yet.')}</div>`}); }
+function showLog(){ return modal({icon:'📜', title:L('Game log'), body:`<div style="font-size:13px;max-height:55vh;overflow:auto">${S.log.slice().reverse().map(l => `<div style="padding:4px 0;border-bottom:1px solid var(--line)">${esc(logText(l))}</div>`).join('') || L('Nothing yet.')}</div>`}); }
 
 /* ---------------- 🏅 trophy case (badges earned on this device) ---------------- */
 function showTrophies(){
@@ -2845,7 +3071,7 @@ function setupPWA(){
     setTimeout(() => { if (navigator.onLine && BUILD.audioFiles) Object.values(BUILD.audioFiles).forEach(u => fetch(u).catch(() => {})); }, 15000);
   }).catch(() => {});
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; $('#bInstall').classList.remove('hidden'); });
-  window.addEventListener('appinstalled', () => { installPrompt = null; $('#bInstall').classList.add('hidden'); toast(L('📲 Money Moves is installed!'), 'good'); });
+  window.addEventListener('appinstalled', () => { installPrompt = null; $('#bInstall').classList.add('hidden'); toast(() => (L('📲 Money Moves is installed!')), 'good'); });
   if (isIOS() && !isStandalone()) $('#bInstall').classList.remove('hidden');
   $('#bInstall').onclick = async () => {
     if (installPrompt){ installPrompt.prompt(); try { await installPrompt.userChoice; } catch(e){} installPrompt = null; $('#bInstall').classList.add('hidden'); return; }
@@ -2867,20 +3093,24 @@ function boot(){
   $('#bContinue').onclick = () => { Sound.init(); resume(); };
   $('#bJoin').onclick = () => { Sound.init(); openJoin(); };
   $('#bLeave').onclick = () => leaveToMenu();
+  $('#lobbyLang').querySelectorAll('button').forEach(b => b.onclick = () => switchLanguage(b.dataset.lang));
   $('#bBadges').onclick = showTrophies;
   $('#bHow').onclick = showHelp; $('#bHelp').onclick = showHelp; $('#bLog').onclick = showLog;
   $('#bRoll').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'roll'}); };
   $('#bEnd').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'end'}); };
   $('#bMoney').onclick = () => { if (canControl(cur())) openMoneyUI(S.turn); };
   $('#bVent').onclick = () => { if (canControl(cur())) openVenturesUI(S.turn, true); };
+  $('#mktChip').onclick = () => { if (modalOpen() || S.phase === 'setup' || !S.players.length) return; const v = NET.role === 'guest' && NET.mySeat >= 0 ? NET.mySeat : S.turn; if (S.players[v]) openInvestUI(v); };
   $('#bSound').onclick = () => { Sound.init(); openSoundSettings(); };
   $('#bSoundSetup').onclick = () => { Sound.init(); openSoundSettings(); };
   updateSoundIcon();
   $('#bCam').onclick = e => { autoCam = !autoCam; e.currentTarget.classList.toggle('on', autoCam); if (autoCam) focusCam(cur()); };
   $('#bMenu').onclick = async () => {
-    if (NET.role === 'guest'){ const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('You’re playing on the host’s game. Leaving hands your seat to a CPU.')}</p>`, buttons:[{label:L('🚪 Leave game'), value:'leave', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}]});
+    const langRow = `<div class="rowb" style="justify-content:space-between;align-items:center;margin-top:10px"><b>🌐 ${L('Language')}</b><div class="mini-segs" id="mLang"><button data-lang="en" class="${LANG === 'en' ? 'sel' : ''}">English</button><button data-lang="de" class="${LANG === 'de' ? 'sel' : ''}">Deutsch</button></div></div>`;
+    const bindLang = (sheet, done) => sheet.querySelectorAll('#mLang button').forEach(b => b.onclick = () => { switchLanguage(b.dataset.lang); done('lang'); });
+    if (NET.role === 'guest'){ const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('You’re playing on the host’s game. Leaving hands your seat to a CPU.')}</p>${langRow}`, buttons:[{label:L('🚪 Leave game'), value:'leave', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}], onRender:bindLang});
       if (r === 'leave') leaveToMenu(); return; }
-    const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('Your game auto-saves after every turn.')}${NET.role === 'host' ? ' ' + L('Connected devices go back to the lobby.') : ''}</p>`, buttons:[{label:L('🆕 New game'), value:'new', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}]});
+    const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('Your game auto-saves after every turn.')}${NET.role === 'host' ? ' ' + L('Connected devices go back to the lobby.') : ''}</p>${langRow}`, buttons:[{label:L('🆕 New game'), value:'new', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}], onRender:bindLang});
     if (r === 'new'){ if (!S.over) save(); showSetup(); } };
   const sc = document.querySelector('a-scene'), ray = new THREE.Raycaster();
   sc.canvas.addEventListener('pointerup', e => {           // tap a tile -> info card (ignored after a drag)
@@ -2941,6 +3171,7 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
       <div class="brand pe">💸<span class="bt"> MONEY <b>MOVES</b></span></div>
       <div id="round" class="pill pe"></div>
       <div id="diffChip" class="pill pe"></div>
+      <button id="mktChip" class="pill pe"></button>
       <div id="netChip" class="pill pe hidden"></div>
       <div class="spacer"></div>
       <button class="icon-btn pe on" id="bCam" data-i18n-title="Auto camera (follows the player)">🎥</button>
@@ -3012,7 +3243,10 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
 <!-- ================= GUEST LOBBY ================= -->
 <div id="lobby" class="overlay hidden">
   <div class="setup-card">
-    <div class="logo">💸 MONEY <span>MOVES</span></div>
+    <div class="setup-top">
+      <div class="logo">💸 MONEY <span>MOVES</span></div>
+      <div class="langbox"><div class="mini-segs" id="lobbyLang"><button data-lang="en">EN</button><button data-lang="de">DE</button></div></div>
+    </div>
     <div class="tagline" data-i18n>📡 You’re connected! Waiting for the host to start the game…</div>
     <div id="lobbyList"></div>
     <div class="setup-actions"><button class="btn" id="bLeave" data-i18n>Leave</button></div>

@@ -1,5 +1,5 @@
-/* Money Moves service worker — makes the installed app work offline. Version 51802f825e */
-const CACHE = 'mm-51802f825e';
+/* Money Moves service worker — makes the installed app work offline. Version 34a46469d8 */
+const CACHE = 'mm-34a46469d8';
 const CORE = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/favicon-64.png"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
