@@ -295,6 +295,27 @@ textarea.code{width:100%;min-height:62px;font:11.5px/1.35 ui-monospace,Menlo,Con
 .spark .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .spark .base{stroke:rgba(255,255,255,.18);stroke-width:1;vector-effect:non-scaling-stroke}
 #mktChip{cursor:pointer;font:inherit;color:inherit}
+/* options */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{padding:10px 8px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:700;font-size:13px;color:var(--muted)}
+.opt b{display:block;font-size:12px;margin-top:2px}
+.opt.on{border-color:var(--accent);color:var(--ink);box-shadow:0 0 0 2px rgba(46,196,182,.25) inset}
+.opt.on b{color:var(--accent)}
+/* fast mode: dialogs that close by themselves */
+.autobar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden}
+.autobar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;animation:autobar linear forwards}
+@keyframes autobar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+/* first-game guide */
+.coach{position:fixed;z-index:55;background:#fff8e1;color:#1d2433;border-radius:16px;padding:12px 14px 10px;box-shadow:0 12px 40px rgba(0,0,0,.45);font-size:14px;line-height:1.4;animation:tin .25s ease-out}
+.coach .ct b{color:#111}
+.coach .cb{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.coach .cb .btn.ghost{color:#5b6475;border-color:rgba(0,0,0,.15);background:transparent}
+.coach .ca{position:absolute;width:16px;height:16px;background:#fff8e1;transform:rotate(45deg)}
+.coach .ca.up{top:-7px}
+.coach .ca.down{bottom:-7px}
+.coach-target{outline:3px solid #ffc83d!important;outline-offset:3px;border-radius:14px;animation:cpulse 1.4s ease-in-out infinite}
+@keyframes cpulse{0%,100%{outline-color:#ffc83d}50%{outline-color:rgba(255,200,61,.35)}}
+body.coaching #toasts{opacity:.18;transition:opacity .2s}
 
 </style>
 <script>
@@ -623,6 +644,19 @@ const MARKET = [
    de:{name:'TrendTech-Aktie', sub:'Eine einzige Firma: große Schwankungen. Sie kann abheben – oder abstürzen.'}}
 ];
 const DIVIDEND = 0.03, MKT_START = 100;
+
+/* 🧭 first-game guide: short tips that point at the right place the first time something happens */
+const GUIDE_STEPS = {
+  welcome:{en:'<b>Welcome to Money Moves!</b> These cards show each player’s cash, fun money, savings and net worth. Highest score at the end wins.', de:'<b>Willkommen bei Money Moves!</b> Diese Karten zeigen Bargeld, Spaß-Geld, Erspartes und Vermögen aller Spieler. Die meisten Punkte am Ende gewinnen.'},
+  roll:{en:'Your turn! Tap <b>🎲 Roll</b> to move around the board.', de:'Du bist dran! Tipp auf <b>🎲 Würfeln</b>, um übers Spielbrett zu ziehen.'},
+  venture:{en:'This venture is for sale. Others pay you a fee when they land here, and it earns income at every Payday. Buying is investing!', de:'Dieses Unternehmen ist zu verkaufen. Wer hier landet, zahlt dir eine Gebühr, und es bringt an jedem Zahltag Einkommen. Kaufen heißt investieren!'},
+  manage:{en:'Now you can open <b>💰 Money</b> (save, invest, insurance, courses) or <b>🏪 Ventures</b>. When you’re done, tap <b>End turn</b>.', de:'Jetzt kannst du <b>💰 Geld</b> (sparen, investieren, Versicherung, Kurse) oder <b>🏪 Unternehmen</b> öffnen. Wenn du fertig bist, tipp auf <b>Zug beenden</b>.'},
+  tile:{en:'Tip: tap any tile on the board to see what it does and what it earns.', de:'Tipp: Tipp auf ein Feld, um zu sehen, was es macht und was es einbringt.'},
+  budget:{en:'<b>Payday!</b> Split your paycheck: needs &amp; bills stay as cash, wants become fun money, the rest is saved. Not sure? Tap <b>50/30/20</b>.', de:'<b>Zahltag!</b> Teil dein Gehalt auf: Bedürfnisse &amp; Rechnungen bleiben Bargeld, Wünsche werden Spaß-Geld, der Rest wird gespart. Unsicher? Tipp auf <b>50/30/20</b>.'},
+  goal:{en:'This bar is your savings goal. Reach it by the end of the game for a bonus.', de:'Dieser Balken ist dein Sparziel. Erreichst du es bis zum Spielende, gibt es einen Bonus.'},
+  market:{en:'The stock market moves every round. Tap here to see prices — or invest under 💰 Money.', de:'Die Börse bewegt sich jede Runde. Tipp hier, um die Kurse zu sehen – investieren kannst du unter 💰 Geld.'},
+  trade:{en:'You own 2 or more ventures. Complete a color set with <b>🤝 Trade</b> in 🏪 Ventures — full sets double your fees.', de:'Du besitzt 2 oder mehr Unternehmen. Vervollständige eine Farbgruppe mit <b>🤝 Tauschen</b> unter 🏪 Unternehmen – ganze Gruppen verdoppeln deine Gebühren.'}
+};
 
 /* ---------------- language & currency ----------------
    UI text goes through L('English text', {params}); German comes from the DE dictionary.
@@ -1178,7 +1212,16 @@ const DE = {
 'Unlocks on Medium and Hard.':'Gibt es auf „Mittel“ und „Schwer“.',
 'You can buy and sell on your turn.':'Kaufen und verkaufen kannst du, wenn du dran bist.',
 '<b>📈 Stock Market:</b> invest in an index fund (and on Medium and Hard a single stock) under 💰 Money. Prices move every round; landing on the Market tile pays a dividend on your index fund.':'<b>📈 Börse:</b> Unter 💰 Geld kannst du in einen Indexfonds investieren (auf „Mittel“ und „Schwer“ auch in eine Einzelaktie). Die Kurse ändern sich jede Runde; landest du auf dem Börsenfeld, bekommst du Dividende auf deinen Indexfonds.',
-'Language':'Sprache'
+'Language':'Sprache',
+'Skip guide':'Tipps aus',
+'Got it':'Verstanden',
+'🧭 Guide turned off. You can turn it back on on the start screen.':'🧭 Tipps ausgeschaltet. Auf dem Startbildschirm kannst du sie wieder einschalten.',
+'Fast mode':'Schnellmodus',
+'On':'An',
+'Off':'Aus',
+'First-game guide':'Tipps fürs erste Spiel',
+'<b>Options:</b> ⚡ Fast mode speeds up moves and closes simple notices by itself. The 🧭 first-game guide points out what to tap the first time; turn it on again on the start screen to replay it.':'<b>Optionen:</b> ⚡ Der Schnellmodus beschleunigt die Züge und schließt einfache Hinweise von selbst. Die 🧭 Tipps fürs erste Spiel zeigen beim ersten Mal, wohin du tippen musst; schalte sie auf dem Startbildschirm wieder ein, um sie nochmal zu sehen.',
+'Options':'Optionen'
 };
 
 /* ---------------- state ---------------- */
@@ -1200,7 +1243,9 @@ const ICE = [{urls:'stun:stun.l.google.com:19302'}];   // only used when online;
 
 /* ---------------- helpers ---------------- */
 const $ = s => document.querySelector(s);
-const sleep = ms => { const g = GEN; return new Promise(r => setTimeout(r, ms)).then(() => g === GEN ? undefined : halt()); };
+/** ⚡ fast mode shortens every wait and animation (it is part of the game state, so guests animate at the same pace) */
+const SPD = () => (S.fast ? 0.35 : 1);
+const sleep = ms => { const g = GEN; return new Promise(r => setTimeout(r, ms*SPD())).then(() => g === GEN ? undefined : halt()); };
 const rnd = n => Math.floor(Math.random()*n);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const poss = n => LANG === 'de' ? n : (n === 'You' ? 'Your' : n + (/s$/i.test(n) ? '’' : '’s'));
@@ -1210,7 +1255,7 @@ const ease = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
 const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const newId = () => Math.random().toString(36).slice(2, 9);
 /* animation helper that also finishes if the tab is hidden (requestAnimationFrame pauses) */
-function tween(ms, fn){ const g = GEN; return new Promise(res => { const t0 = performance.now(); let done = false;
+function tween(ms, fn){ const g = GEN; ms = Math.max(60, ms*SPD()); return new Promise(res => { const t0 = performance.now(); let done = false;
   const fin = () => { if (done) return; done = true; fn(1); res(); };
   const safety = setTimeout(fin, ms + 250);
   (function f(now){ if (done) return; const t = Math.min(1, (now - t0)/ms); if (t >= 1){ clearTimeout(safety); return fin(); } fn(t); requestAnimationFrame(f); })(t0); })
@@ -1634,7 +1679,7 @@ const mktOn = a => LVL() >= a.lvl;
 const mktPrice = id => (S.mkt && S.mkt.p && S.mkt.p[id]) || MKT_START;
 const holdValue = (p, id) => Math.round(((p.units && p.units[id]) || 0)*mktPrice(id));
 const investValue = p => MARKET.reduce((s, a) => s + holdValue(p, a.id), 0);
-const signedPct = r => (r >= 0 ? '+' : '−') + pct(Math.abs(r));
+const signedPct = r => { const v = Math.round(r*100); return v === 0 ? pct(0) : (v > 0 ? '+' : '−') + pct(Math.abs(r)); };
 function newMarket(){ return {p:{idx:MKT_START, stk:MKT_START}, h:[{idx:MKT_START, stk:MKT_START}], last:{idx:0, stk:0}}; }
 function buyInvest(p, id, amt){ const a = MARKET.find(x => x.id === id); if (!a || !mktOn(a)) return 0;
   amt = Math.min(Math.floor(amt), p.cash); if (amt <= 0) return 0;
@@ -1821,7 +1866,7 @@ async function payday(p){
 }
 
 /* ---------------- modal ---------------- */
-function modal({icon='', title='', body='', buttons=[{label:L('OK'), value:'ok', kind:'primary'}], stack=false, wide=false, onRender=null}){
+function modal({icon='', title='', body='', buttons=[{label:L('OK'), value:'ok', kind:'primary'}], stack=false, wide=false, onRender=null, auto=0, autoValue, guide=''}){
   return new Promise(res => {
     const m = $('#modal');
     m.innerHTML = `<div class="sheet ${wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${String(title).replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}">
@@ -1830,19 +1875,94 @@ function modal({icon='', title='', body='', buttons=[{label:L('OK'), value:'ok',
       <div class="sheet-btns ${stack?'stack':''}">${buttons.map((b,k) => `<button class="btn ${b.kind||''}" data-k="${k}" ${b.disabled?'disabled':''}>${b.label}</button>`).join('')}</div></div>`;
     m.classList.add('open'); $('#info').classList.add('hidden');
     const sheet = m.querySelector('.sheet');
-    const done = v => { if (!sheet.isConnected) return; m.classList.remove('open'); m.innerHTML = ''; res(v); };
+    let timer = null;
+    const done = v => { if (!sheet.isConnected) return; clearTimeout(timer); m.classList.remove('open'); m.innerHTML = ''; Guide.modalClosed(); res(v); };
     m.querySelectorAll('.sheet-btns > button').forEach(b => b.onclick = () => done(buttons[+b.dataset.k].value));
     if (onRender) onRender(sheet, done);
+    if (auto > 0){ const av = autoValue !== undefined ? autoValue : (buttons.find(b => !b.disabled) || {value:'ok'}).value;
+      sheet.insertAdjacentHTML('beforeend', `<div class="autobar"><i style="animation-duration:${auto}ms"></i></div>`); timer = setTimeout(() => done(av), auto);
+      sheet.addEventListener('pointerdown', () => { clearTimeout(timer); const bar = sheet.querySelector('.autobar'); if (bar) bar.remove(); }, {once:true}); }
+    if (Guide.cur && !Guide.inModal) Guide.hide();      // a dialog covers the board: put board tips away for now
+    if (guide) Guide.show(guide, (guide === 'budget' && sheet.querySelector('[data-pre]')) || sheet.querySelector('.sheet-btns .btn.primary') || sheet);
     const first = m.querySelector('.sheet-btns > button:not(:disabled)'); if (first && !onRender) first.focus({preventScroll:true});
   });
 }
 const modalOpen = () => $('#modal').classList.contains('open');
+
+/* ---------------- 🧭 first-game guide ----------------
+   One bubble at a time, pointing at the thing to tap. Progress is kept per device. */
+const GUIDE_KEY = 'moneymoves-guide-v1';
+const Guide = {
+  st:(() => { try { const g = JSON.parse(localStorage.getItem(GUIDE_KEY) || 'null'); if (g && Array.isArray(g.seen)) return {seen:g.seen.filter(x => GUIDE_STEPS[x]), off:!!g.off}; } catch(e){} return {seen:[], off:false}; })(),
+  cur:null, el:null, target:null, tf:null, inModal:false,
+  persist(){ try { localStorage.setItem(GUIDE_KEY, JSON.stringify(this.st)); } catch(e){} },
+  active(){ return !this.st.off && this.st.seen.length < Object.keys(GUIDE_STEPS).length; },
+  seen(id){ return this.st.seen.includes(id); },
+  setOn(on){ this.st = on ? {seen:[], off:false} : {seen:this.st.seen, off:true}; this.persist(); if (!on) this.hide(); },
+  /** show a tip once; target = element to point at (or null for a centered bubble) */
+  show(id, target, tf=null){
+    if (!GUIDE_STEPS[id] || !this.active() || this.seen(id) || this.cur === id || S.phase === 'setup') return false;
+    if (this.cur && !this.inModal && target && target.closest && target.closest('#modal')) this.hide();   // a dialog tip replaces a board tip
+    else if (this.cur) return false;
+    this.cur = id; this.target = target || null; this.tf = tf; this.inModal = !!(target && target.closest && target.closest('#modal'));
+    const el = this.el || (this.el = document.createElement('div')); el.id = 'coach'; el.className = 'coach';
+    el.innerHTML = `<div class="ct">🧭 ${pick(GUIDE_STEPS[id])}</div><div class="cb"><button class="btn ghost sm" data-g="skip">${L('Skip guide')}</button><button class="btn primary sm" data-g="ok">${L('Got it')}</button></div><i class="ca"></i>`;
+    document.body.appendChild(el); document.body.classList.add('coaching');
+    el.querySelector('[data-g=ok]').onclick = () => this.finish();
+    el.querySelector('[data-g=skip]').onclick = () => { this.finish(); this.setOn(false); toast(L('🧭 Guide turned off. You can turn it back on on the start screen.')); };
+    if (this.target && this.target.classList){ this.target.classList.add('coach-target'); this.target.addEventListener('click', this.onTarget = () => this.finish(), {once:true}); }
+    this.place(); return true; },
+  place(){ const el = this.el; if (!el || !this.cur) return;
+    const vw = innerWidth, vh = innerHeight, bw = Math.min(330, vw - 24); el.style.width = bw + 'px';
+    const r = this.target && this.target.isConnected ? this.target.getBoundingClientRect() : null, bh = el.offsetHeight, ca = el.querySelector('.ca');
+    if (!r || (!r.width && !r.height)){ el.style.left = (vw - bw)/2 + 'px'; el.style.top = Math.max(12, vh*0.3 - bh/2) + 'px'; ca.style.display = 'none'; return; }
+    const below = r.bottom + 14 + bh < vh || r.top - 14 - bh < 0, top = below ? Math.min(vh - bh - 8, r.bottom + 14) : Math.max(8, r.top - 14 - bh);
+    const left = clamp(r.left + r.width/2 - bw/2, 12, vw - bw - 12);
+    el.style.left = left + 'px'; el.style.top = top + 'px'; ca.style.display = '';
+    ca.className = 'ca ' + (below ? 'up' : 'down'); ca.style.left = clamp(r.left + r.width/2 - left - 8, 14, bw - 30) + 'px'; },
+  finish(){ if (!this.cur) return; if (!this.seen(this.cur)) this.st.seen.push(this.cur); this.persist(); this.hide(); setTimeout(() => guideTick(), 400); },
+  hide(){ if (this.target && this.target.classList) this.target.classList.remove('coach-target');
+    if (this.target && this.onTarget) this.target.removeEventListener('click', this.onTarget);
+    if (this.el) this.el.remove(); document.body.classList.remove('coaching'); this.cur = null; this.target = null; this.tf = null; this.inModal = false; },
+  /** the board was re-drawn: point at the new copy of the element */
+  retarget(){ if (!this.cur || !this.tf) return; const t = this.tf(); if (t && t !== this.target){ if (this.target) this.target.classList.remove('coach-target'); this.target = t; t.classList.add('coach-target'); } this.place(); },
+  /** a dialog closed: its tip counts as seen */
+  modalClosed(){ if (this.cur && this.inModal) this.finish(); }
+};
+window.addEventListener('resize', () => Guide.place());
+/** the player this device is playing for right now (or null) */
+function guideMe(){ if (S.phase === 'setup' || !Array.isArray(S.players) || !S.players.length) return null;
+  if (NET.role === 'guest') return S.players[NET.mySeat] || null;
+  const c = cur(); if (c && c.ctrl === 'local' && !c.cpu) return c;
+  return S.players.find(p => p.ctrl === 'local' && !p.cpu) || null; }
+/** pick the next tip that fits what is on screen */
+function guideTick(){
+  if (!Guide.active() || S.over || S.phase === 'setup') return;
+  const me = guideMe(); if (!me || me.out) return;
+  const myTurn = cur() === me && canControl(me), pi = pidx(me);
+  // board tips go away when their moment has passed
+  if (Guide.cur === 'roll' && !(myTurn && S.phase === 'roll')) Guide.finish();
+  if (Guide.cur === 'manage' && !(myTurn && S.phase === 'manage')) Guide.finish();
+  if (Guide.cur){ Guide.retarget(); return; }
+  if (modalOpen()) return;
+  const card = $('#players').children[pi], goalEl = () => { const c = $('#players').children[pidx(me)]; return c && c.querySelector('.goal'); };
+  const steps = [
+    ['welcome', true, $('#players')],
+    ['roll', myTurn && S.phase === 'roll', $('#bRoll')],
+    ['manage', myTurn && S.phase === 'manage', $('#btns')],
+    ['tile', myTurn && S.phase === 'manage' && Guide.seen('manage'), null],
+    ['goal', me.savings > 0 && !!card, card && card.querySelector('.goal')],
+    ['market', S.mkt && S.mkt.h.length > 1 && myTurn && (S.phase === 'roll' || S.phase === 'manage'), $('#mktChip')],
+    ['trade', myTurn && S.phase === 'manage' && owned(pi).length >= 2, $('#bVent')]];
+  for (const [id, ok, el] of steps) if (ok && !Guide.seen(id)){ Guide.show(id, el, id === 'goal' ? goalEl : null); return; }
+}
 const lessonBox = s => `<div class="lesson">${s}</div>`;
 
 /** Ask the player controlling p a question: a local dialog, or a prompt sent to their device. */
 /** the language a player reads in: guests choose their own */
 const langOf = p => (p && p.ctrl === 'remote' && NET.peers[p.rid] && NET.peers[p.rid].lang) || LANG;
-function ask(p, opts){ const g = GEN; const o = typeof opts === 'function' ? inLang(langOf(p), opts) : opts; return askRaw(p, o).then(v => g === GEN ? v : halt()); }
+function ask(p, opts){ const g = GEN; const o = typeof opts === 'function' ? inLang(langOf(p), opts) : opts;
+  if (o && o.fastAuto && S.fast){ o.auto = o.fastAuto; } return askRaw(p, o).then(v => g === GEN ? v : halt()); }
 function askRaw(p, opts){
   if (p.ctrl === 'remote'){
     const peer = NET.peers[p.rid];
@@ -1860,7 +1980,8 @@ function askRaw(p, opts){
   return modal(opts);
 }
 function defaultAnswer(o){ if (o.panel) return o.panel === 'budget' || o.panel === 'counter' ? null : 'ok'; if ('dflt' in o) return o.dflt; const b = (o.buttons || []).find(x => !x.disabled); return b ? b.value : 'ok'; }
-function info(p, opts){ if (p.cpu) return Promise.resolve(); return ask(p, opts); }
+/** a notice with an OK button (closes by itself in fast mode) */
+function info(p, opts){ if (p.cpu) return Promise.resolve(); return ask(p, () => ({...(typeof opts === 'function' ? opts() : opts), fastAuto:2600})); }
 
 /* ---------------- turn flow (runs on the host / single device) ---------------- */
 async function startTurn(){
@@ -1972,7 +2093,7 @@ async function landVenture(p, i){
   if (o === pi){ toast(() => (L('{e} {n} checks on their {v}. Business is good!', {e:t.emoji, n:B(p.name), v:tname(i)}))); return; }
   if (o >= 0 && !S.players[o].out){
     const owner = S.players[o], f = fee(i);
-    if (!p.cpu) await ask(p, () => ({icon:t.emoji, title:L('Customer at {p} {v}', {p:esc(poss(owner.name)), n:esc(owner.name), v:tname(i)}), body:`<p>${L('You’re a customer here — pay {m} to {n}.', {m:`<b>${money(f)}</b>`, n:esc(owner.name)})}</p>${lessonBox(L('Owning businesses means other people’s spending becomes your income.'))}`, buttons:[{label:L('Pay {m}', {m:money(f)}), value:'ok', kind:'primary'}]}));
+    if (!p.cpu) await ask(p, () => ({icon:t.emoji, title:L('Customer at {p} {v}', {p:esc(poss(owner.name)), n:esc(owner.name), v:tname(i)}), body:`<p>${L('You’re a customer here — pay {m} to {n}.', {m:`<b>${money(f)}</b>`, n:esc(owner.name)})}</p>${lessonBox(L('Owning businesses means other people’s spending becomes your income.'))}`, buttons:[{label:L('Pay {m}', {m:money(f)}), value:'ok', kind:'primary'}], fastAuto:2600}));
     charge(p, f, () => (L('customer at {p} {v}', {p:poss(owner.name), n:owner.name, v:tname(i)})), owner);
     toast(() => (L('{e} {n} paid {m} to {o} at {v}.', {e:t.emoji, n:B(p.name), m:money(f), o:B(owner.name), v:tname(i)})));
     return;
@@ -1997,7 +2118,7 @@ async function landVenture(p, i){
       ${setBox(pi, t.g)}${short()}${lessonBox(d.credit && !can ? L('Borrowing to buy an asset can pay off — but only if it earns more than the loan costs in interest.') : pick(LESSON.venture))}`;
     const btns = () => [can ? {label:L('Buy for {m}', {m:money(price)}), value:'buy', kind:'primary'} : {label: d.credit ? L('💰 Money / Borrow') : L('💰 Open Money'), value:'money', kind:'gold'},
       {label:L('🏪 My ventures ({k})', {k:nOwned}), value:'mine'}, {label:L('Pass'), value:'pass'}];
-    const r = await ask(p, () => ({icon:t.emoji, title:L('{v} is for sale', {v:tname(i)}), body:body(), buttons:btns(), dflt:'pass'}));
+    const r = await ask(p, () => ({icon:t.emoji, title:L('{v} is for sale', {v:tname(i)}), body:body(), buttons:btns(), dflt:'pass', guide:'venture'}));
     if (r === 'buy' && p.cash >= price){ buy(p, i); return; }
     if (r === 'money'){ await ask(p, {panel:'money'}); continue; }
     if (r === 'mine'){ await ask(p, {panel:'ventures'}); continue; }
@@ -2026,7 +2147,7 @@ async function doQuiz(p){
       stack:true, buttons: opts.map((o,m) => ({label:`${'ABCD'[m]}. ${esc(fmtTokens(qa()[o.k]))}`, value:o.k})), dflt:-1}));
     right = pickA === 0;
     await ask(p, () => ({icon: right ? '✅' : '❌', title: right ? L('Correct! +{m}', {m:money(QUIZ_REWARD)}) : L('Not quite'),
-      body:`${right ? '' : `<p>${L('The answer is: {a}', {a:`<b>${esc(fmtTokens(qa()[0]))}</b>`})}</p>`}${lessonBox(esc(tx(q,'why')))}`}));
+      body:`${right ? '' : `<p>${L('The answer is: {a}', {a:`<b>${esc(fmtTokens(qa()[0]))}</b>`})}</p>`}${lessonBox(esc(tx(q,'why')))}`, fastAuto:5500}));
   }
   if (right){ p.quizRight++; gain(p, QUIZ_REWARD, () => (L('Money Quiz'))); Sound.good(); } else Sound.bad();
 }
@@ -2068,7 +2189,7 @@ async function doLife(p){
   updateUI();
   const msg = () => msgs.map(f => f()).join(' · '), lesson = () => ch ? chLesson(chIdx) : cardText(c, tx(c,'lesson'));
   if (p.cpu) toast(() => (`${c.e} ${B(p.name)} — ${esc(title())}${ch ? ': ' + L('chose “{c}”', {c:esc(chLabel(chIdx).replace(/^[^\p{L}\p{N}]+/u,''))}) : ''} ${msg()}`));
-  else await ask(p, () => ({icon:c.e, title:esc(title()), body:`${ch ? '' : `<p>${esc(text())}</p>`}${msgs.length ? `<p class="big ${bad ? 'bad-t' : ''}" style="font-size:22px">${msg()}</p>` : ''}${insNote ? `<p class="muted">${insNote()}</p>` : ''}${lessonBox(esc(lesson()))}`}));
+  else await ask(p, () => ({icon:c.e, title:esc(title()), body:`${ch ? '' : `<p>${esc(text())}</p>`}${msgs.length ? `<p class="big ${bad ? 'bad-t' : ''}" style="font-size:22px">${msg()}</p>` : ''}${insNote ? `<p class="muted">${insNote()}</p>` : ''}${lessonBox(esc(lesson()))}`, fastAuto:5500}));
 }
 
 async function doMall(p){
@@ -2100,7 +2221,7 @@ async function doBank(p){
   if (bonus > 0){ p.intEarned += bonus; gain(p, bonus, () => (L('Savings Bank bonus')), true); }
   if (p.cpu){ toast(() => (L('🏦 {n} earned a {m} savings bonus.', {n:B(p.name), m:money(bonus)})), 'good'); return; }
   const r = await ask(p, () => ({icon:'🏦', title:L('Savings Bank'), body:`<p>${bonus > 0 ? L('Your savings earned a {m} bonus (10%).', {m:`<b>${money(bonus)}</b>`}) : L('You have no savings yet, so there’s no bonus this time.')}</p>${lessonBox(pick(LESSON.bank))}`,
-    buttons:[{label:L('💰 Deposit now'), value:'money', kind:'gold'}, {label:L('OK'), value:'ok', kind:'primary'}], dflt:'ok'}));
+    buttons:[{label:L('💰 Deposit now'), value:'money', kind:'gold'}, {label:L('OK'), value:'ok', kind:'primary'}], dflt:'ok', fastAuto:3200, autoValue:'ok'}));
   if (r === 'money') await ask(p, {panel:'money'});
 }
 
@@ -2297,7 +2418,7 @@ function openBudgetUI(pi, gross){
     bindBudget(body, st, gross, null);
     body.querySelector('#bAsk').onchange = e => { askAgain = e.target.checked; };
   };
-  return modal({icon:'💵', title:L('Payday budget'), body:'', buttons:[{label:L('✅ Use this budget'), value:'ok', kind:'primary'}], onRender:render})
+  return modal({icon:'💵', title:L('Payday budget'), body:'', buttons:[{label:L('✅ Use this budget'), value:'ok', kind:'primary'}], onRender:render, guide:'budget'})
     .then(() => ({save:st.save, fun:st.fun, ask:askAgain}));
 }
 
@@ -2463,8 +2584,8 @@ function updateUI(){
   checkBadges();
   const d = D();
   $('#round').innerHTML = `<span class="bt">${L('Round')} </span><b>${Math.min(S.round, S.maxRounds)}</b>/${S.maxRounds}`;
-  $('#diffChip').innerHTML = `${d.emoji}<span class="bt"> ${tx(d,'name')}</span>${d.inflation && S.priceLevel > 1 ? ` <b>×${S.priceLevel.toFixed(2)}</b>` : ''}`;
-  const mc = $('#mktChip'), lr = S.mkt ? S.mkt.last.idx : 0;
+  $('#diffChip').innerHTML = `${d.emoji}<span class="bt"> ${tx(d,'name')}</span>${d.inflation && S.priceLevel > 1 ? ` <b>×${S.priceLevel.toFixed(2)}</b>` : ''}${S.fast ? ' ⚡' : ''}`;
+  const mc = $('#mktChip'), lr = S.mkt ? Math.round(S.mkt.last.idx*100)/100 : 0;
   mc.innerHTML = `${lr < 0 ? '📉' : '📈'}<b class="${lr < 0 ? 'bad-t' : 'good-t'}"> ${signedPct(lr)}</b>`; mc.title = L('Stock market: the index moved {p} last round', {p:signedPct(lr)});
   const nc = $('#netChip');
   if (NET.role === 'host'){ const n = Object.values(NET.peers).filter(x => x.open).length; nc.classList.remove('hidden'); nc.innerHTML = `📡 <b>${n}</b>`; nc.title = L('Hosting: {k} device(s) connected', {k:n}); }
@@ -2492,7 +2613,7 @@ function updateUI(){
   $('#bRoll').disabled = !(me && S.phase === 'roll');
   $('#bEnd').disabled = !(me && S.phase === 'manage');
   $('#bMoney').disabled = $('#bVent').disabled = !(me && (S.phase === 'roll' || S.phase === 'manage'));
-  syncSoon();
+  syncSoon(); guideTick();
 }
 function rotateTip(){ const pool = TIPS.filter(t => (t.lvl || 0) <= LVL()); const t = pool[tipIdx++ % pool.length]; $('#tip').innerHTML = '💡 ' + pick({en:t.t, de:t.de}); }
 
@@ -2757,13 +2878,14 @@ async function answerPrompt(m){ const o = m.opts || {}; let v;
   else if (o.panel === 'counter') v = await openTradeUI(NET.mySeat, cleanOffer({...(o.offer || {}), from:NET.mySeat}));
   else if (o.panel === 'invest') v = await openInvestUI(NET.mySeat);
   else v = await modal({icon:clean(o.icon), title:clean(o.title), body:clean(o.body), stack:!!o.stack, wide:!!o.wide,
+    auto:clamp(Math.floor(+o.auto || 0), 0, 10000), autoValue:o.autoValue, guide:GUIDE_STEPS[o.guide] ? o.guide : '',
     buttons:(Array.isArray(o.buttons) && o.buttons.length ? o.buttons : [{label:L('OK'), value:'ok'}]).slice(0, 8).map(b => ({label:clean(b.label), value:b.value, kind:String(b.kind || '').replace(/[^a-z ]/g, ''), disabled:!!b.disabled}))});
   netSend({t:'answer', id:m.id, v}); }
 function sanitizeState(s){
   if (!s || !Array.isArray(s.players)) throw new Error('bad state');
   if (!DIFFS[s.diff]) s.diff = 'medium';
   const num = (v, d=0) => Number.isFinite(+v) ? +v : d, n = s.players.length;
-  s.round = num(s.round, 1); s.maxRounds = num(s.maxRounds, 20); s.priceLevel = Math.max(1, num(s.priceLevel, 1)); s.turn = clamp(Math.floor(num(s.turn)), 0, Math.max(0, n-1));
+  s.fast = !!s.fast; s.round = num(s.round, 1); s.maxRounds = num(s.maxRounds, 20); s.priceLevel = Math.max(1, num(s.priceLevel, 1)); s.turn = clamp(Math.floor(num(s.turn)), 0, Math.max(0, n-1));
   s.owners = Array.from({length:24}, (_,i) => { const o = Math.floor(num(s.owners && s.owners[i], -1)); return o >= 0 && o < n ? o : -1; });
   s.levels = Array.from({length:24}, (_,i) => clamp(Math.floor(num(s.levels && s.levels[i])), 0, 3));
   s.log = Array.isArray(s.log) ? s.log.slice(-120).map(l => l && typeof l === 'object' ? {en:String(l.en || ''), de:String(l.de || l.en || '')} : String(l)) : []; s.phase = String(s.phase || 'busy'); s.over = !!s.over;
@@ -2947,7 +3069,17 @@ let setupRows = [
 let setupRounds = 20, setupDiff = 'medium';
 const goalAmt = g => Math.round(g.amount*setupRounds/20/10)*10;   // goals scale with game length
 const isDefaultName = n => !n || /^(Player|Spieler) \d$/.test(n);
+/* ---------------- options: ⚡ fast mode & 🧭 guide ---------------- */
+const PREFS_KEY = 'moneymoves-prefs-v1';
+const Prefs = (() => { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null'); if (p && typeof p === 'object') return {fast:!!p.fast}; } catch(e){} return {fast:false}; })();
+function savePrefs(){ try { localStorage.setItem(PREFS_KEY, JSON.stringify(Prefs)); } catch(e){} }
+function renderOptions(){
+  const f = $('#optFast'), g = $('#optGuide'); if (!f || !g) return;
+  f.classList.toggle('on', Prefs.fast); f.innerHTML = `⚡ ${L('Fast mode')} <b>${Prefs.fast ? L('On') : L('Off')}</b>`;
+  const gOn = Guide.active(); g.classList.toggle('on', gOn); g.innerHTML = `🧭 ${L('First-game guide')} <b>${gOn ? L('On') : L('Off')}</b>`; }
+function setFast(on){ Prefs.fast = !!on; savePrefs(); if (S.phase !== 'setup' && NET.role !== 'guest'){ S.fast = Prefs.fast; updateUI(); flushState(); save(); } renderOptions(); }
 function renderSetup(){
+  renderOptions();
   setupRows.forEach((r,k) => { if (isDefaultName(r.name) && r.kind === 'local') r.name = defaultName(k); });
   $('#srows').innerHTML = setupRows.map((r,k) => { const pr = NET.peers[r.id];
     const conn = r.kind !== 'remote' ? '' : `<div class="conn">${pr && pr.open
@@ -2979,7 +3111,7 @@ function renderSetup(){
   bc.classList.toggle('hidden', !sv); if (sv) bc.textContent = L('↻ Continue (round {r}, {d})', {r:sv.round, d:tx(DIFFS[sv.diff] || DIFFS.medium, 'name')});
   sendLobby();
 }
-function showSetup(){ GEN++; for (const [, pd] of NET.pending) pd.res(defaultAnswer(pd.opts)); NET.pending.clear(); NET.panelOpen = {};
+function showSetup(){ GEN++; Guide.hide(); for (const [, pd] of NET.pending) pd.res(defaultAnswer(pd.opts)); NET.pending.clear(); NET.panelOpen = {};
   S.phase = 'setup'; S.over = false; $('#setup').classList.remove('hidden'); $('#ui').classList.add('hidden'); $('#info').classList.add('hidden'); renderSetup(); }
 /** switch language/currency and redraw everything that shows text */
 /** switch only the language while connected or playing (keeps the game's currency); guests tell the host */
@@ -3015,7 +3147,7 @@ async function startGame(){
       ins:false, insPaid:0, insSaved:0, claims:0, insDecided:false, courses:[], eduSpent:0, eduDisc:0, skips:0, goodBudgets:0, smart:0, hadDebt:false, badges:[],
       units:{idx:0, stk:0}, invIn:0, invOut:0, divs:0, holdRounds:0 }; });
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), lang:LANG, cur:CUR, owners:Array(24).fill(-1), levels:Array(24).fill(0),
-    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[], mkt:newMarket() });
+    lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[], mkt:newMarket(), fast:Prefs.fast });
   snapHist(0);
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
   GEN++; sendSeats();
@@ -3046,6 +3178,7 @@ function showHelp(){ const d = DIFFS[S.phase === 'setup' ? setupDiff : S.diff] |
   <p><b>${L('Difficulty — {e} {n}:', {e:d.emoji, n:tx(d,'name')})}</b></p><ul class="dfeat">${(LANG === 'de' ? d.de.feats : d.feats).map(f => `<li>${f}</li>`).join('')}</ul>
   <p>${L('<b>Play on several devices:</b> on the host device set a player to <b>📡 Other device</b> and tap Connect. Your friend opens this same page, taps <b>📡 Join a friend’s game</b> and pastes or scans the invite, then sends their reply code back. Same Wi-Fi works without internet; different networks need internet (some strict networks may block it). Each player can pick their own language in the ☰ menu.')}</p>
   <p>${L('<b>Controls:</b> drag to rotate, pinch or scroll to zoom, tap a tile for details.')}</p>
+  <p>${L('<b>Options:</b> ⚡ Fast mode speeds up moves and closes simple notices by itself. The 🧭 first-game guide points out what to tap the first time; turn it on again on the start screen to replay it.')}</p>
   ${lessonBox(L('Interest here is paid every Payday to keep the game fast. Real savings accounts and loans usually quote yearly rates.'))}
   <p class="credits"><b>${L('Credits.')}</b> ${MUSIC_CREDIT()}<br>${SFX_CREDIT()}<br>${L('3D: A-Frame (MIT). QR codes: qrcode-generator (MIT), jsQR (Apache-2.0).')}</p>`}); }
 function showLog(){ return modal({icon:'📜', title:L('Game log'), body:`<div style="font-size:13px;max-height:55vh;overflow:auto">${S.log.slice().reverse().map(l => `<div style="padding:4px 0;border-bottom:1px solid var(--line)">${esc(logText(l))}</div>`).join('') || L('Nothing yet.')}</div>`}); }
@@ -3095,6 +3228,8 @@ function boot(){
   $('#bLeave').onclick = () => leaveToMenu();
   $('#lobbyLang').querySelectorAll('button').forEach(b => b.onclick = () => switchLanguage(b.dataset.lang));
   $('#bBadges').onclick = showTrophies;
+  $('#optFast').onclick = () => setFast(!Prefs.fast);
+  $('#optGuide').onclick = () => { Guide.setOn(!Guide.active()); renderOptions(); };
   $('#bHow').onclick = showHelp; $('#bHelp').onclick = showHelp; $('#bLog').onclick = showLog;
   $('#bRoll').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'roll'}); };
   $('#bEnd').onclick = e => { if (!canControl(cur())) return; e.currentTarget.disabled = true; act(S.turn, {k:'end'}); };
@@ -3107,10 +3242,12 @@ function boot(){
   $('#bCam').onclick = e => { autoCam = !autoCam; e.currentTarget.classList.toggle('on', autoCam); if (autoCam) focusCam(cur()); };
   $('#bMenu').onclick = async () => {
     const langRow = `<div class="rowb" style="justify-content:space-between;align-items:center;margin-top:10px"><b>🌐 ${L('Language')}</b><div class="mini-segs" id="mLang"><button data-lang="en" class="${LANG === 'en' ? 'sel' : ''}">English</button><button data-lang="de" class="${LANG === 'de' ? 'sel' : ''}">Deutsch</button></div></div>`;
-    const bindLang = (sheet, done) => sheet.querySelectorAll('#mLang button').forEach(b => b.onclick = () => { switchLanguage(b.dataset.lang); done('lang'); });
+    const fastRow = NET.role === 'guest' ? '' : `<div class="rowb" style="justify-content:space-between;align-items:center;margin-top:8px"><b>⚡ ${L('Fast mode')}</b><div class="mini-segs" id="mFast"><button data-f="0" class="${S.fast ? '' : 'sel'}">${L('Off')}</button><button data-f="1" class="${S.fast ? 'sel' : ''}">${L('On')}</button></div></div>`;
+    const bindLang = (sheet, done) => { sheet.querySelectorAll('#mLang button').forEach(b => b.onclick = () => { switchLanguage(b.dataset.lang); done('lang'); });
+      sheet.querySelectorAll('#mFast button').forEach(b => b.onclick = () => { setFast(b.dataset.f === '1'); done('fast'); }); };
     if (NET.role === 'guest'){ const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('You’re playing on the host’s game. Leaving hands your seat to a CPU.')}</p>${langRow}`, buttons:[{label:L('🚪 Leave game'), value:'leave', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}], onRender:bindLang});
       if (r === 'leave') leaveToMenu(); return; }
-    const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('Your game auto-saves after every turn.')}${NET.role === 'host' ? ' ' + L('Connected devices go back to the lobby.') : ''}</p>${langRow}`, buttons:[{label:L('🆕 New game'), value:'new', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}], onRender:bindLang});
+    const r = await modal({icon:'☰', title:L('Menu'), body:`<p>${L('Your game auto-saves after every turn.')}${NET.role === 'host' ? ' ' + L('Connected devices go back to the lobby.') : ''}</p>${langRow}${fastRow}`, buttons:[{label:L('🆕 New game'), value:'new', kind:'danger'}, {label:L('Keep playing'), value:'no', kind:'primary'}], onRender:bindLang});
     if (r === 'new'){ if (!S.over) save(); showSetup(); } };
   const sc = document.querySelector('a-scene'), ray = new THREE.Raycaster();
   sc.canvas.addEventListener('pointerup', e => {           // tap a tile -> info card (ignored after a drag)
@@ -3227,6 +3364,8 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
       <button data-r="20" class="sel"></button>
       <button data-r="30"></button>
     </div>
+    <div class="lbl" data-i18n>Options</div>
+    <div class="opts"><button class="opt" id="optFast"></button><button class="opt" id="optGuide"></button></div>
     <div class="setup-actions">
       <button class="btn" id="bHow" data-i18n>❓ How to play</button>
       <button class="btn" id="bJoin" data-i18n>📡 Join a friend’s game</button>

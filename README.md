@@ -25,6 +25,8 @@ The web version loads the music separately so the first load is smaller, and cac
 - **Net-worth chart:** the game-over report shows every player's net worth round by round. Hover or tap the chart to see the exact values.
 - **Money lessons built into the rules**: compound interest, side-hustle ventures that earn income, a quiz, surprise "Life Happens" cards, taxes and savings goals. Every game ends with a report card.
 - **English and German:** switch with **EN / DE** on the setup screen (German defaults to euros, and you can pick **$ / €** separately). In multiplayer, every player picks their own language (in the lobby or the ☰ menu) and sees popups, messages and the game log in it; amounts use the host's currency.
+- **⚡ Fast mode:** switch it on at the start screen or in the ☰ menu. Moves and CPU turns run about twice as fast, and simple notices (bills, taxes, quiz answers, Life Happens results) close by themselves after a few seconds — tap one to keep it open. In multiplayer the host's setting applies to everyone.
+- **🧭 First-game guide:** on a device's first game, short tips point at what to tap: rolling, buying a venture, budgeting at Payday, your savings goal, the stock market and trading. Each tip shows once; **Skip guide** turns them off, and the start-screen switch turns them back on to replay.
 - **Auto-save**: the host's device saves the game after every turn.
 - **Sound and music**: real recorded dice, chip, card and coin sounds, fanfares for big moments, and background music in three styles: 🎉 Upbeat, ☕ Calm lo-fi, or 🔀 Mix (the default). Tap 🎵 to pick a style, skip tracks, turn music or sound effects on or off, and change their volume.
 
