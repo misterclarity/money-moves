@@ -1,0 +1,7 @@
+# Search engines only read robots.txt at the root of a domain, so this file
+# takes effect once the game runs on its own domain (see tools/set-site-url.sh).
+User-agent: *
+Allow: /
+Disallow: /money-moves-offline.html
+
+Sitemap: https://misterclarity.github.io/money-moves/sitemap.xml

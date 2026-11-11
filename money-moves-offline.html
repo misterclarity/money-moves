@@ -657,6 +657,8 @@ const GUIDE_STEPS = {
    strings are recorded in window.__mmMissing so tests can catch them. */
 const THREE = AFRAME.THREE;
 const BUILD = window.MM_BUILD || {};
+/** count an anonymous event in the visitor statistics, if switched on (see MM_ANALYTICS in <head>) */
+const track = (name, props) => { try { if (window.mmTrack) window.mmTrack(name, props); } catch(e){} };
 const LOCALE_KEY = 'moneymoves-locale-v1';
 let LANG = 'en', CUR = 'USD', NF = null;
 (() => { try { const s = JSON.parse(localStorage.getItem(LOCALE_KEY) || 'null');
@@ -1109,6 +1111,8 @@ const DE = {
 '▶ Start game':'▶ Spiel starten',
 'Works offline · auto-saves on this device · for play across devices, set a player to <b>📡 Other device</b>':'Funktioniert offline · speichert automatisch auf diesem Gerät · für mehrere Geräte eine Person auf <b>📡 Anderes Gerät</b> stellen',
 '⬇ Download the single-file offline version':'⬇ Offline-Version als einzelne Datei herunterladen',
+'Imprint':'Impressum',
+'Privacy':'Datenschutz',
 '📡 You’re connected! Waiting for the host to start the game…':'📡 Du bist verbunden! Warte, bis der Gastgeber das Spiel startet …',
 'Leave':'Verlassen',
 'Auto camera (follows the player)':'Auto-Kamera (folgt der Spielfigur)',
@@ -2623,6 +2627,7 @@ function gameOver(){
   const ranked = S.players.map(p => ({p, g:grade(p)})).filter(x => !x.p.out).sort((a,b) => b.g.score - a.g.score);
   if (ranked.length) ranked.filter(x => x.g.score === ranked[0].g.score).forEach(x => award(x.p, 'winner'));
   S.over = true; clearSave(); updateUI(); flushState(); bcast({t:'over'}); Sound.win();
+  track('Game finished', {difficulty:S.diff, rounds:S.maxRounds, players:S.players.length});
   showReport(true);
 }
 async function showReport(isHost){
@@ -3142,6 +3147,7 @@ async function startGame(){
   Object.assign(S, { turn:0, round:1, maxRounds:setupRounds, priceLevel:1, gameId:1 + rnd(1e9), lang:LANG, cur:CUR, owners:Array(24).fill(-1), levels:Array(24).fill(0),
     lifeDeck:[], quizDeck:[], log:[], over:false, phase:'busy', tradeCool:{}, hist:[], mkt:newMarket(), fast:Prefs.fast });
   snapHist(0);
+  track('Game start', {difficulty:S.diff, rounds:S.maxRounds, players:S.players.length, cpu:S.players.filter(p => p.cpu).length, remote:S.players.filter(p => p.ctrl === 'remote').length, lang:LANG});
   if (!Object.keys(NET.peers).length && NET.role === 'host') NET.role = null;
   GEN++; sendSeats();
   enterGame(); flushState();
@@ -3151,7 +3157,7 @@ async function startGame(){
 }
 function enterGame(){ $('#setup').classList.add('hidden'); $('#lobby').classList.add('hidden'); $('#ui').classList.remove('hidden');
   spawnTokens(); refreshAllTiles(); rotateTip(); updateUI(); }
-function resume(){ const d = loadSave(); if (!d) return; GEN++; Object.assign(S, d); S.over = false; S.tradeCool = S.tradeCool || {};
+function resume(){ const d = loadSave(); if (!d) return; GEN++; track('Game resume'); Object.assign(S, d); S.over = false; S.tradeCool = S.tradeCool || {};
   S.players.forEach(normPlayer); if (!Array.isArray(S.hist)) S.hist = []; if (!S.mkt) S.mkt = newMarket();
   if (S.lang && (S.lang !== LANG || S.cur !== CUR)) applyLocale(S.lang, S.cur, false);
   S.players.forEach(p => { if (p.ctrl === 'remote' && !(NET.peers[p.rid] && NET.peers[p.rid].open)){ p.ctrl = 'cpu'; p.cpu = true; } });
@@ -3197,7 +3203,7 @@ function setupPWA(){
     setTimeout(() => { if (navigator.onLine && BUILD.audioFiles) Object.values(BUILD.audioFiles).forEach(u => fetch(u).catch(() => {})); }, 15000);
   }).catch(() => {});
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; $('#bInstall').classList.remove('hidden'); });
-  window.addEventListener('appinstalled', () => { installPrompt = null; $('#bInstall').classList.add('hidden'); toast(() => (L('📲 Money Moves is installed!')), 'good'); });
+  window.addEventListener('appinstalled', () => { track('App installed'); installPrompt = null; $('#bInstall').classList.add('hidden'); toast(() => (L('📲 Money Moves is installed!')), 'good'); });
   if (isIOS() && !isStandalone()) $('#bInstall').classList.remove('hidden');
   $('#bInstall').onclick = async () => {
     if (installPrompt){ installPrompt.prompt(); try { await installPrompt.userChoice; } catch(e){} installPrompt = null; $('#bInstall').classList.add('hidden'); return; }
@@ -3217,7 +3223,7 @@ function boot(){
   $('#bAddP').onclick = () => { if (setupRows.length < 4){ const used = setupRows.map(r=>r.shape); setupRows.push({id:newId(), name:['Robo-Rae','Coin Kid','Buck'][setupRows.length-1] || 'CPU', kind:'cpu', shape:[0,1,2,3].find(s=>!used.includes(s)) ?? 3, goal:3}); renderSetup(); } };
   $('#bStart').onclick = () => { Sound.init(); startGame(); };
   $('#bContinue').onclick = () => { Sound.init(); resume(); };
-  $('#bJoin').onclick = () => { Sound.init(); openJoin(); };
+  $('#bJoin').onclick = () => { Sound.init(); track('Join opened'); openJoin(); };
   $('#bLeave').onclick = () => leaveToMenu();
   $('#lobbyLang').querySelectorAll('button').forEach(b => b.onclick = () => switchLanguage(b.dataset.lang));
   $('#bBadges').onclick = showTrophies;
@@ -3368,7 +3374,7 @@ document.addEventListener('DOMContentLoaded', () => { const sc = document.queryS
       <button class="btn hidden" id="bContinue"></button>
       <button class="btn primary" id="bStart" data-i18n>▶ Start game</button>
     </div>
-    <div class="foot"><span data-i18n>Works offline · auto-saves on this device · for play across devices, set a player to <b>📡 Other device</b></span><span id="offlineLink" class="hidden"> · <a href="money-moves-offline.html" download data-i18n>⬇ Download the single-file offline version</a></span></div>
+    <div class="foot"><span data-i18n>Works offline · auto-saves on this device · for play across devices, set a player to <b>📡 Other device</b></span><span id="offlineLink" class="hidden"> · <a href="money-moves-offline.html" download id="offlineDl" data-i18n>⬇ Download the single-file offline version</a></span><br><a href="https://misterclarity.github.io/money-moves/impressum.html" target="_blank" rel="noopener" data-i18n>Imprint</a> · <a href="https://misterclarity.github.io/money-moves/datenschutz.html" target="_blank" rel="noopener" data-i18n>Privacy</a></div>
   </div>
 </div>
 

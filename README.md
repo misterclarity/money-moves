@@ -73,6 +73,28 @@ The host's device runs the game. Guests see the same board and make their own mo
 | `money-moves-offline.html` | The same game as one self-contained file, music included |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Make the site installable and playable offline |
 | `audio/` | Background music |
+| `impressum.html`, `datenschutz.html`, `legal.css` | Imprint and privacy policy (German templates, fill in before going live) |
+| `icons/og-image.jpg` | 1200×630 preview image for shared links |
+| `sitemap.xml`, `robots.txt` | For search engines |
+| `tools/set-site-url.sh` | Switches every absolute link to a new address (own domain) |
+
+## Before promoting the game
+
+1. **Fill in the legal pages.** `impressum.html` and `datenschutz.html` are templates: replace every highlighted placeholder (`<mark>…</mark>`), remove the marks, and have them checked. Both pages are linked from the start screen footer (also in the offline file, as absolute links).
+2. **Link previews** are set up: Open Graph and Twitter tags, a canonical URL and schema.org data in `index.html`, with `icons/og-image.jpg` as the image. Check how a link looks with the [opengraph.xyz](https://www.opengraph.xyz) preview or the LinkedIn Post Inspector after deploying.
+3. **Visitor statistics** are built in but **off**. In `index.html`, find `window.MM_ANALYTICS` and fill in *one* of:
+   - `plausibleDomain`: the site name registered at [plausible.io](https://plausible.io) (EU-hosted, paid), or
+   - `goatcounterCode`: your code at [goatcounter.com](https://www.goatcounter.com) (free for small non-commercial sites).
+
+   Both are cookieless, so no cookie banner is needed. Then keep the matching paragraph in section 5 of `datenschutz.html` and delete the other. Statistics only run on the hosted https site, never in the offline file. Besides page views the game sends anonymous events: `Game start` (difficulty, rounds, number of players, CPU and remote players, language), `Game resume`, `Game finished`, `Join opened`, `App installed`, `Offline download`.
+4. **Own domain:** register a domain, then run
+
+   ```bash
+   tools/set-site-url.sh https://your-domain.example/ --cname
+   ```
+
+   This rewrites the absolute URLs (previews, canonical, sitemap, offline-file links, README) and writes a `CNAME` file. Then set the domain under the repository's **Settings → Pages** and add the DNS records GitHub shows. `robots.txt` only takes effect on your own domain, because search engines read it from the domain root.
+5. **Search engines:** add the site to [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit `sitemap.xml`.
 
 ## Credits: music and sound
 
